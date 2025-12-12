@@ -86,6 +86,55 @@ Esta historia de usuario, aparentemente inocente, esconde uno de los vectores de
 | <a href="#glosario-de-terminos-clave" title="Asociación de sesión a fingerprint de dispositivo">Device Binding</a> (fingerprint hash) | Bloquea replay cross-device; combina identificadores estables del dispositivo. | Binding por IP/Geo | IP móvil es volátil, genera falsos positivos; no previene replay en mismo país/ISP. |
 | <a href="#glosario-de-terminos-clave" title="Serializa refreshes para evitar concurrencia">Queued Interceptor</a> para refresh | Serializa refresh y evita storms de refresh concurrentes; reduce condiciones de carrera. | Refresh ad-hoc por request | Multiplica llamadas /refresh y riesgo de inconsistencias en storage. |
 
+### 3.5 Mini-ADR (Decisión de Arquitectura)
+- Problema: tokens comprometidos con ventana larga y sin detección de reuse.
+- Opciones evaluadas: sliding sessions sin rotación, rotation single-use con device binding, sesiones cortas sin refresh.
+- Decisión: rotation single-use + device binding + revocación remota + BLoC auditable.
+- Consecuencias: mayor complejidad en backend (familia de tokens, invalidación); UX depende de conectividad para revocación.
+- Riesgos aceptados: funcionalidad limitada offline; dependencia de push para logout remoto.
+
+### 3.6 NFRs y objetivos medibles
+| Categoría | Objetivo | Cómo se mide |
+|:----------|:---------|:-------------|
+| Seguridad | 0 incidentes de token reuse/día | Métrica `auth.security.token_reuse` + alerta crítica |
+| Rendimiento | p95 `/auth/refresh` < 500 ms | APM backend + trazas en interceptor |
+| Confiabilidad | Éxito refresh > 99.5% | Métrica `auth.token.refresh_success_rate` |
+| UX | Reintentos de refresh ≤ 1 antes de pedir login | Contador de reintentos en interceptor |
+
+### 3.7 Contratos de API (backend)
+- `POST /auth/login`: `{username, password, device_fingerprint}` → `{access_token, refresh_token, token_family_id, expires_in}`; errores 401 credenciales, 423 dispositivo bloqueado.
+- `POST /auth/refresh`: `{refresh_token, device_fingerprint}` → `{new_access_token, new_refresh_token, token_family_id, expires_in}`; errores 401 inválido, 403 `token_family_revoked`, 429 rate-limit.
+- Política de rate-limit sugerida: 5 req/min por usuario para `/auth/refresh`; manejar `Retry-After`.
+
+### 3.8 Diagrama de flujo (texto)
+```
+App -> Interceptor: Request
+Interceptor: ¿access expira en <30s? sí -> refrescar
+Interceptor -> Backend /auth/refresh {refresh_token, fingerprint}
+Backend: valida familia, invalida refresh anterior, emite nuevo par
+Backend -> Interceptor: {access, refresh}
+Interceptor: reintenta request original
+```
+
+### 3.9 Riesgo → Control → Métrica
+| Riesgo | Control | Métrica/Alerta |
+|:-------|:--------|:---------------|
+| Refresh robado reutilizado | Rotation single-use + invalidar familia | `auth.security.token_reuse` alerta crítica |
+| Refresh storm concurrente | Queued Interceptor | Número de refresh concurrentes (esperado 1) |
+| Root/JB extracción | Detección root/JB y bloqueo | Evento `auth.security.root_detected` |
+| Revocación tardía | TTL corto y push de logout | `auth.session.expired` p95 < 15m |
+
+### 3.10 Plan de verificación (V&V)
+- Unit: interceptor serializa refresh; BLoC registra transiciones.
+- Integration: backend responde `token_family_revoked` → app limpia storage y pide login.
+- Security/manual: backup extraction en Android con `allowBackup=false`; prueba en root/JB bloquea operaciones.
+- Observabilidad: validar que eventos `auth.*` se envían con trazas y atributos (user, device_hash, family_id).
+
+### 3.11 Notas de seguridad TLS y claves
+- Pinning: aplicar certificate/public key pinning (Dio/Native) y rotación coordinada (al menos 2 pines activos).
+- Skew de reloj: tolerancia ±2 min en expiración para evitar falsos 401.
+- Claves backend: rotar claves de firma JWT y revocar familias vinculadas a claves comprometidas; exponer `kid` en header.
+
 <a id="glosario-de-terminos-clave"></a>
 ## Glosario de Términos Clave
 
