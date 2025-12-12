@@ -12,18 +12,20 @@
 
 Este repositorio contiene el contenido del libro **"Maestría Empresarial Móvil"**, una guía exhaustiva de arquitectura Flutter orientada a aplicaciones de **Banca** y **E-commerce** de nivel empresarial.
 
+El contenido está estructurado como **100 casos prácticos** organizados en 10 capítulos, cada uno abordando un escenario real con soluciones arquitectónicas completas.
+
 ### Audiencia Objetivo
 - Desarrolladores Senior
 - Arquitectos de Software
 - Equipos técnicos en Banca (Lulo Bank, Bancolombia, NuBank)
 - Equipos técnicos en E-commerce (MercadoLibre, Amazon, Rappi)
 
-### Propósito
+### Propósito Principal
 Este contenido alimenta una **Base de Conocimiento (RAG)** para un Agente de IA que actúa como **"Líder Técnico"**, capaz de:
-- Guiar decisiones arquitectónicas
-- Recomendar patrones según contexto
-- Proporcionar criterios de aceptación técnicos
-- Sugerir estrategias de testing
+- Guiar decisiones arquitectónicas basadas en casos reales
+- Recomendar patrones según contexto de negocio
+- Proporcionar criterios de aceptación técnicos (TACs) por plataforma
+- Sugerir estrategias de testing específicas
 
 ---
 
@@ -32,13 +34,14 @@ Este contenido alimenta una **Base de Conocimiento (RAG)** para un Agente de IA 
 ```
 maestro-movil/
 ├── README.md                          # Este archivo
+├── CLAUDE.md                          # Contexto para Claude AI
 ├── TABLA_DE_CONTENIDOS.md             # Índice completo de los 100 casos
 ├── capitulos/
-│   ├── 01-seguridad-bancaria/         # Casos 1-10
+│   ├── 01-seguridad-bancaria/         # Casos 1-10  ✅
 │   │   ├── README.md
 │   │   ├── caso-01-token-nunca-expira.md
 │   │   ├── caso-02-biometria-falsificada.md
-│   │   └── ...
+│   │   └── ... (10 casos)
 │   ├── 02-gestion-estado/             # Casos 11-20
 │   ├── 03-rendimiento/                # Casos 21-30
 │   ├── 04-offline-first/              # Casos 31-40
@@ -55,64 +58,89 @@ maestro-movil/
 
 ## Formato de Cada Caso
 
-Cada caso sigue un formato estandarizado optimizado para indexación RAG:
+Cada caso sigue un formato estandarizado de **6 secciones** optimizado para indexación RAG:
 
 ### 0. Metadata para Indexación (AI-Tags)
-- Palabras Clave de Negocio
-- Patrón Técnico
-- Stack Seleccionado
-- Nivel de Criticidad
+| Campo | Descripción |
+|:------|:------------|
+| Palabras Clave de Negocio | Tags para búsqueda semántica |
+| Patrón Técnico | Patrones arquitectónicos aplicados |
+| Stack Seleccionado | Tecnologías específicas usadas |
+| Nivel de Criticidad | Alto / Medio / Bajo |
 
 ### 1. Planteamiento del Problema
-- Escenario de Negocio (Historia de Usuario)
-- Evidencia de Industria (Casos reales documentados)
-- Riesgos (Económico, Técnico, Reputacional)
+- **Escenario de Negocio:** Historia de Usuario que dispara el caso
+- **Evidencia de Industria:** Casos reales documentados (brechas, incidentes, estadísticas)
+- **Riesgos:** Económico, Regulatorio, Técnico, Reputacional
 
 ### 2. Matriz de Soluciones
-| Rol | Solución | Trade-offs |
-|-----|----------|------------|
-| Junior | ... | Por qué falla |
-| Senior | ... | Mejoras y limitaciones |
-| Architect | ... | Solución enterprise |
+
+| Nivel de Madurez | Descripción |
+|:-----------------|:------------|
+| **BAJA** | Solución que falla o es inadecuada (anti-patrón) |
+| **ACEPTABLE** | Cumple mínimos pero tiene limitaciones |
+| **ENTERPRISE** | Solución óptima para banca/e-commerce de alto nivel |
 
 ### 3. Profundización Técnica
-- Capacidades (qué SÍ permite)
-- Restricciones (qué NO permite)
-- Criterios de Selección de herramientas
+- **Capacidades:** Qué SÍ permite la solución
+- **Restricciones Duras:** Qué NO permite (limitaciones técnicas)
+- **Criterios de Selección:** Por qué se eligió cada herramienta
 
 ### 4. Estrategia de Implementación
-- Fase 1: Diseño y Arquitectura
-- Fase 2: Detalles Técnicos de Implementación
-- Fase 3: Observability y Métricas
+- **Justificación del Plan:** Cómo se deriva el plan del análisis del problema
+- **Fase 1: Diseño:** Arquitectura, estructura de carpetas, contratos
+- **Fase 2: Implementación por Plataforma:**
+  - 2.1 Flutter (Cross-Platform)
+  - 2.2 Android — Configuración Nativa
+  - 2.3 iOS — Configuración Nativa
+- **Fase 3: Observability:** Métricas, KPIs, Alertas
 
 ### 5. Criterios de Aceptación Técnicos (TACs)
-Lista de requisitos copiables para Jira/tickets
+Separados por plataforma para claridad:
+- **TACs Flutter (Cross-Platform)**
+- **TACs Android**
+- **TACs iOS**
+- **TACs Backend (Referencia)**
 
 ### 6. Estrategia de Pruebas
-- Stack de Testing
-- Escenarios Críticos Obligatorios
+- **Stack de Testing:** Unit, Integration, E2E, Security
+- **Escenarios Críticos:** Tabla con Plataforma y Tipo de test
 
 ---
 
 ## Stack Tecnológico Cubierto
 
 ### Gestión de Estado
-- **BLoC** - Casos complejos/auditables
-- **Riverpod** - Casos modernos con DI
-- **Cubit** - Casos simples
-- **Provider** - Legados/simples
+| Tecnología | Uso Recomendado |
+|:-----------|:----------------|
+| **BLoC** | Casos complejos con auditoría de transiciones |
+| **Riverpod** | DI moderno, testing con overrides |
+| **Cubit** | Casos simples sin eventos complejos |
+| **Provider** | Legados, estados mínimos |
 
 ### Persistencia
-- **Hive/Isar** - NoSQL rápido
-- **Drift** - Relacional/SQL
-- **Secure Storage** - Tokens y credenciales
-- **SharedPreferences** - Flags simples
+| Tecnología | Uso Recomendado |
+|:-----------|:----------------|
+| **flutter_secure_storage** | Tokens, credenciales (Keychain/Keystore) |
+| **drift** | SQL local con queries complejos |
+| **Hive/Isar** | NoSQL rápido, caching |
+| **SharedPreferences** | Flags simples, preferencias |
 
 ### Networking
-- **Dio** - HTTP con interceptores
-- **GraphQL** - Queries flexibles
-- **gRPC** - Alta performance
-- **WebSockets** - Tiempo real
+| Tecnología | Uso Recomendado |
+|:-----------|:----------------|
+| **Dio** | HTTP con interceptores, retry, logging |
+| **GraphQL** | Queries flexibles, subscriptions |
+| **gRPC** | Alta performance, streaming |
+| **WebSockets** | Tiempo real, chat |
+
+### Seguridad
+| Tecnología | Uso Recomendado |
+|:-----------|:----------------|
+| **local_auth** | Biometría del dispositivo |
+| **Platform Channels** | SDKs nativos (Facetec, Stripe, etc.) |
+| **play_integrity** | Attestation Android |
+| **App Attest** | Attestation iOS |
 
 ---
 
@@ -120,36 +148,75 @@ Lista de requisitos copiables para Jira/tickets
 
 | # | Capítulo | Casos | Estado |
 |:-:|:---------|:-----:|:------:|
-| 1 | Seguridad Bancaria y Gestión de Identidad | 1-10 | ✅ |
-| 2 | Gestión de Estado Compleja | 11-20 | 🔄 |
-| 3 | Optimización de Rendimiento | 21-30 | 📋 |
-| 4 | Estrategias Offline-First | 31-40 | 📋 |
-| 5 | Networking Avanzado | 41-50 | 📋 |
-| 6 | Arquitectura Modular | 51-60 | 📋 |
-| 7 | Integración Nativa | 61-70 | 📋 |
-| 8 | DevOps y CI/CD | 71-80 | 📋 |
-| 9 | Hardware, IoT y Biometría | 81-90 | 📋 |
-| 10 | Migración de Legacy | 91-100 | 📋 |
+| 1 | Seguridad Bancaria y Gestión de Identidad | 1-10 | ✅ Completado |
+| 2 | Gestión de Estado Compleja | 11-20 | 📋 Pendiente |
+| 3 | Optimización de Rendimiento | 21-30 | 📋 Pendiente |
+| 4 | Estrategias Offline-First | 31-40 | 📋 Pendiente |
+| 5 | Networking Avanzado | 41-50 | 📋 Pendiente |
+| 6 | Arquitectura Modular | 51-60 | 📋 Pendiente |
+| 7 | Integración Nativa | 61-70 | 📋 Pendiente |
+| 8 | DevOps y CI/CD | 71-80 | 📋 Pendiente |
+| 9 | Hardware, IoT y Biometría | 81-90 | 📋 Pendiente |
+| 10 | Migración de Legacy | 91-100 | 📋 Pendiente |
 
-**Leyenda:** ✅ Completado | 🔄 En progreso | 📋 Pendiente
+**Leyenda:** ✅ Completado | 📋 Pendiente
 
 ---
 
-## Uso con Agente IA
+## Uso con Agente IA (RAG)
 
-Este contenido está diseñado para ser consumido por un Agente de IA (RAG). Los tags de metadata en cada caso permiten:
+Este contenido está diseñado para ser consumido por un Agente de IA. Los tags de metadata en cada caso permiten búsqueda semántica precisa:
 
 ```
-Usuario: "¿Cómo implemento refresh tokens seguros?"
-Agente: [Busca en metadata: "refresh token", "sesión", "Token Rotation"]
-        → Retorna Caso 1 con solución arquitectónica completa
+Usuario: "¿Cómo implemento refresh tokens seguros en Flutter?"
+Agente: [Busca en metadata: "refresh token", "Token Rotation", "flutter_secure_storage"]
+        → Retorna Caso 1 con:
+          - Solución ENTERPRISE completa
+          - TACs específicos por plataforma (Flutter, Android, iOS)
+          - Escenarios de prueba críticos
 ```
+
+### Ejemplo de Query por Plataforma
+```
+Usuario: "¿Qué configuración necesito en iOS para certificate pinning?"
+Agente: [Busca: "certificate pinning", "iOS", "ATS"]
+        → Retorna Caso 3, sección 2.3 iOS y TACs iOS específicos
+```
+
+---
+
+## Convenciones del Proyecto
+
+### Nomenclatura de Archivos
+- `caso-XX-nombre-descriptivo.md` donde XX es el número del caso
+- Nombres en kebab-case, descriptivos del problema
+
+### Estructura de TACs
+```
+[ ] TAC-X.Y-PLATAFORMA: Descripción del criterio de aceptación.
+```
+Donde:
+- `X` = Número de caso
+- `Y` = Número de TAC dentro del caso
+- `PLATAFORMA` = FLUTTER, ANDROID, IOS, o BACKEND
+
+### Referencias a Casos Reales
+Cada caso incluye al menos 2-3 referencias a:
+- Incidentes de seguridad documentados
+- Estadísticas de industria (Verizon, Kaspersky, ACFE)
+- Normativas (PCI-DSS, GDPR, PSD2, NIST)
 
 ---
 
 ## Contribución
 
-Este es un repositorio privado de contenido propietario. Las contribuciones se manejan internamente.
+Este es un repositorio privado de contenido propietario. Las contribuciones se manejan internamente siguiendo el proceso:
+
+1. Crear rama `feature/caso-XX-descripcion`
+2. Seguir el formato de 6 secciones
+3. Incluir al menos 2 referencias de industria
+4. Separar TACs por plataforma
+5. Pull Request con revisión de arquitectura
 
 ---
 
@@ -160,5 +227,21 @@ Contenido propietario. Todos los derechos reservados.
 ---
 
 **Autor:** Arquitectura de Soluciones - Pragma
-**Versión:** 1.0.0
+**Versión:** 1.1.0
 **Última actualización:** Diciembre 2024
+
+---
+
+## Changelog
+
+### v1.1.0 (Diciembre 2024)
+- Actualizado formato de matriz de soluciones: BAJA/ACEPTABLE/ENTERPRISE
+- Añadida sección "Justificación del Plan" en cada caso
+- Reorganizada Fase 2 por plataforma (Flutter, Android, iOS)
+- TACs ahora separados por plataforma
+- Añadida columna Plataforma en escenarios de prueba
+- Creado CLAUDE.md para contexto del agente
+
+### v1.0.0 (Diciembre 2024)
+- Release inicial con Capítulo 1 completo (10 casos)
+- Tabla de contenidos de 100 casos
