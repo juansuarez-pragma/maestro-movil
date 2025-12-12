@@ -37,11 +37,7 @@ maestro-movil/
 ├── CLAUDE.md                          # Contexto para Claude AI
 ├── TABLA_DE_CONTENIDOS.md             # Índice completo de los 100 casos
 ├── capitulos/
-│   ├── 01-seguridad-bancaria/         # Casos 1-10  ✅
-│   │   ├── README.md
-│   │   ├── caso-01-token-nunca-expira.md
-│   │   ├── caso-02-biometria-falsificada.md
-│   │   └── ... (10 casos)
+│   ├── 01-seguridad-bancaria/         # Casos 1-10
 │   ├── 02-gestion-estado/             # Casos 11-20
 │   ├── 03-rendimiento/                # Casos 21-30
 │   ├── 04-offline-first/              # Casos 31-40
@@ -58,53 +54,13 @@ maestro-movil/
 
 ## Formato de Cada Caso
 
-Cada caso sigue un formato estandarizado de **6 secciones** optimizado para indexación RAG:
-
-### 0. Metadata para Indexación (AI-Tags)
-| Campo | Descripción |
-|:------|:------------|
-| Palabras Clave de Negocio | Tags para búsqueda semántica |
-| Patrón Técnico | Patrones arquitectónicos aplicados |
-| Stack Seleccionado | Tecnologías específicas usadas |
-| Nivel de Criticidad | Alto / Medio / Bajo |
-
-### 1. Planteamiento del Problema
-- **Escenario de Negocio:** Historia de Usuario que dispara el caso
-- **Evidencia de Industria:** Casos reales documentados (brechas, incidentes, estadísticas)
-- **Riesgos:** Económico, Regulatorio, Técnico, Reputacional
-
-### 2. Matriz de Soluciones
-
-| Nivel de Madurez | Descripción |
-|:-----------------|:------------|
-| **BAJA** | Solución que falla o es inadecuada (anti-patrón) |
-| **ACEPTABLE** | Cumple mínimos pero tiene limitaciones |
-| **ENTERPRISE** | Solución óptima para banca/e-commerce de alto nivel |
-
-### 3. Profundización Técnica
-- **Capacidades:** Qué SÍ permite la solución
-- **Restricciones Duras:** Qué NO permite (limitaciones técnicas)
-- **Criterios de Selección:** Por qué se eligió cada herramienta
-
-### 4. Estrategia de Implementación
-- **Justificación del Plan:** Cómo se deriva el plan del análisis del problema
-- **Fase 1: Diseño:** Arquitectura, estructura de carpetas, contratos
-- **Fase 2: Implementación por Plataforma:**
-  - 2.1 Flutter (Cross-Platform)
-  - 2.2 Android — Configuración Nativa
-  - 2.3 iOS — Configuración Nativa
-- **Fase 3: Observability:** Métricas, KPIs, Alertas
-
-### 5. Criterios de Aceptación Técnicos (TACs)
-Separados por plataforma para claridad:
-- **TACs Flutter (Cross-Platform)**
-- **TACs Android**
-- **TACs iOS**
-- **TACs Backend (Referencia)**
-
-### 6. Estrategia de Pruebas
-- **Stack de Testing:** Unit, Integration, E2E, Security
-- **Escenarios Críticos:** Tabla con Plataforma y Tipo de test
+Estructura común optimizada para indexación RAG:
+- **0. Metadata (AI-Tags):** Palabras clave de negocio, patrón técnico, stack, criticidad.
+- **1. Planteamiento del Problema:** Escenario, evidencia de industria, riesgos.
+- **2. Matriz de Soluciones:** BAJA / ACEPTABLE / ENTERPRISE con análisis de trade-offs.
+- **3. Profundización:** Capacidades, límites, criterio de selección.
+- **Glosario de términos clave:** Definiciones con ancla para tooltips internos.
+- **Referencias:** Fuentes externas relevantes.
 
 ---
 
