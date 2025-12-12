@@ -52,13 +52,35 @@ Esta historia de usuario, aparentemente inocente, esconde uno de los vectores de
 
 ## 3. Profundización: Capacidades, Límites y Restricciones
 
-**Esta sección describe la solución ENTERPRISE seleccionada.** El objetivo es minimizar ventana de explotación, habilitar revocación inmediata y garantizar trazabilidad forense.
+**Esta sección describe la solución ENTERPRISE**: rotación single-use de refresh, device binding y revocación remota para minimizar la ventana de explotación y ofrecer trazabilidad forense.
 
-| Dimensión | Detalle Técnico |
-|:----------|:----------------|
-| **Capacidades (SÍ permite)** | Almacenamiento cifrado con HSM (cuando existe) y exclusión de backups. Rotación automática de refresh token (single-use) orquestada por interceptor + BLoC. Binding de token a fingerprint de dispositivo (ANDROID_ID + modelo + instalación hash SHA-256) para prevenir reuso en otro hardware. Logout remoto vía push (FCM/APNS) con limpieza inmediata de storage. Detección de reuso de token por familia (token_family_id) y cierre en cascada. |
-| **Restricciones Duras (NO permite)** | **Offline:** Sin conectividad no se verifica revocación; se mitiga con TTL corto (<15m). **Hardware:** Android API <23 sin HSM obliga a cifrado software. **Keychain:** `first_unlock_this_device` no es “always available”; operaciones críticas antes del primer unlock fallarán. **Backup/Root/JB:** Aunque se excluyen backups, dispositivos rooteados/jailbreakeados pueden extraer datos; se debe bloquear operaciones sensibles ante detección. |
-| **Criterio de Selección (vs alternativas)** | **flutter_secure_storage** sobre Hive/SharedPreferences: usa Keystore/Keychain, evita gestionar claves maestras y cumple requerimientos regulatorios de cifrado en reposo. **Token Rotation** sobre Sliding Session simple: elimina reuso de refresh y reduce impacto de robo. **BLoC** sobre Provider/Riverpod para auth: auditable (eventos y transiciones loggeadas), fácil de instrumentar con tracing y alertas de anomalía. **Device Binding** evita replay cross-device; se descartó solo IP-based binding por volatilidad de redes móviles. |
+### 3.1 Capacidades clave
+- Almacenamiento cifrado con HSM cuando está disponible, excluido de backups.
+- Refresh automático single-use (token rotation) orquestado por interceptor + BLoC auditables.
+- Binding de sesión a fingerprint de dispositivo (ANDROID_ID + modelo + instalación → hash SHA-256) para evitar replay cross-device.
+- Logout remoto vía push (FCM/APNS) con limpieza inmediata de storage y cierre de familia de tokens (`token_family_id`).
+- Registro estructurado de eventos (login, refresh, token_reuse, remote_logout) para detección de anomalías.
+
+### 3.2 Límites y mitigaciones
+
+| Límite / Riesgo | Mitigación |
+|:----------------|:-----------|
+| Sin conectividad no se puede verificar revocación | TTL corto para access (<15m) y refresh (≤7d); bloqueo de operaciones sensibles offline |
+| Android < API 23 sin HSM | Cifrado software; monitorear porcentaje de usuarios legacy y plan de desuso |
+| Keychain `first_unlock_this_device` no disponible antes del primer unlock | Posponer operaciones críticas hasta primer unlock o reintentar con UX clara |
+| Dispositivos rooteados/jailbreak | Bloquear operaciones sensibles al detectar root/JB; alertar seguridad |
+| Reuso de refresh robado | Token rotation single-use + invalidación de toda la familia ante reuse |
+
+### 3.3 Dependencias y supuestos
+- Backend debe emitir `token_family_id` y soportar invalidación de familia completa.
+- Interceptor controla concurrencia de refresh (cola) y expone eventos a BLoC para auditoría.
+- Politica UX: si remote logout llega, se fuerza limpieza de storage y se muestra motivo claro.
+
+### 3.4 Decisiones arquitectónicas (vs alternativas)
+- **flutter_secure_storage** sobre Hive/SharedPreferences: evita gestionar claves maestras y cumple cifrado en reposo exigido por banca.
+- **Token Rotation** sobre sliding session simple: reduce impacto de robo y permite revocación granular.
+- **BLoC** sobre Provider/Riverpod en auth: trazabilidad de eventos y estados para auditoría y observabilidad.
+- **Device Binding** sobre binding por IP/geo: más estable para redes móviles y protege contra replays cross-device.
 
 ## Referencias
 
