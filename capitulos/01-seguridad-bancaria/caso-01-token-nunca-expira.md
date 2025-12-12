@@ -52,11 +52,11 @@ Esta historia de usuario, aparentemente inocente, esconde uno de los vectores de
 
 ## 3. Profundización: Capacidades, Límites y Restricciones
 
-**Esta sección describe la solución ENTERPRISE**: rotación single-use de refresh, device binding y revocación remota para minimizar la ventana de explotación y ofrecer trazabilidad forense.
+**Esta sección describe la solución ENTERPRISE**: <a href="#glosario-de-terminos-clave" title="Emite un refresh nuevo en cada uso e invalida el anterior">Token Rotation</a> single-use, <a href="#glosario-de-terminos-clave" title="Asocia la sesión a un fingerprint del dispositivo">Device Binding</a> y <a href="#glosario-de-terminos-clave" title="Invalidación de sesiones activas desde backend via push">Revocación Remota</a> para minimizar la ventana de explotación y ofrecer trazabilidad forense.
 
 ### 3.1 Capacidades clave
-- Almacenamiento cifrado con HSM cuando está disponible, excluido de backups.
-- Refresh automático single-use (token rotation) orquestado por interceptor + BLoC auditables.
+- Almacenamiento cifrado con <a href="#glosario-de-terminos-clave" title="Hardware Security Module, cifrado respaldado por hardware">HSM</a> cuando está disponible, excluido de backups.
+- Refresh automático single-use (<a href="#glosario-de-terminos-clave" title="Refresh nuevo en cada uso, invalida el anterior">Token Rotation</a>) orquestado por interceptor + BLoC auditables.
 - Binding de sesión a fingerprint de dispositivo (ANDROID_ID + modelo + instalación → hash SHA-256) para evitar replay cross-device.
 - Logout remoto vía push (FCM/APNS) con limpieza inmediata de storage y cierre de familia de tokens (`token_family_id`).
 - Registro estructurado de eventos (login, refresh, token_reuse, remote_logout) para detección de anomalías.
@@ -65,11 +65,11 @@ Esta historia de usuario, aparentemente inocente, esconde uno de los vectores de
 
 | Límite / Riesgo | Mitigación |
 |:----------------|:-----------|
-| Sin conectividad no se puede verificar revocación | TTL corto para access (<15m) y refresh (≤7d); bloqueo de operaciones sensibles offline |
+| Sin conectividad no se puede verificar revocación | <a href="#glosario-de-terminos-clave" title="Tiempo de vida del token">TTL</a> corto para access (<15m) y refresh (≤7d); bloqueo de operaciones sensibles offline |
 | Android < API 23 sin HSM | Cifrado software; monitorear porcentaje de usuarios legacy y plan de desuso |
 | Keychain `first_unlock_this_device` no disponible antes del primer unlock | Posponer operaciones críticas hasta primer unlock o reintentar con UX clara |
-| Dispositivos rooteados/jailbreak | Bloquear operaciones sensibles al detectar root/JB; alertar seguridad |
-| Reuso de refresh robado | Token rotation single-use + invalidación de toda la familia ante reuse |
+| Dispositivos rooteados/jailbreak | Bloquear operaciones sensibles al detectar <a href="#glosario-de-terminos-clave" title="Chequeos de integridad y permisos elevados">Root/JB</a>; alertar seguridad |
+| Reuso de refresh robado | <a href="#glosario-de-terminos-clave" title="Refresh nuevo en cada uso e invalida el anterior">Token Rotation</a> single-use + invalidación de toda la familia ante reuse |
 
 ### 3.3 Dependencias y supuestos
 - Backend debe emitir `token_family_id` y soportar invalidación de familia completa.
@@ -81,10 +81,10 @@ Esta historia de usuario, aparentemente inocente, esconde uno de los vectores de
 | Opción elegida | Por qué se eligió | Alternativa descartada | Por qué no |
 |:---------------|:------------------|:-----------------------|:-----------|
 | flutter_secure_storage (Keychain/Keystore) | Cifrado at-rest respaldado por hardware; evita gestionar claves maestras; alineado con [OWASP MASVS](https://owasp.org/www-project-mobile-security-testing-guide/) y cumplimiento regulatorio. | Hive/SharedPreferences con cifrado propio | Requiere manejar key de cifrado (chicken-egg), mayor superficie de error, sin HSM. |
-| Token Rotation (refresh single-use) | Cierra ventana de reuso; permite invalidar familias completas ante reuse, recomendado por [Auth0 Rotation](https://auth0.com/docs/secure/tokens/refresh-tokens/refresh-token-rotation). | Sliding session sin rotation | Refresh robado sigue siendo válido hasta expirar; no detecta reuse. |
+| <a href="#glosario-de-terminos-clave" title="Refresh nuevo en cada uso e invalida el anterior">Token Rotation</a> (refresh single-use) | Cierra ventana de reuso; permite invalidar familias completas ante reuse, recomendado por [Auth0 Rotation](https://auth0.com/docs/secure/tokens/refresh-tokens/refresh-token-rotation). | Sliding session sin rotation | Refresh robado sigue siendo válido hasta expirar; no detecta reuse. |
 | BLoC para auth | Estados y eventos auditables; fácil instrumentación con logging/tracing; separación clara de UI/negocio. | Provider/Riverpod para auth | Menor trazabilidad de transiciones; patrones más acoplados a UI. |
-| Device Binding (fingerprint hash) | Bloquea replay cross-device; combina identificadores estables del dispositivo. | Binding por IP/Geo | IP móvil es volátil, genera falsos positivos; no previene replay en mismo país/ISP. |
-| Queued Interceptor para refresh | Serializa refresh y evita storms de refresh concurrentes; reduce condiciones de carrera. | Refresh ad-hoc por request | Multiplica llamadas /refresh y riesgo de inconsistencias en storage. |
+| <a href="#glosario-de-terminos-clave" title="Asociación de sesión a fingerprint de dispositivo">Device Binding</a> (fingerprint hash) | Bloquea replay cross-device; combina identificadores estables del dispositivo. | Binding por IP/Geo | IP móvil es volátil, genera falsos positivos; no previene replay en mismo país/ISP. |
+| <a href="#glosario-de-terminos-clave" title="Serializa refreshes para evitar concurrencia">Queued Interceptor</a> para refresh | Serializa refresh y evita storms de refresh concurrentes; reduce condiciones de carrera. | Refresh ad-hoc por request | Multiplica llamadas /refresh y riesgo de inconsistencias en storage. |
 
 ## Glosario de Términos Clave
 
