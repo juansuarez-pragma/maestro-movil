@@ -86,6 +86,7 @@ Esta historia de usuario, aparentemente inocente, esconde uno de los vectores de
 | <a href="#glosario-de-terminos-clave" title="Asociación de sesión a fingerprint de dispositivo">Device Binding</a> (fingerprint hash) | Bloquea replay cross-device; combina identificadores estables del dispositivo. | Binding por IP/Geo | IP móvil es volátil, genera falsos positivos; no previene replay en mismo país/ISP. |
 | <a href="#glosario-de-terminos-clave" title="Serializa refreshes para evitar concurrencia">Queued Interceptor</a> para refresh | Serializa refresh y evita storms de refresh concurrentes; reduce condiciones de carrera. | Refresh ad-hoc por request | Multiplica llamadas /refresh y riesgo de inconsistencias en storage. |
 
+<a id="glosario-de-terminos-clave"></a>
 ## Glosario de Términos Clave
 
 | Término | Definición breve |
