@@ -121,12 +121,16 @@
 ---
 
 ## 4. Impacto esperado (vista rápida)
-- Tasa de spoof detectado > 99% en PAD 2D/3D; falsos positivos (FAR) < 0.1%.
-- Tiempo de verificación biométrica p95 < 10 s; reintentos promedio ≤ 1.
-- Reducción de fraude en onboarding/credit approvals: meta ↓ incidents en ≥ 80% vs baseline.
-- Tickets de soporte por fallas de biometría ↓ 25% en 4 semanas post-rollout.
-- % de sesiones aprobadas sin PAD (alerta si > 0) → control de exposición.
-- Incidentes/1M verificaciones: deepfake/spoof aceptado (meta 0) → tolerancia cero a ataques de presentación.
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Detección de spoof (PAD 2D/3D) | > 99% | FAR < 0.1% | Minimiza fraude por fotos/máscaras/deepfakes |
+| Tiempo de verificación p95 | < 10 s | Alerta si supera meta | UX ágil; menos abandonos |
+| Reintentos promedio | ≤ 1 | Alerta si > 1 | Reduce fricción y soporte |
+| % sesiones aprobadas sin PAD | 0 | Alerta si > 0 | Elimina exposiciones por flujo débil |
+| Incidentes/1M verificaciones (deepfake/spoof aceptado) | 0 | Cualquier > 0 es crítico | Tolerancia cero a ataques de presentación |
+| Reducción de fraude en onboarding/crédito | ≥ 80% vs baseline | Alertar si no mejora tras rollout | Beneficio de negocio tangible |
+| Tickets por fallas de biometría | ↓ 25% en 4 semanas | Alertar si no baja | Mejora NPS y costo operativo |
 
 ---
 

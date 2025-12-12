@@ -124,12 +124,15 @@ Config firmada (remota): rota pins cada 90 días; backup pin siempre presente
 ---
 
 ## 4. Impacto esperado
-- Bloqueo de MITM: > 99.9% de sesiones con pin match; alertas en mismatches enviadas al SOC.
-- Disponibilidad: cero caídas por rotación de cert si se mantiene ≥2 SPKI activos; ventana de rotación controlada < 24 h.
-- Rendimiento: handshake TLS p95 < 500 ms; overhead de pinning < 30 ms.
-- Seguridad operacional: intentos de proxying detectados en < 5 s y enviados a SIEM con huella del cert.
-- Cobertura de pinning: 100% de endpoints críticos; alertar si mismatches > 0.1%.
-- Eventos `pinning.blocked` por dispositivo/hora (alerta si >3) → detección de MITM/debug indebido.
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Bloqueo de MITM (pin match) | > 99.9% de sesiones | Alertar mismatches > 0.1% | Tráfico protegido contra CA/propios maliciosos |
+| Disponibilidad en rotación | 0 caídas; ventana < 24 h con ≥2 SPKI | Alerta si pin faltante o caída por rotación | Continuidad del servicio al rotar cert/keys |
+| Rendimiento handshake TLS | p95 < 500 ms; overhead pinning < 30 ms | Warning si se acerca al límite | UX sin latencia extra notable |
+| Eventos `pinning.blocked` | ≤ 3 por dispositivo/hora | Alerta si > 3 | Detección de MITM/debug indebido |
+| Cobertura de pinning | 100% de endpoints críticos | Alerta si endpoint sin pinning | Cierra superficie de ataque en APIs sensibles |
+| Detección proxy/root/JB | Eventos con huella de cert y motivo | Alerta inmediata a SOC | Respuesta rápida ante ataques/interceptores |
 
 ---
 
