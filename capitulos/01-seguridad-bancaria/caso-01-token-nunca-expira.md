@@ -82,6 +82,20 @@ Esta historia de usuario, aparentemente inocente, esconde uno de los vectores de
 - **BLoC** sobre Provider/Riverpod en auth: trazabilidad de eventos y estados para auditoría y observabilidad.
 - **Device Binding** sobre binding por IP/geo: más estable para redes móviles y protege contra replays cross-device.
 
+## Glosario de Términos Clave
+
+| Término | Definición breve |
+|:--------|:-----------------|
+| Token Rotation | Emisión de un nuevo refresh token en cada uso e invalidación del anterior para evitar reuso. |
+| Token Family | Identificador (`token_family_id`) que agrupa la cadena de refresh; permite revocar toda la familia ante reuse. |
+| Device Binding | Asociación del token a un fingerprint de dispositivo (ANDROID_ID + modelo + instalación hasheados). |
+| Refresh Token Single-Use | Política que marca un refresh token como consumido tras usarse una vez. |
+| Revocación Remota | Invalida sesiones activas desde backend y notifica por push para limpiar storage local. |
+| HSM | Hardware Security Module; provee cifrado respaldado por hardware (Keystore/Keychain). |
+| TTL | Tiempo de vida del token; en esta solución: access <15m, refresh ≤7d. |
+| Queued Interceptor | Patrón para serializar refresh de tokens y evitar múltiples refreshes concurrentes. |
+| Root/Jailbreak Detection | Controles para bloquear operaciones sensibles en dispositivos comprometidos. |
+
 ## Referencias
 
 - [OWASP Mobile Security Testing Guide - Session Management](https://owasp.org/www-project-mobile-security-testing-guide/)
