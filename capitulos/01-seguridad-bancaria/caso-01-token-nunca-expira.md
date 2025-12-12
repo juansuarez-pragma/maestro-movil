@@ -169,15 +169,18 @@ App -> Interceptor: recibe push, limpia storage y fuerza AuthLogout
 | Claves backend | JWKS con `kid`, RS256/ES256, rotación con solapamiento | Revocar familias asociadas a claves comprometidas |
 
 ## 4. Impacto esperado (vista rápida)
-- 0 incidentes de token reuse/día (alerta crítica si >0) → reduce fraude y riesgo regulatorio.
-- p95 de `/auth/refresh` < 500 ms (warning ≥ 650 ms; crítico ≥ 800 ms) → UX fluida.
-- Éxito de refresh > 99.5% (rolling 7d; alerta si <99.5% por 5 min) → confiabilidad de sesión.
-- Tickets de soporte por “sesión perdida” ↓ 30% en 4 semanas post-rollout → eficiencia operativa y mejor NPS.
-- % de sesiones activas > 24h / 7d / 30d (alerta si >5% a 30d) → exposición controlada.
-- % de refresh tokens reutilizados (>1 uso) por device_id (alerta si >0.5%) → detección temprana de reuse.
-- Incidentes/1M sesiones: accesos desde IP/ASN anómala con token válido (meta <5) → anomalías contenidas.
-- Device swap con mismo token (user_id igual, device_fingerprint distinto) <0.1% → evita replay cross-device.
-- Duración de sesión p95 < 24h; p99 < 7d → ventana de ataque acotada.
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Reuse de token | 0 incidentes/día | Crítica si > 0 | Fraude contenido y cumplimiento regulatorio |
+| `/auth/refresh` p95 | < 500 ms | Warning ≥ 650 ms; crítica ≥ 800 ms | UX fluida y sin timeouts |
+| Éxito de refresh | > 99.5% (rolling 7d) | Alerta si < 99.5% por 5 min | Sesiones confiables y estables |
+| Tickets “sesión perdida” | ↓ 30% en 4 semanas | Alertar si no baja tras el release | Menos soporte y mejor NPS |
+| Sesiones activas > 30d | < 5% | Alerta si ≥ 5% | Ventana de exposición acotada |
+| Reuse de refresh por device_id | < 0.5% | Alerta si ≥ 0.5% | Detección temprana de reuse |
+| Incidentes con token válido (IP/ASN anómala) | < 5 por 1M sesiones | Alerta si ≥ 5 | Anomalías contenidas |
+| Device swap con mismo token | < 0.1% | Alerta si ≥ 0.1% | Replay cross-device mitigado |
+| Duración de sesión | p95 < 24h; p99 < 7d | Alerta si supera metas | Ventana de ataque limitada |
 
 <a id="glosario-de-terminos-clave"></a>
 ## Glosario de Términos Clave
