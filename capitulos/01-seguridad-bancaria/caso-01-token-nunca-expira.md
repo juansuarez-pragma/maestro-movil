@@ -16,11 +16,13 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
-### Escenario de Negocio y caso problema
+### Problema detectado (técnico)
+Tokens de acceso y refresh con TTL extendido y sin rotación permitieron sesiones persistentes (“sesiones zombis”) imposibles de revocar de forma selectiva. La ausencia de device binding y de revocación remota impidió cortar el uso indebido de credenciales comprometidas, elevando el riesgo de fraude y exposición regulatoria.
 
+### Escenario de negocio que lo gatilló
 > *"Como usuario de banca móvil, quiero mantener mi sesión iniciada para no tener que autenticarme cada vez que abro la app."*
 
-Caso que disparó el requerimiento: un usuario perdió su teléfono; el atacante mantuvo la sesión activa porque el token no expiraba ni rotaba. Durante la noche se ejecutaron transferencias fraudulentas (> $2.4M). Sin revocación ni trazabilidad, el banco no pudo cortar la “sesión zombi” ni auditar a tiempo, elevando reclamos, churn y riesgo PSD2/SCA. El negocio pidió mantener la conveniencia (sesión persistente) sin abrir esta ventana de fraude.
+En producción, un usuario perdió su teléfono; el atacante mantuvo la sesión activa porque el token no expiraba ni rotaba. Durante la noche se ejecutaron transferencias fraudulentas (> $2.4M). Sin trazabilidad ni rotación, el banco no pudo auditar ni cerrar la “sesión zombi”, disparando reclamos, churn y riesgo PSD2/SCA. El requerimiento de negocio: conservar la conveniencia (sesión persistente) pero con controles que eviten esta ventana de fraude.
 
 ### Evidencia de Industria
 
