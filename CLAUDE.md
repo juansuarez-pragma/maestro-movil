@@ -34,89 +34,22 @@ maestro-movil/
 
 ## Formato Obligatorio de Cada Caso
 
-Cada archivo `caso-XX-*.md` DEBE seguir esta estructura de **6 secciones**:
+Cada archivo `caso-XX-*.md` DEBE seguir esta estructura (agnóstica y sin código):
 
-### Sección 0: Metadata para Indexación (AI-Tags)
-```markdown
-| Campo | Valor |
-|:------|:------|
-| **Palabras Clave de Negocio** | tags, separados, por, comas |
-| **Patrón Técnico** | Nombre del patrón |
-| **Stack Seleccionado** | tecnología1 + tecnología2 + GestorEstado |
-| **Nivel de Criticidad** | Alto / Medio / Bajo |
-```
+- **Sección 0: Metadata para Indexación (AI-Tags)**
+  - Palabras Clave de Negocio, Patrón Técnico, Stack Seleccionado, Nivel de Criticidad.
+- **Sección 1: Planteamiento del Problema (El "Trigger")**
+  - Escenario de negocio (quote), evidencia de industria, riesgos (tabla).
+- **Sección 2: Matriz de Soluciones y Selección de Herramientas**
+  - BAJA / ACEPTABLE / ENTERPRISE con trade-offs (NO usar “junior/senior/architect”).
+- **Sección 3: Profundización**
+  - Tabla de Capacidades (SÍ), Restricciones Duras (NO), Criterio de Selección.
+- **Glosario de Términos Clave**
+  - Tabla con definiciones y ancla `#glosario-de-terminos-clave` para tooltips internos.
+- **Referencias**
+  - Fuentes externas relevantes.
 
-### Sección 1: Planteamiento del Problema (El "Trigger")
-- **Escenario de Negocio:** Historia de usuario en formato quote
-- **Evidencia de Industria:** 2-3 casos reales con fechas y datos
-- **Riesgos:** Tabla con tipos (Económico, Regulatorio, Reputacional, etc.)
-
-### Sección 2: Matriz de Soluciones y Selección de Herramientas
-
-| Nivel de Madurez | Solución y Herramienta | Análisis de Decisión (Trade-offs) |
-|:-----------------|:-----------------------|:----------------------------------|
-| **BAJA** | Solución inadecuada | Por qué falla |
-| **ACEPTABLE** | Solución mínima | Cumple pero tiene limitaciones |
-| **ENTERPRISE** | Solución óptima | Por qué es la mejor para banca/e-commerce |
-
-**IMPORTANTE:** NO usar "Junior/Senior/Architect". Usar BAJA/ACEPTABLE/ENTERPRISE.
-
-### Sección 3: Profundización: Capacidades, Límites y Restricciones
-Tabla con:
-- **Capacidades (SÍ permite)**
-- **Restricciones Duras (NO permite)**
-- **Criterio de Selección** (por qué cada herramienta)
-
-### Sección 4: Manos a la Obra: Estrategia de Implementación
-
-#### REGLA "NO-CODE" (OBLIGATORIO)
-
-En la Sección 4, **ESTÁ PROHIBIDO** escribir bloques de código de implementación (ni Dart, ni Kotlin, ni Swift).
-
-**En su lugar, DEBES usar:**
-
-1. **Tablas de Definición de Componentes y Responsabilidades**
-   ```markdown
-   | Capa | Componente | Responsabilidad |
-   |:-----|:-----------|:----------------|
-   | Data | AuthLocalDataSource | Persistencia segura de tokens... |
-   ```
-
-2. **Descripciones algorítmicas paso a paso (Lógica de negocio)**
-   ```markdown
-   ##### Algoritmo: TokenRefreshInterceptor
-
-   **Propósito:** Manejar automáticamente la expiración de tokens...
-
-   **Lógica paso a paso:**
-   1. **onRequest:** SI la ruta está en lista de exclusión → continuar...
-   2. **onError:** SI código es 401 → intentar refresh...
-   ```
-
-3. **Tablas de Contratos de Datos (Atributos y Reglas)**
-   ```markdown
-   | Atributo | Tipo | Descripción | Reglas de Validación |
-   |:---------|:-----|:------------|:---------------------|
-   | access_token | String (JWT) | Token de acceso | TTL máximo: 15 min |
-   ```
-
-4. **Sugerencias de Diagramas visuales usando el formato:**
-   ```markdown
-   #### Diagrama Sugerido: [Nombre del Diagrama]
-
-   [DIAGRAMA DE {SECUENCIA|FLUJO|COMPONENTES|ESTADOS}]
-
-   Título: ...
-   Participantes: ...
-   Flujo Principal: ...
-   Flujo Alternativo: ...
-   ```
-
-**Objetivo:** Crear una arquitectura de referencia **agnóstica al lenguaje** que pueda ser implementada en cualquier stack tecnológico.
-
----
-
-**DEBE incluir:**
+**Regla NO-CODE (se mantiene):** No incluir bloques de código de implementación (Dart/Kotlin/Swift). Usa tablas, descripciones paso a paso, contratos de datos y diagramas sugeridos si aplica.
 
 1. **Justificación del Plan** (OBLIGATORIO)
    - Explicar cómo se deriva el plan del análisis del problema
