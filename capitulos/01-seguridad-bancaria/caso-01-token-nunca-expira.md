@@ -16,11 +16,11 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
-### Escenario de Negocio
+### Escenario de Negocio y caso problema
 
 > *"Como usuario de banca móvil, quiero mantener mi sesión iniciada para no tener que autenticarme cada vez que abro la app."*
 
-Esta historia de usuario, aparentemente inocente, esconde uno de los vectores de ataque más explotados en aplicaciones financieras: la gestión inadecuada del ciclo de vida de tokens.
+Caso que disparó el requerimiento: un usuario perdió su teléfono; el atacante mantuvo la sesión activa porque el token no expiraba ni rotaba. Durante la noche se ejecutaron transferencias fraudulentas (> $2.4M). Sin revocación ni trazabilidad, el banco no pudo cortar la “sesión zombi” ni auditar a tiempo, elevando reclamos, churn y riesgo PSD2/SCA. El negocio pidió mantener la conveniencia (sesión persistente) sin abrir esta ventana de fraude.
 
 ### Evidencia de Industria
 
