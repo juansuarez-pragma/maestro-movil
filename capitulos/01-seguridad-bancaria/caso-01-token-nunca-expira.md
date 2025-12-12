@@ -42,11 +42,11 @@ Esta historia de usuario, aparentemente inocente, esconde uno de los vectores de
 
 ## 2. Matriz de Soluciones y Selección de Herramientas
 
-| Rol | Solución y Herramienta | Análisis de Decisión (Trade-offs) |
-|:----|:-----------------------|:----------------------------------|
-| **Junior** | `SharedPreferences` para guardar el token, sin expiración, refresh manual cuando falla una request | **FALLA:** Tokens en texto plano accesibles via backup de Android, sin rotación automática, vulnerable a replay attacks. No detecta dispositivos rooteados. Un atacante con acceso físico al dispositivo extrae el token en 30 segundos con `adb backup`. |
-| **Senior** | `flutter_secure_storage` + token con TTL de 15 min + refresh token con TTL de 7 días + interceptor Dio para auto-refresh | **MEJORA:** Cifrado AES-256 en Keychain/Keystore, automatización del refresh, pero carece de: rotación de refresh tokens, detección de anomalías, logout remoto. Un token robado tiene ventana de 7 días. |
-| **Architect** | `flutter_secure_storage` + **Token Rotation** (nuevo refresh token en cada uso) + **BLoC para estado de auth** + Device Binding + Anomaly Detection + Remote Revocation via FCM | **ENTERPRISE:** Cada refresh genera nuevo refresh token e invalida el anterior. Vinculación dispositivo-token. Detección de uso simultáneo en múltiples dispositivos. Capacidad de logout remoto instantáneo. Cumple PSD2/SCA. |
+| Nivel de Madurez | Solución y Herramienta | Análisis de Decisión (Trade-offs) |
+|:-----------------|:-----------------------|:----------------------------------|
+| **BAJA** | `SharedPreferences` para guardar el token, sin expiración, refresh manual cuando falla una request | **INADECUADO:** Tokens en texto plano accesibles via backup de Android, sin rotación automática, vulnerable a replay attacks. No detecta dispositivos rooteados. Un atacante con acceso físico al dispositivo extrae el token en 30 segundos con `adb backup`. |
+| **ACEPTABLE** | `flutter_secure_storage` + token con TTL de 15 min + refresh token con TTL de 7 días + interceptor Dio para auto-refresh | **CUMPLE MÍNIMOS:** Cifrado AES-256 en Keychain/Keystore, automatización del refresh, pero carece de: rotación de refresh tokens, detección de anomalías, logout remoto. Un token robado tiene ventana de 7 días. |
+| **ENTERPRISE** | `flutter_secure_storage` + **Token Rotation** (nuevo refresh token en cada uso) + **BLoC para estado de auth** + Device Binding + Anomaly Detection + Remote Revocation via FCM | **ÓPTIMO PARA BANCA:** Cada refresh genera nuevo refresh token e invalida el anterior. Vinculación dispositivo-token. Detección de uso simultáneo en múltiples dispositivos. Capacidad de logout remoto instantáneo. Cumple PSD2/SCA. |
 
 ---
 
@@ -62,6 +62,19 @@ Esta historia de usuario, aparentemente inocente, esconde uno de los vectores de
 
 ## 4. Manos a la Obra: Estrategia de Implementación
 
+### Justificación del Plan
+
+La estrategia de implementación se deriva directamente de los requisitos de seguridad identificados en la matriz de soluciones nivel **ENTERPRISE**. El análisis de los casos de Revolut y Capital One revela que las brechas ocurrieron por:
+
+1. **Tokens de larga duración sin rotación** → Implementamos Token Rotation
+2. **Falta de binding dispositivo-sesión** → Implementamos Device Fingerprinting
+3. **Imposibilidad de invalidar sesiones remotamente** → Implementamos Remote Revocation via FCM
+4. **Ausencia de detección de anomalías** → Implementamos logging estructurado para análisis
+
+La arquitectura propuesta sigue Clean Architecture para facilitar testing y mantenibilidad, con BLoC como gestor de estado por su capacidad de auditoría de transiciones.
+
+---
+
 ### Fase 1: Diseño — Contratos y Arquitectura
 
 **Estructura de Carpetas Recomendada:**
@@ -72,8 +85,8 @@ lib/
 │   ├── auth/
 │   │   ├── data/
 │   │   │   ├── datasources/
-│   │   │   │   ├── auth_local_datasource.dart      # Secure Storage
-│   │   │   │   └── auth_remote_datasource.dart     # API calls
+│   │   │   │   ├── auth_local_datasource.dart
+│   │   │   │   └── auth_remote_datasource.dart
 │   │   │   ├── models/
 │   │   │   │   ├── token_pair_model.dart
 │   │   │   │   └── device_info_model.dart
@@ -105,12 +118,14 @@ lib/
 - `token_family_id`: Identificador de familia para detectar reuso
 - `device_bound`: Boolean indicando si está vinculado a dispositivo
 
-### Fase 2: Implementación — Detalles Técnicos
+---
+
+### Fase 2: Implementación por Plataforma
+
+#### 2.1 Flutter (Cross-Platform) — Capa de Aplicación
 
 **AuthLocalDataSource:**
-- Configurar `FlutterSecureStorage` con opciones de seguridad máxima
-- Android: `encryptedSharedPreferences: true`, `preferencesKeyPrefix` único
-- iOS: `KeychainAccessibility.first_unlock_this_device` para balance seguridad/usabilidad
+- Configurar `FlutterSecureStorage` con opciones de seguridad máxima por plataforma
 - Implementar métodos: `saveTokenPair`, `getTokenPair`, `clearTokens`, `getDeviceFingerprint`
 - Usar `Future.wait` para operaciones paralelas de lectura/escritura
 
@@ -120,17 +135,58 @@ lib/
 - El estado `AuthAuthenticated` debe incluir `session` y `authenticatedAt` para tracking
 
 **TokenRefreshInterceptor (QueuedInterceptor):**
-- Extender `QueuedInterceptor` para manejar requests concurrentes durante refresh
+- Extender `QueuedInterceptor` de Dio para manejar requests concurrentes durante refresh
 - Mantener `Completer` para evitar múltiples refreshes simultáneos
 - Refresh proactivo cuando access token tiene < 30 segundos de vida
 - En `onError` con 401: intentar refresh y retry de request original
 - Excluir rutas de auth del interceptor (`/auth/login`, `/auth/refresh`)
 
-**Device Fingerprint:**
-- Combinar: ANDROID_ID (Android) / identifierForVendor (iOS)
-- Modelo de dispositivo
-- ID de instalación único (generado en primer launch)
-- Hash SHA-256 del conjunto para privacidad
+---
+
+#### 2.2 Android — Configuración Nativa
+
+**Configuración de flutter_secure_storage:**
+```
+AndroidOptions(
+  encryptedSharedPreferences: true,
+  sharedPreferencesName: 'secure_auth_prefs',
+  preferencesKeyPrefix: 'auth_',
+)
+```
+
+**Device Fingerprint Android:**
+- Obtener `ANDROID_ID` via `Settings.Secure`
+- Combinar con `Build.MODEL`, `Build.MANUFACTURER`
+- Hash SHA-256 del conjunto
+
+**Consideraciones Android:**
+- API 23+ requerido para KeyStore respaldado por hardware
+- Configurar `android:allowBackup="false"` en AndroidManifest
+- EncryptedSharedPreferences usa AES-256-GCM
+
+---
+
+#### 2.3 iOS — Configuración Nativa
+
+**Configuración de flutter_secure_storage:**
+```
+IOSOptions(
+  accessibility: KeychainAccessibility.first_unlock_this_device,
+  accountName: 'com.bank.app.auth',
+)
+```
+
+**Device Fingerprint iOS:**
+- Obtener `identifierForVendor` via UIDevice
+- Combinar con modelo de dispositivo
+- Hash SHA-256 del conjunto
+
+**Consideraciones iOS:**
+- Keychain persiste entre reinstalaciones (considerar cleanup)
+- `first_unlock_this_device` balancea seguridad y usabilidad
+- Datos NO se sincronizan a iCloud con esta configuración
+
+---
 
 ### Fase 3: Observability — Métricas y Alertas
 
@@ -155,36 +211,74 @@ lib/
 
 ## 5. Salida para el Agente: Criterios de Aceptación Técnicos (TACs)
 
-```
-[ ] TAC-1.1: Los tokens DEBEN almacenarse exclusivamente usando flutter_secure_storage
-    con configuración de seguridad máxima para cada plataforma.
+### TACs Flutter (Cross-Platform)
 
-[ ] TAC-1.2: El access token DEBE tener TTL máximo de 15 minutos.
+```
+[ ] TAC-1.1-FLUTTER: Los tokens DEBEN almacenarse usando flutter_secure_storage,
+    NUNCA SharedPreferences ni Hive sin cifrado.
+
+[ ] TAC-1.2-FLUTTER: El access token DEBE tener TTL máximo de 15 minutos.
     El refresh token DEBE tener TTL máximo de 7 días.
 
-[ ] TAC-1.3: DEBE implementarse Token Rotation: cada refresh exitoso genera nuevo
-    refresh token e invalida el anterior.
+[ ] TAC-1.3-FLUTTER: DEBE implementarse Token Rotation: cada refresh exitoso
+    genera nuevo refresh token e invalida el anterior en el backend.
 
-[ ] TAC-1.4: El sistema DEBE detectar y rechazar tokens de familia ya revocada
-    (token reuse attack), forzando logout completo.
+[ ] TAC-1.4-FLUTTER: El sistema DEBE detectar token_family_revoked del backend
+    y forzar logout completo limpiando storage local.
 
-[ ] TAC-1.5: El interceptor de Dio DEBE realizar refresh proactivo cuando
-    access token tenga < 30 segundos de vida.
+[ ] TAC-1.5-FLUTTER: El TokenRefreshInterceptor DEBE usar QueuedInterceptor
+    para evitar múltiples refreshes simultáneos.
 
-[ ] TAC-1.6: DEBE existir mecanismo de logout remoto via FCM/Push que invalide
-    sesiones en < 5 segundos.
+[ ] TAC-1.6-FLUTTER: DEBE implementarse refresh proactivo cuando access token
+    tenga < 30 segundos de vida restante.
+```
 
-[ ] TAC-1.7: Cada evento de autenticación DEBE generar log de auditoría con:
-    timestamp, device_fingerprint, ip_address, resultado, session_family_id.
+### TACs Android
 
-[ ] TAC-1.8: El tiempo de respuesta del endpoint /auth/refresh NO DEBE superar
+```
+[ ] TAC-1.7-ANDROID: flutter_secure_storage DEBE configurarse con
+    encryptedSharedPreferences: true (requiere API 23+).
+
+[ ] TAC-1.8-ANDROID: El AndroidManifest DEBE incluir android:allowBackup="false"
+    para prevenir extracción de datos via adb backup.
+
+[ ] TAC-1.9-ANDROID: El Device Fingerprint DEBE incluir ANDROID_ID + Build.MODEL
+    hasheados con SHA-256.
+
+[ ] TAC-1.10-ANDROID: La app DEBE verificar si el dispositivo está rooteado
+    usando checks de /system/bin/su y build tags antes de operaciones sensibles.
+```
+
+### TACs iOS
+
+```
+[ ] TAC-1.11-IOS: flutter_secure_storage DEBE configurarse con
+    KeychainAccessibility.first_unlock_this_device.
+
+[ ] TAC-1.12-IOS: Los tokens NO DEBEN sincronizarse a iCloud
+    (configuración por defecto con first_unlock_this_device).
+
+[ ] TAC-1.13-IOS: El Device Fingerprint DEBE usar identifierForVendor + modelo,
+    hasheados con SHA-256.
+
+[ ] TAC-1.14-IOS: DEBE considerarse limpiar Keychain en primera instalación
+    para evitar tokens huérfanos de instalaciones previas.
+```
+
+### TACs Backend (Referencia)
+
+```
+[ ] TAC-1.15-BACKEND: El endpoint /auth/refresh DEBE retornar nuevo refresh_token
+    en cada llamada exitosa e invalidar el anterior.
+
+[ ] TAC-1.16-BACKEND: DEBE implementarse detección de token reuse: si un refresh
+    token ya usado se presenta, invalidar toda la familia de tokens.
+
+[ ] TAC-1.17-BACKEND: DEBE existir endpoint para logout remoto que invalide
+    sesiones específicas o todas las sesiones de un usuario.
+
+[ ] TAC-1.18-BACKEND: El tiempo de respuesta de /auth/refresh NO DEBE superar
     500ms en p95.
-
-[ ] TAC-1.9: DEBE implementarse device binding: tokens vinculados a fingerprint
-    de dispositivo.
-
-[ ] TAC-1.10: La aplicación DEBE limpiar TODOS los tokens locales cuando detecta
-    dispositivo rooteado/jailbroken.
 ```
 
 ---
@@ -198,11 +292,13 @@ lib/
 
 ### Escenarios Críticos Obligatorios
 
-| # | Escenario | Qué Validar | Tipo |
-|:-:|:----------|:------------|:-----|
-| 1 | **Refresh token expirado en background** | Al volver a foreground: detectar expiración, limpiar storage, redirigir a login SIN crash. No intentar refresh infinito. | Integration |
-| 2 | **Token reuse attack** | Cuando backend responde `token_family_revoked`: limpiar tokens, enviar evento seguridad, mostrar mensaje claro, NO permitir retry. | Unit + Integration |
-| 3 | **Múltiples requests con token expirado** | Solo UNA request de refresh debe ejecutarse. Las demás esperan. Si falla, todas fallan consistentemente. | Unit (QueuedInterceptor) |
+| # | Escenario | Qué Validar | Plataforma | Tipo |
+|:-:|:----------|:------------|:-----------|:-----|
+| 1 | **Refresh token expirado en background** | Al volver a foreground: detectar expiración, limpiar storage, redirigir a login SIN crash. No intentar refresh infinito. | Flutter | Integration |
+| 2 | **Token reuse attack** | Cuando backend responde `token_family_revoked`: limpiar tokens, enviar evento seguridad, mostrar mensaje claro, NO permitir retry. | Flutter | Unit + Integration |
+| 3 | **Múltiples requests con token expirado** | Solo UNA request de refresh debe ejecutarse. Las demás esperan. Si falla, todas fallan consistentemente. | Flutter | Unit |
+| 4 | **Extracción via adb backup** | Con allowBackup=false, verificar que tokens NO aparecen en backup extraído. | Android | Security (Manual) |
+| 5 | **Persistencia tras reinstalación** | En iOS, verificar comportamiento de Keychain tras desinstalar/reinstalar. Implementar cleanup si necesario. | iOS | Integration |
 
 ---
 
@@ -211,7 +307,8 @@ lib/
 - [OWASP Mobile Security Testing Guide - Session Management](https://owasp.org/www-project-mobile-security-testing-guide/)
 - [RFC 6749 - OAuth 2.0](https://tools.ietf.org/html/rfc6749)
 - [Auth0 - Refresh Token Rotation](https://auth0.com/docs/secure/tokens/refresh-tokens/refresh-token-rotation)
-- [Verizon DBIR 2023](https://www.verizon.com/business/resources/reports/dbir/)
+- [Android Keystore System](https://developer.android.com/training/articles/keystore)
+- [iOS Keychain Services](https://developer.apple.com/documentation/security/keychain_services)
 
 ---
 

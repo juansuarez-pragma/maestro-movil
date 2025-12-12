@@ -42,11 +42,11 @@ El problema real: HTTPS estándar confía en cualquier Certificate Authority (CA
 
 ## 2. Matriz de Soluciones y Selección de Herramientas
 
-| Rol | Solución y Herramienta | Análisis de Decisión (Trade-offs) |
-|:----|:-----------------------|:----------------------------------|
-| **Junior** | HTTPS estándar con Dio, confiar en CAs del sistema | **FALLA:** Vulnerable a cualquier CA comprometida. Proxy (Charles, mitmproxy) + certificado instalado ve todo en texto plano. |
-| **Senior** | Certificate pinning con `SecurityContext` y certificado en assets | **MEJORA:** Bloquea CAs desconocidas. PERO: si certificado expira, app muere. Sin actualización dinámica. |
-| **Architect** | **Multi-layer pinning:** 1) Pin de Public Key (no certificado), 2) Backup pins para rollover, 3) Fallback con alertas, 4) Actualización dinámica via config firmada, 5) Detección de proxy | **ENTERPRISE:** Resistente a rotación de certs, detecta intercepción, alerta al SOC, cumple PCI-DSS. |
+| Nivel de Madurez | Solución y Herramienta | Análisis de Decisión (Trade-offs) |
+|:-----------------|:-----------------------|:----------------------------------|
+| **BAJA** | HTTPS estándar con Dio, confiar en CAs del sistema | **INADECUADO:** Vulnerable a cualquier CA comprometida. Proxy (Charles, mitmproxy) + certificado instalado ve todo en texto plano. |
+| **ACEPTABLE** | Certificate pinning con `SecurityContext` y certificado en assets | **CUMPLE MÍNIMOS:** Bloquea CAs desconocidas. PERO: si certificado expira, app muere. Sin actualización dinámica. |
+| **ENTERPRISE** | **Multi-layer pinning:** 1) Pin de Public Key (no certificado), 2) Backup pins para rollover, 3) Fallback con alertas, 4) Actualización dinámica via config firmada, 5) Detección de proxy | **ÓPTIMO PARA BANCA:** Resistente a rotación de certs, detecta intercepción, alerta al SOC, cumple PCI-DSS. |
 
 ---
 
@@ -61,6 +61,19 @@ El problema real: HTTPS estándar confía en cualquier Certificate Authority (CA
 ---
 
 ## 4. Manos a la Obra: Estrategia de Implementación
+
+### Justificación del Plan
+
+La estrategia se deriva del análisis de DigiNotar y los requisitos de PCI-DSS:
+
+1. **CAs pueden ser comprometidas** → No confiar solo en trust store del sistema
+2. **Certificados rotan periódicamente** → Usar Public Key pinning que sobrevive rotaciones
+3. **Necesidad de actualizar pins sin release** → Config remota firmada
+4. **Detectar ataques activamente** → Logging de violaciones de pinning al SOC
+
+Se implementa en capas para máxima resiliencia: pins hardcodeados como baseline, config remota para actualizaciones, detección de proxy para alertas.
+
+---
 
 ### Fase 1: Diseño — Estrategia de Pins
 
@@ -87,7 +100,11 @@ lib/core/
     └── remote_config_validator.dart
 ```
 
-### Fase 2: Implementación — Detalles Técnicos
+---
+
+### Fase 2: Implementación por Plataforma
+
+#### 2.1 Flutter (Cross-Platform) — Capa de Aplicación
 
 **PinningConfig:**
 - Lista de pins hardcodeados como baseline (SHA-256 de SPKI)
@@ -99,23 +116,68 @@ lib/core/
 - `validateCertificate(X509Certificate cert, String host)`: Validar contra pins
 - `_shouldPinDomain(host)`: Solo validar dominios configurados
 - `_extractPublicKeyHash(cert)`: Extraer SPKI, calcular SHA-256, encodear Base64
-- `_logPinningViolation`: Log para análisis forense (timestamp, host, receivedPin, expectedPins, cert info)
+- `_logPinningViolation`: Log para análisis forense
 
 **SSLPinningInterceptor (Dio):**
-- En `onRequest`: Detectar proxy con `ProxyDetector`, bloquear endpoints críticos si proxy detectado
+- En `onRequest`: Detectar proxy, bloquear endpoints críticos si detectado
 - En `onError`: Detectar errores SSL/TLS, transformar a mensaje amigable
-- Configurar `IOHttpClientAdapter` con `badCertificateCallback` que siempre rechaza
-
-**ProxyDetector:**
-- Verificar variables de entorno (`http_proxy`, `HTTP_PROXY`, `https_proxy`, `HTTPS_PROXY`)
-- Verificar VPN activa (requiere platform channel)
-- Método `isDebugMode()` para detectar herramientas de reversing
+- Configurar `IOHttpClientAdapter` con `badCertificateCallback`
 
 **RemotePinConfig:**
 - Obtener pins de servidor con config firmada
 - Verificar firma ECDSA/RSA con clave pública hardcodeada
-- Cache en `flutter_secure_storage` con TTL
+- Cache en secure storage con TTL
 - Fallback a pins hardcodeados si falla red
+
+---
+
+#### 2.2 Android — Configuración Nativa
+
+**Network Security Config (res/xml/network_security_config.xml):**
+- Configurar pins nativos como capa adicional
+- Especificar dominios y sus pins
+- Configurar expiration dates para forzar actualizaciones
+
+**AndroidManifest.xml:**
+```
+android:networkSecurityConfig="@xml/network_security_config"
+```
+
+**ProxyDetector Android:**
+- Verificar `System.getProperty("http.proxyHost")`
+- Verificar `ConnectivityManager` para VPN activa
+- Verificar `WifiManager` para proxy configurado en WiFi
+
+**Consideraciones Android:**
+- Network Security Config funciona desde API 24+
+- Para API < 24, implementar pinning en código Dart
+- `cleartextTrafficPermitted="false"` para forzar HTTPS
+
+---
+
+#### 2.3 iOS — Configuración Nativa
+
+**Info.plist - App Transport Security:**
+```
+NSAppTransportSecurity:
+  NSPinnedDomains:
+    api.bank.com:
+      NSIncludesSubdomains: true
+      NSPinnedCAIdentities:
+        - SPKI-SHA256-BASE64: "..."
+```
+
+**ProxyDetector iOS:**
+- Verificar `CFNetworkCopySystemProxySettings()`
+- Detectar VPN via `NEVPNManager`
+- Verificar proxy en WiFi settings
+
+**Consideraciones iOS:**
+- ATS pinning disponible desde iOS 14+
+- Para iOS < 14, implementar pinning en código Dart
+- `NSAllowsArbitraryLoads` debe ser `false` en producción
+
+---
 
 ### Fase 3: Observability — Métricas y Alertas
 
@@ -124,7 +186,6 @@ lib/core/
 - `ssl.proxy.detected`
 - `ssl.cert.bad`
 - `ssl.config.tampered`
-- `ssl.handshake.latency_ms`
 
 **Alertas:**
 
@@ -138,32 +199,65 @@ lib/core/
 
 ## 5. Salida para el Agente: Criterios de Aceptación Técnicos (TACs)
 
+### TACs Flutter (Cross-Platform)
+
 ```
-[ ] TAC-3.1: DEBE implementarse Public Key Pinning para todos los endpoints
-    críticos (auth, transfers, payments).
+[ ] TAC-3.1-FLUTTER: DEBE implementarse Public Key Pinning para todos los
+    endpoints críticos (auth, transfers, payments).
 
-[ ] TAC-3.2: DEBE mantener mínimo 2 backup pins para soportar rotación sin
-    disrupciones.
+[ ] TAC-3.2-FLUTTER: DEBE mantener mínimo 2 backup pins para soportar rotación.
 
-[ ] TAC-3.3: Ante fallo de pinning, conexión DEBE rechazarse.
+[ ] TAC-3.3-FLUTTER: Ante fallo de pinning, conexión DEBE rechazarse.
     NO fallback a conexión no pineada.
 
-[ ] TAC-3.4: Cada fallo de pinning DEBE generar alerta con: host, pin recibido,
-    pins esperados, timestamp, device_id.
+[ ] TAC-3.4-FLUTTER: Cada fallo de pinning DEBE generar alerta con: host,
+    pin recibido, pins esperados, timestamp, device_id.
 
-[ ] TAC-3.5: DEBE existir mecanismo de actualización de pins via config remota
-    firmada criptográficamente.
+[ ] TAC-3.5-FLUTTER: DEBE existir mecanismo de actualización de pins via
+    config remota firmada criptográficamente.
 
-[ ] TAC-3.6: DEBE detectar proxy y bloquear operaciones críticas cuando se detecte.
+[ ] TAC-3.6-FLUTTER: En builds DEBUG, pinning puede deshabilitarse.
+    En RELEASE, DEBE estar siempre activo.
+```
 
-[ ] TAC-3.7: En builds DEBUG, pinning puede deshabilitarse. En RELEASE, DEBE
-    estar siempre activo.
+### TACs Android
 
-[ ] TAC-3.8: Pins hardcodeados DEBEN rotarse mínimo cada 6 meses.
+```
+[ ] TAC-3.7-ANDROID: DEBE configurarse Network Security Config con pins
+    para todos los dominios críticos (API 24+).
 
-[ ] TAC-3.9: DEBE existir runbook para rotación de emergencia de certificados.
+[ ] TAC-3.8-ANDROID: AndroidManifest DEBE incluir
+    android:networkSecurityConfig="@xml/network_security_config".
 
-[ ] TAC-3.10: Métricas de pinning DEBEN monitorearse con alertas automáticas.
+[ ] TAC-3.9-ANDROID: ProxyDetector DEBE verificar http.proxyHost,
+    ConnectivityManager VPN, y WifiManager proxy.
+
+[ ] TAC-3.10-ANDROID: cleartextTrafficPermitted DEBE ser false en producción.
+```
+
+### TACs iOS
+
+```
+[ ] TAC-3.11-IOS: DEBE configurarse NSPinnedDomains en Info.plist para
+    dominios críticos (iOS 14+).
+
+[ ] TAC-3.12-IOS: NSAllowsArbitraryLoads DEBE ser false en producción.
+
+[ ] TAC-3.13-IOS: ProxyDetector DEBE verificar CFNetworkCopySystemProxySettings
+    y NEVPNManager.
+
+[ ] TAC-3.14-IOS: Para iOS < 14, DEBE implementarse pinning equivalente en Dart.
+```
+
+### TACs Backend (Referencia)
+
+```
+[ ] TAC-3.15-BACKEND: DEBE existir endpoint para config de pins firmada
+    criptográficamente.
+
+[ ] TAC-3.16-BACKEND: Pins hardcodeados DEBEN rotarse mínimo cada 6 meses.
+
+[ ] TAC-3.17-BACKEND: DEBE existir runbook para rotación de emergencia.
 ```
 
 ---
@@ -177,18 +271,21 @@ lib/core/
 
 ### Escenarios Críticos Obligatorios
 
-| # | Escenario | Qué Validar | Tipo |
-|:-:|:----------|:------------|:-----|
-| 1 | **MITM con Charles Proxy** | Configurar Charles, instalar certificado. Requests a endpoints pineados DEBEN fallar. | Security (Manual) |
-| 2 | **Rotación de certificado** | Agregar nuevo pin a backup, rotar cert en servidor. App DEBE seguir funcionando con backup pin. | Integration |
-| 3 | **Todos los pins expirados** | Ningún pin válido. App DEBE mostrar error claro, enviar alerta crítica, NO conectar sin pinning. | Unit + Integration |
+| # | Escenario | Qué Validar | Plataforma | Tipo |
+|:-:|:----------|:------------|:-----------|:-----|
+| 1 | **MITM con Charles Proxy** | Requests a endpoints pineados DEBEN fallar. | Android + iOS | Security (Manual) |
+| 2 | **Rotación de certificado** | App DEBE seguir funcionando con backup pin. | Flutter | Integration |
+| 3 | **Todos los pins expirados** | Error claro, alerta crítica, NO conectar sin pinning. | Flutter | Unit + Integration |
+| 4 | **Network Security Config** | Verificar que pins de XML se aplican correctamente. | Android | Security (Manual) |
+| 5 | **ATS Pinning** | Verificar que NSPinnedDomains funciona. | iOS | Security (Manual) |
 
 ---
 
 ## Referencias
 
 - [OWASP Certificate Pinning Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Pinning_Cheat_Sheet.html)
-- [RFC 7469 - HTTP Public Key Pinning (HPKP)](https://tools.ietf.org/html/rfc7469)
+- [Android Network Security Config](https://developer.android.com/training/articles/security-config)
+- [iOS App Transport Security](https://developer.apple.com/documentation/bundleresources/information_property_list/nsapptransportsecurity)
 - [PCI-DSS Requirement 4.1](https://www.pcisecuritystandards.org/)
 
 ---
