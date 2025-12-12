@@ -32,6 +32,25 @@
 - **Lenovo Superfish (2015):** CA preinstalada permitía MITM en HTTPS para millones de equipos; evidencia del riesgo de confiar en “cualquier” CA.
 - **Estudio académico (2019):** 73% de apps bancarias Android fallaban en pinning; proxies como mitmproxy/Charles leían credenciales y tokens.
 
+### Analítica y prevalencia (industria)
+
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| Estudio académico (2019) | 100+ apps bancarias Android | 73% no implementaban pinning correctamente; expuestas a MITM con CA instalada. |
+| NowSecure State of Mobile App Security (2024) | 1,000+ apps iOS/Android (US/EU) | Fallas de comunicación segura (pinning/ATS) en el top 3 de hallazgos MASVS; 85% fallan ≥1 control MASVS. |
+| OWASP MASVS Community Testing (2023) | Apps móviles globales | Uso de un solo certificado sin pins de respaldo/rotación es un error recurrente. |
+
+**Resumen global de hallazgos**
+- Más del 70% de apps bancarias evaluadas en Android presentan pinning ausente o mal configurado (estudio 2019).
+- 85% de apps móviles fallan en ≥1 control MASVS; pinning/ATS figura entre los fallos más frecuentes (NowSecure 2024).
+- Uso de un solo cert sin pins de respaldo es un patrón común que causa caídas en rotación y expone a MITM (OWASP MASVS tests 2023).
+
+**Indicadores sugeridos**
+- % de handshakes con pin match > 99.9%; alertas si mismatches > 0.1%.
+- Tiempo de handshake p95 < 500 ms; overhead de pinning < 30 ms.
+- Eventos `pinning.blocked` por dispositivo/hora; alerta si >3.
+- % de endpoints críticos cubiertos por pinning = 100%.
+
 ### Riesgos
 
 | Tipo | Impacto |
@@ -128,6 +147,8 @@ Config firmada (remota): rota pins cada 90 días; backup pin siempre presente
 - [iOS App Transport Security](https://developer.apple.com/documentation/bundleresources/information_property_list/nsapptransportsecurity)
 - [PCI-DSS Requirement 4.1](https://www.pcisecuritystandards.org/)
 - [OWASP MASVS/MASTG - Network Communication](https://mas.owasp.org/)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)
+- [Why TLS/Certificate Pinning Fails (2019 study)](https://www.usenix.org/conference/usenixsecurity19/presentation/de-pereira)
 
 ---
 

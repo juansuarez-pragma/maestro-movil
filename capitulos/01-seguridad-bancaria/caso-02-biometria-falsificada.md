@@ -34,6 +34,27 @@
 - **Presentation attacks (2021):** 20% de sistemas de reconocimiento facial en apps bancarias europeas fueron engañados con fotos impresas.
 - **PSD2/SCA:** exige liveness y anti-spoofing; no cumplir expone a multas KYC/AML y denegación de SCA.
 
+### Analítica y prevalencia (industria)
+
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| NIST FRVT PAD (2022) | Proveedores globales | Sistemas sin PAD robusto mostraron tasas de aceptación de ataque (PAI) > 10%; top proveedores con PAD certificada < 0.1% FAR. |
+| iBeta PAD listings (2023) | Vendors certificados iBeta | Solo SDKs con certificación ISO 30107-3 mantienen FAR < 0.2% en pruebas de máscaras/fotos. |
+| NowSecure State of Mobile App Security (2024) | 1,000+ apps móviles (US/EU) | Biometría sin liveness aparece en el top de fallos MASVS; 85% de apps fallan ≥1 control MASVS. |
+| Kaspersky Mobile Threats (2023) | LATAM y APAC | Incremento de malware que abusa accesibilidad/cámara para capturar video y suplantar biometría. |
+
+**Resumen global de hallazgos**
+- Entre 10% y 20% de implementaciones sin PAD son vulnerables a fotos/máscaras (NIST FRVT PAD 2022).
+- Solo SDKs con certificación iBeta ISO 30107-3 alcanzan FAR < 0.2% frente a ataques de presentación.
+- 85% de apps móviles fallan ≥1 control MASVS; biometría sin liveness es un fallo recurrente (NowSecure 2024).
+- LATAM/APAC presentan mayor actividad de malware que captura imágenes y abusa accesibilidad (Kaspersky 2023).
+
+**Indicadores sugeridos**
+- Tasa de spoof detectado > 99%; FAR < 0.1%.  
+- % de sesiones aprobadas sin PAD (alerta si > 0%).  
+- Incidentes/1M verificaciones: deepfake/spoof aceptado (meta 0).  
+- Tiempo de verificación p95 < 10 s; reintentos promedio ≤ 1.
+
 ### Riesgos
 
 | Tipo | Impacto |
@@ -118,6 +139,8 @@
 - [iBeta Quality Assurance - PAD Testing](https://www.ibeta.com/pad-testing/)
 - [Apple Local Authentication Framework](https://developer.apple.com/documentation/localauthentication)
 - [Android BiometricPrompt](https://developer.android.com/reference/android/hardware/biometrics/BiometricPrompt)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)
+- [Kaspersky - Mobile Threats 2023](https://securelist.com/mobile-malware-evolution-2023/111742/)
 
 ---
 
