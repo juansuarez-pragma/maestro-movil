@@ -29,13 +29,13 @@
 - Sin trazabilidad ni rotación, el banco no puede auditar ni cerrar la “sesión zombi”, disparando reclamos, churn y riesgo PSD2/SCA.
 - Requerimiento de negocio: conservar la conveniencia (sesión persistente) pero con controles que eliminen esta ventana de fraude.
 
-### Evidencia de Industria
+### Incidentes reportados
 
-**Caso Revolut 2022:** En septiembre de 2022, Revolut sufrió una brecha que expuso datos de 50,000+ usuarios. El ataque de ingeniería social fue posible parcialmente porque tokens de sesión comprometidos no fueron invalidados oportunamente. La compañía tardó horas en detectar sesiones anómalas porque carecían de mecanismos robustos de rotación y revocación.
+**Revolut 2022:** brecha que expuso datos de 50,000+ usuarios. Tokens comprometidos no se invalidaron a tiempo; el equipo tardó horas en detectar sesiones anómalas por falta de rotación/revocación. Impacto: exfiltración de datos, reclamos masivos.
 
-**Caso Capital One 2019:** Aunque el vector principal fue una misconfiguration de WAF, la investigación reveló que tokens de servicio tenían lifetimes excesivamente largos, ampliando la ventana de explotación.
+**Capital One 2019:** misconfiguración de WAF y tokens de servicio con lifetimes largos ampliaron la ventana de explotación. Impacto: mayor superficie de ataque y exposición de datos.
 
-**Estadística crítica:** Según el reporte de Verizon DBIR 2023, el 74% de las brechas financieras involucran credenciales comprometidas, y el tiempo promedio de detección de sesiones fraudulentas es de 207 días.
+**Dato crítico (Verizon DBIR 2023):** 74% de brechas financieras involucran credenciales comprometidas; tiempo promedio de detección de sesiones fraudulentas: 207 días.
 
 ### Riesgos
 
@@ -133,27 +133,31 @@ App -> Interceptor: recibe push, limpia storage y fuerza AuthLogout
 | Root/JB extracción | Detección root/JB y bloqueo | Evento `auth.security.root_detected` |
 | Revocación tardía | TTL corto y push de logout | `auth.session.expired` p95 < 15m |
 
-### 3.10 Plan de verificación (V&V)
-- Unit (CI): interceptor serializa refresh; BLoC registra transiciones y estados sin carreras.
-- Integration (CI): backend responde `token_family_revoked` → app limpia storage y pide login; reintentos no exceden 1.
-- Seguridad manual: backup extraction en Android con `allowBackup=false`; prueba en root/JB bloquea operaciones sensibles.
-- Observabilidad (CI): validar eventos `auth.*` con atributos obligatorios (trace_id, device_hash hash, family_id, app_version).
+### 3.10 Plan de verificación (V&V) — vista comparativa
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Unit (CI) | Interceptor serializa refresh; BLoC sin carreras | Equipo móvil, CI |
+| Integration (CI) | Respuesta `token_family_revoked` → limpiar storage, login; reintentos ≤ 1 | Equipo móvil/backend, CI |
+| Seguridad manual | Extracción backup con `allowBackup=false`; root/JB bloquea operaciones sensibles | Seguridad/QE, dispositivos reales |
+| Observabilidad (CI) | Eventos `auth.*` con atributos (trace_id, device_hash, family_id, app_version) | Equipo móvil, CI |
 
-### 3.11 UX y política offline
-- Operaciones sensibles se bloquean sin conectividad; se muestra mensaje claro y se invita a reconectar.
-- Manejo de reloj: tolerancia ±2 min de skew para expiración/refresh; si se detecta desalineación, guiar al usuario a sincronizar hora.
-- Si el refresh falla por red, se hace un único reintento; luego se pide login.
+### 3.11 UX y política offline — checklist rápido
+- Operaciones sensibles bloqueadas sin conectividad; mensaje claro y call to action para reconectar.
+- Manejo de reloj: tolerancia ±2 min de skew; si hay desalineación, guiar al usuario a sincronizar hora.
+- Refresh: un único reintento por error de red; luego pedir login.
 
-### 3.12 Notas de seguridad TLS y claves
-- Pinning: 2–3 pines SPKI activos en base64, rotación cada 90 días, fail-closed salvo ventana de rotación planificada; soportar doble pin en cliente.
-- Skew de reloj: tolerancia ±2 min en expiración para evitar falsos 401.
-- Claves backend: publicar JWKS con `kid`, usar RS256/ES256, rotar claves de firma JWT con solapamiento; revocar familias asociadas a claves comprometidas.
+### 3.12 Notas de seguridad TLS y claves — tabla sintética
+| Tema | Requisito | Notas |
+|:-----|:----------|:------|
+| Pinning | 2–3 pines SPKI activos, rotación cada 90 días, fail-closed salvo ventana planificada | Soportar doble pin en cliente |
+| Skew de reloj | ±2 min en expiración/validación | Evita falsos 401 |
+| Claves backend | JWKS con `kid`, RS256/ES256, rotación con solapamiento | Revocar familias asociadas a claves comprometidas |
 
-## 4. Impacto esperado
-- 0 incidentes de token reuse/día (alerta crítica si >0).
-- p95 de `/auth/refresh` < 500 ms; warning ≥ 650 ms; crítico ≥ 800 ms.
-- Éxito de refresh > 99.5% (rolling 7d); alerta si baja de 99.5% por 5 min.
-- Tickets de soporte por “sesión perdida” ↓ 30% en 4 semanas post-rollout.
+## 4. Impacto esperado (vista rápida)
+- 0 incidentes de token reuse/día (alerta crítica si >0) → reduce fraude y riesgo regulatorio.
+- p95 de `/auth/refresh` < 500 ms (warning ≥ 650 ms; crítico ≥ 800 ms) → UX fluida.
+- Éxito de refresh > 99.5% (rolling 7d; alerta si <99.5% por 5 min) → confiabilidad de sesión.
+- Tickets de soporte por “sesión perdida” ↓ 30% en 4 semanas post-rollout → eficiencia operativa y mejor NPS.
 
 <a id="glosario-de-terminos-clave"></a>
 ## Glosario de Términos Clave
