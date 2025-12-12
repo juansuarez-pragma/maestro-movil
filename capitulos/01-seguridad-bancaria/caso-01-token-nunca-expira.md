@@ -77,46 +77,64 @@ La arquitectura propuesta sigue Clean Architecture para facilitar testing y mant
 
 ### Fase 1: Diseño — Contratos y Arquitectura
 
-**Estructura de Carpetas Recomendada:**
+#### Tabla de Componentes y Responsabilidades
+
+| Capa | Componente | Responsabilidad |
+|:-----|:-----------|:----------------|
+| **Data** | AuthLocalDataSource | Persistencia segura de tokens en almacenamiento cifrado del dispositivo |
+| **Data** | AuthRemoteDataSource | Comunicación con endpoints de autenticación del backend |
+| **Data** | TokenPairModel | Modelo de datos para serialización/deserialización de tokens |
+| **Data** | DeviceInfoModel | Modelo para información de fingerprint del dispositivo |
+| **Data** | AuthRepositoryImpl | Implementación concreta que coordina datasources |
+| **Domain** | AuthSession | Entidad de dominio que representa una sesión autenticada |
+| **Domain** | AuthRepository | Contrato abstracto del repositorio de autenticación |
+| **Domain** | LoginUseCase | Caso de uso para flujo de login |
+| **Domain** | RefreshTokenUseCase | Caso de uso para rotación de tokens |
+| **Domain** | LogoutUseCase | Caso de uso para cierre de sesión |
+| **Presentation** | AuthBloc | Gestor de estado de autenticación con auditoría de transiciones |
+| **Network** | AuthInterceptor | Inyección automática de access token en requests |
+| **Network** | TokenRefreshInterceptor | Manejo de expiración y refresh automático |
+
+#### Contrato de Datos: Token Response (Backend → App)
+
+| Atributo | Tipo | Descripción | Reglas de Validación |
+|:---------|:-----|:------------|:---------------------|
+| `access_token` | String (JWT) | Token de acceso para autorizar requests | TTL máximo: 15 minutos. Formato: JWT firmado. |
+| `refresh_token` | String (Opaco) | Token para obtener nuevos access tokens | TTL máximo: 7 días. Single-use (rotación). |
+| `token_family_id` | UUID | Identificador de familia para detectar reuso | Generado en login inicial. Compartido por toda la cadena de refreshes. |
+| `device_bound` | Boolean | Indica si el token está vinculado al dispositivo | Si `true`, backend valida device fingerprint. |
+| `expires_in` | Integer | Segundos hasta expiración del access token | Usado para refresh proactivo. |
+
+#### Diagrama Sugerido: Flujo de Token Rotation
 
 ```
-lib/
-├── core/
-│   ├── auth/
-│   │   ├── data/
-│   │   │   ├── datasources/
-│   │   │   │   ├── auth_local_datasource.dart
-│   │   │   │   └── auth_remote_datasource.dart
-│   │   │   ├── models/
-│   │   │   │   ├── token_pair_model.dart
-│   │   │   │   └── device_info_model.dart
-│   │   │   └── repositories/
-│   │   │       └── auth_repository_impl.dart
-│   │   ├── domain/
-│   │   │   ├── entities/
-│   │   │   │   └── auth_session.dart
-│   │   │   ├── repositories/
-│   │   │   │   └── auth_repository.dart
-│   │   │   └── usecases/
-│   │   │       ├── login_usecase.dart
-│   │   │       ├── refresh_token_usecase.dart
-│   │   │       └── logout_usecase.dart
-│   │   └── presentation/
-│   │       └── bloc/
-│   │           ├── auth_bloc.dart
-│   │           ├── auth_event.dart
-│   │           └── auth_state.dart
-│   └── network/
-│       └── interceptors/
-│           ├── auth_interceptor.dart
-│           └── token_refresh_interceptor.dart
-```
+[DIAGRAMA DE SECUENCIA]
 
-**Contrato de Token Response (Backend):**
-- `access_token`: JWT con TTL de 15 minutos
-- `refresh_token`: Token opaco con TTL de 7 días
-- `token_family_id`: Identificador de familia para detectar reuso
-- `device_bound`: Boolean indicando si está vinculado a dispositivo
+Título: Token Rotation con Detección de Reuso
+
+Participantes:
+- App (Flutter)
+- TokenRefreshInterceptor
+- Backend /auth/refresh
+- Token Store (DB)
+
+Flujo Principal:
+1. App → Interceptor: Request con access_token expirado
+2. Interceptor: Detecta 401 o TTL < 30s
+3. Interceptor → Backend: POST /auth/refresh {refresh_token, device_fingerprint}
+4. Backend → Token Store: Verificar refresh_token válido y no usado
+5. Token Store → Backend: Token válido, familia activa
+6. Backend → Token Store: Invalidar refresh_token anterior
+7. Backend → Token Store: Generar nuevo refresh_token en misma familia
+8. Backend → Interceptor: {new_access_token, new_refresh_token}
+9. Interceptor → App: Reintentar request original con nuevo token
+
+Flujo Alternativo (Token Reuse Attack):
+4b. Token Store → Backend: refresh_token YA FUE USADO
+5b. Backend → Token Store: INVALIDAR TODA LA FAMILIA
+6b. Backend → Interceptor: 403 {error: "token_family_revoked"}
+7b. Interceptor → App: Forzar logout, limpiar storage
+```
 
 ---
 
@@ -124,67 +142,130 @@ lib/
 
 #### 2.1 Flutter (Cross-Platform) — Capa de Aplicación
 
-**AuthLocalDataSource:**
-- Configurar `FlutterSecureStorage` con opciones de seguridad máxima por plataforma
-- Implementar métodos: `saveTokenPair`, `getTokenPair`, `clearTokens`, `getDeviceFingerprint`
-- Usar `Future.wait` para operaciones paralelas de lectura/escritura
+##### Tabla de Definición: AuthLocalDataSource
 
-**AuthBloc - Estados y Eventos:**
-- Estados: `AuthInitial`, `AuthLoading`, `AuthAuthenticated`, `AuthUnauthenticated`, `AuthFailure`
-- Eventos: `AuthCheckRequested`, `AuthLoginRequested`, `AuthTokenRefreshRequested`, `AuthLogoutRequested`, `AuthRemoteLogoutReceived`
-- El estado `AuthAuthenticated` debe incluir `session` y `authenticatedAt` para tracking
+| Método | Entrada | Salida | Lógica de Negocio |
+|:-------|:--------|:-------|:------------------|
+| `saveTokenPair` | TokenPair | void | 1. Validar que tokens no sean nulos. 2. Guardar en secure storage con key prefixada. 3. Guardar timestamp de almacenamiento. |
+| `getTokenPair` | - | TokenPair? | 1. Leer de secure storage. 2. Si no existe, retornar null. 3. Si existe, deserializar y retornar. |
+| `clearTokens` | - | void | 1. Eliminar access_token. 2. Eliminar refresh_token. 3. Eliminar metadata asociada. |
+| `getDeviceFingerprint` | - | String | 1. Obtener identificadores de plataforma. 2. Concatenar valores. 3. Aplicar hash SHA-256. |
 
-**TokenRefreshInterceptor (QueuedInterceptor):**
-- Extender `QueuedInterceptor` de Dio para manejar requests concurrentes durante refresh
-- Mantener `Completer` para evitar múltiples refreshes simultáneos
-- Refresh proactivo cuando access token tiene < 30 segundos de vida
-- En `onError` con 401: intentar refresh y retry de request original
-- Excluir rutas de auth del interceptor (`/auth/login`, `/auth/refresh`)
+##### Tabla de Estados: AuthBloc
+
+| Estado | Descripción | Datos Asociados | Transiciones Válidas |
+|:-------|:------------|:----------------|:---------------------|
+| `AuthInitial` | Estado inicial, sin verificación | Ninguno | → AuthLoading |
+| `AuthLoading` | Verificando credenciales o refrescando | Ninguno | → AuthAuthenticated, AuthUnauthenticated, AuthFailure |
+| `AuthAuthenticated` | Sesión activa válida | session, authenticatedAt | → AuthLoading (refresh), AuthUnauthenticated (logout) |
+| `AuthUnauthenticated` | Sin sesión activa | reason (opcional) | → AuthLoading (login) |
+| `AuthFailure` | Error en operación de auth | errorMessage, errorCode | → AuthLoading (retry), AuthUnauthenticated |
+
+##### Tabla de Eventos: AuthBloc
+
+| Evento | Trigger | Handler | Efecto |
+|:-------|:--------|:--------|:-------|
+| `AuthCheckRequested` | App startup | Verificar tokens en storage | Emitir Authenticated o Unauthenticated |
+| `AuthLoginRequested` | Usuario envía credenciales | Llamar backend, guardar tokens | Emitir Authenticated o Failure |
+| `AuthTokenRefreshRequested` | Token cerca de expirar | Llamar /refresh con rotation | Actualizar tokens o emitir Unauthenticated |
+| `AuthLogoutRequested` | Usuario cierra sesión | Limpiar storage, notificar backend | Emitir Unauthenticated |
+| `AuthRemoteLogoutReceived` | Push de invalidación | Limpiar storage inmediatamente | Emitir Unauthenticated con reason |
+
+##### Algoritmo: TokenRefreshInterceptor (QueuedInterceptor)
+
+**Propósito:** Manejar automáticamente la expiración de tokens y evitar múltiples refreshes simultáneos.
+
+**Lógica paso a paso:**
+
+1. **onRequest (antes de cada request):**
+   - SI la ruta está en lista de exclusión (`/auth/login`, `/auth/refresh`) → continuar sin modificar
+   - SI access_token tiene menos de 30 segundos de vida → ejecutar refresh proactivo
+   - Agregar header `Authorization: Bearer {access_token}`
+
+2. **onError (cuando request falla):**
+   - SI código de error NO es 401 → propagar error original
+   - SI ya hay un refresh en progreso → encolar request actual y esperar
+   - SI no hay refresh en progreso:
+     - Crear Completer para coordinar requests encoladas
+     - Llamar a RefreshTokenUseCase
+     - SI refresh exitoso → actualizar tokens, completar Completer, reintentar request
+     - SI refresh falla con `token_family_revoked` → emitir AuthRemoteLogoutReceived, propagar error
+     - SI refresh falla por otra razón → propagar error, limpiar cola
+
+3. **Manejo de concurrencia:**
+   - Mantener referencia a Completer activo
+   - Requests concurrentes esperan el mismo Completer
+   - Al completar refresh, todos los requests encolados se reintentan
 
 ---
 
 #### 2.2 Android — Configuración Nativa
 
-**Configuración de flutter_secure_storage:**
-```
-AndroidOptions(
-  encryptedSharedPreferences: true,
-  sharedPreferencesName: 'secure_auth_prefs',
-  preferencesKeyPrefix: 'auth_',
-)
-```
+##### Tabla de Configuración: Secure Storage Android
 
-**Device Fingerprint Android:**
-- Obtener `ANDROID_ID` via `Settings.Secure`
-- Combinar con `Build.MODEL`, `Build.MANUFACTURER`
-- Hash SHA-256 del conjunto
+| Parámetro | Valor Requerido | Justificación |
+|:----------|:----------------|:--------------|
+| `encryptedSharedPreferences` | `true` | Habilita cifrado AES-256-GCM respaldado por Keystore |
+| `sharedPreferencesName` | `'secure_auth_prefs'` | Aísla preferencias de auth de otras preferencias |
+| `preferencesKeyPrefix` | `'auth_'` | Facilita identificación y limpieza selectiva |
+| `keyCipherAlgorithm` | RSA/ECB/PKCS1Padding | Algoritmo para cifrado de clave maestra |
+| `storageCipherAlgorithm` | AES/GCM/NoPadding | Algoritmo para cifrado de datos |
 
-**Consideraciones Android:**
+##### Tabla de Configuración: AndroidManifest
+
+| Atributo | Valor | Propósito |
+|:---------|:------|:----------|
+| `android:allowBackup` | `false` | Previene extracción de datos via `adb backup` |
+| `android:fullBackupContent` | `false` | Excluye app de Auto Backup |
+
+##### Algoritmo: Device Fingerprint Android
+
+1. Obtener `ANDROID_ID` de `Settings.Secure`
+2. Obtener `Build.MODEL` (modelo del dispositivo)
+3. Obtener `Build.MANUFACTURER` (fabricante)
+4. Concatenar: `{ANDROID_ID}|{MODEL}|{MANUFACTURER}`
+5. Aplicar hash SHA-256 al resultado
+6. Retornar hash como string hexadecimal
+
+**Consideraciones:**
 - API 23+ requerido para KeyStore respaldado por hardware
-- Configurar `android:allowBackup="false"` en AndroidManifest
-- EncryptedSharedPreferences usa AES-256-GCM
+- En API < 23, usar EncryptedSharedPreferences con cifrado software
+- ANDROID_ID es único por combinación app/usuario/dispositivo
 
 ---
 
 #### 2.3 iOS — Configuración Nativa
 
-**Configuración de flutter_secure_storage:**
-```
-IOSOptions(
-  accessibility: KeychainAccessibility.first_unlock_this_device,
-  accountName: 'com.bank.app.auth',
-)
-```
+##### Tabla de Configuración: Secure Storage iOS
 
-**Device Fingerprint iOS:**
-- Obtener `identifierForVendor` via UIDevice
-- Combinar con modelo de dispositivo
-- Hash SHA-256 del conjunto
+| Parámetro | Valor Requerido | Justificación |
+|:----------|:----------------|:--------------|
+| `accessibility` | `first_unlock_this_device` | Accesible después del primer desbloqueo, no sincroniza a iCloud |
+| `accountName` | `'com.{empresa}.{app}.auth'` | Identifica la cuenta en Keychain |
+| `synchronizable` | `false` (implícito) | No sincroniza a iCloud por la opción de accessibility |
 
-**Consideraciones iOS:**
-- Keychain persiste entre reinstalaciones (considerar cleanup)
-- `first_unlock_this_device` balancea seguridad y usabilidad
-- Datos NO se sincronizan a iCloud con esta configuración
+##### Tabla de Valores: Keychain Accessibility
+
+| Valor | Cuándo Accesible | Sincroniza iCloud | Uso Recomendado |
+|:------|:-----------------|:------------------|:----------------|
+| `passcode` | Solo con passcode activo | No | Máxima seguridad, puede bloquear al usuario |
+| `first_unlock` | Después de primer desbloqueo | Sí | Balance seguridad/UX, sincroniza |
+| `first_unlock_this_device` | Después de primer desbloqueo | **No** | **RECOMENDADO para tokens bancarios** |
+| `always` | Siempre | Sí | Baja seguridad, no usar para auth |
+| `always_this_device` | Siempre | No | Baja seguridad, no usar para auth |
+
+##### Algoritmo: Device Fingerprint iOS
+
+1. Obtener `identifierForVendor` de `UIDevice.current`
+2. Obtener modelo de dispositivo via `utsname`
+3. Concatenar: `{identifierForVendor}|{deviceModel}`
+4. Aplicar hash SHA-256 al resultado
+5. Retornar hash como string hexadecimal
+
+**Consideraciones:**
+- `identifierForVendor` persiste mientras haya al menos una app del vendor instalada
+- Keychain persiste entre reinstalaciones (implementar cleanup en primera ejecución si necesario)
+- Agregar `NSFaceIDUsageDescription` en Info.plist si se usa biometría
 
 ---
 

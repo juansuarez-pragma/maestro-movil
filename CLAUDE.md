@@ -69,6 +69,53 @@ Tabla con:
 
 ### Sección 4: Manos a la Obra: Estrategia de Implementación
 
+#### REGLA "NO-CODE" (OBLIGATORIO)
+
+En la Sección 4, **ESTÁ PROHIBIDO** escribir bloques de código de implementación (ni Dart, ni Kotlin, ni Swift).
+
+**En su lugar, DEBES usar:**
+
+1. **Tablas de Definición de Componentes y Responsabilidades**
+   ```markdown
+   | Capa | Componente | Responsabilidad |
+   |:-----|:-----------|:----------------|
+   | Data | AuthLocalDataSource | Persistencia segura de tokens... |
+   ```
+
+2. **Descripciones algorítmicas paso a paso (Lógica de negocio)**
+   ```markdown
+   ##### Algoritmo: TokenRefreshInterceptor
+
+   **Propósito:** Manejar automáticamente la expiración de tokens...
+
+   **Lógica paso a paso:**
+   1. **onRequest:** SI la ruta está en lista de exclusión → continuar...
+   2. **onError:** SI código es 401 → intentar refresh...
+   ```
+
+3. **Tablas de Contratos de Datos (Atributos y Reglas)**
+   ```markdown
+   | Atributo | Tipo | Descripción | Reglas de Validación |
+   |:---------|:-----|:------------|:---------------------|
+   | access_token | String (JWT) | Token de acceso | TTL máximo: 15 min |
+   ```
+
+4. **Sugerencias de Diagramas visuales usando el formato:**
+   ```markdown
+   #### Diagrama Sugerido: [Nombre del Diagrama]
+
+   [DIAGRAMA DE {SECUENCIA|FLUJO|COMPONENTES|ESTADOS}]
+
+   Título: ...
+   Participantes: ...
+   Flujo Principal: ...
+   Flujo Alternativo: ...
+   ```
+
+**Objetivo:** Crear una arquitectura de referencia **agnóstica al lenguaje** que pueda ser implementada en cualquier stack tecnológico.
+
+---
+
 **DEBE incluir:**
 
 1. **Justificación del Plan** (OBLIGATORIO)
@@ -76,13 +123,14 @@ Tabla con:
    - Listar 3-4 puntos conectando problema → solución
 
 2. **Fase 1: Diseño**
-   - Estructura de carpetas
-   - Arquitectura general
+   - Tabla de Componentes y Responsabilidades
+   - Contrato de Datos
+   - Diagrama sugerido de arquitectura
 
 3. **Fase 2: Implementación por Plataforma** (SEPARAR POR PLATAFORMA)
-   - **2.1 Flutter (Cross-Platform)** — Capa de Aplicación
-   - **2.2 Android** — Configuración/Integración Nativa
-   - **2.3 iOS** — Configuración/Integración Nativa
+   - **2.1 Flutter (Cross-Platform)** — Tablas de definición, estados, eventos, algoritmos
+   - **2.2 Android** — Tablas de configuración, algoritmos específicos
+   - **2.3 iOS** — Tablas de configuración, algoritmos específicos
 
 4. **Fase 3: Observability**
    - Métricas
