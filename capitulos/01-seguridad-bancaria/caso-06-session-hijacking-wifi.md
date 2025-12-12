@@ -16,19 +16,23 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- Redes no confiables permiten robo de tokens/sesiones (sidejacking) vía ARP spoofing, rogue AP o SSL stripping si no hay [pinning](caso-03-mitm-certificate-pinning.md#glosario-de-terminos-clave).
+- Sin binding de sesión a contexto de red, el token robado se reutiliza desde otra red sin fricción.
+- Solo mostrar un warning es insuficiente: los usuarios lo ignoran; se necesita protección activa (step-up, restricción de operaciones, VPN sugerida).
+
 ### Escenario de Negocio
 
 > *"Como usuario, quiero poder revisar mi cuenta bancaria desde el WiFi de la cafetería mientras espero mi café."*
 
-Redes WiFi públicas son terreno fértil para ataques. ARP spoofing, rogue access points, SSL stripping, y sniffing de tráfico son amenazas reales.
+- Caso: cliente usa WiFi abierto, atacante con rogue AP captura token y realiza transferencias → fraude y pérdida de confianza.
+- Caso: la app no alerta ni limita operaciones en WiFi abierto; el banco enfrenta reclamaciones legales.
 
-### Evidencia de Industria
+### Incidentes reportados
 
-**DarkHotel APT (2014-presente):** Grupo APT que comprometía WiFi de hoteles de lujo para atacar ejecutivos de empresas Fortune 500. Instalaba malware via portales cautivos falsos.
-
-**Estudio Kaspersky 2023:** 25% de puntos WiFi públicos no tienen cifrado, otro 25% usan cifrado débil (WEP). Solo 50% usa WPA2/WPA3.
-
-**Caso Firesheep (2010):** Herramienta que demostró lo trivial que es capturar cookies de sesión en redes no cifradas. Afectó a millones de usuarios de Facebook, Twitter.
+- **DarkHotel APT (2014-presente):** Comprometía WiFi de hoteles de lujo, instalando malware vía portales falsos a ejecutivos.
+- **Firesheep (2010):** Demostró lo trivial de capturar cookies de sesión en redes no cifradas; millones afectados.
+- **Kaspersky 2023:** 25% de WiFi públicos sin cifrado, 25% con cifrado débil (WEP); superficie ideal para sidejacking.
 
 ### Riesgos
 
@@ -54,9 +58,34 @@ Redes WiFi públicas son terreno fértil para ataques. ARP spoofing, rogue acces
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Detectar tipo de red (WiFi/Celular/VPN). Identificar WiFi segura vs insegura por nivel de cifrado. Step-up authentication en redes no confiables. Vincular sesión a contexto de red. Limitar operaciones por nivel de confianza. Sugerir VPN. |
-| **Restricciones Duras (NO permite)** | **Certeza absoluta:** No puede garantizar que una red "privada" no esté comprometida. **VPN detection:** Complejo y no siempre confiable. **iOS restricciones:** APIs más limitadas para inspección de red. **Battery drain:** Monitoreo constante consume batería. |
-| **Criterio de Selección** | Se usa **BLoC** porque estado de red cambia dinámicamente y múltiples features deben reaccionar (transfers, auth, visualización de datos). `connectivity_plus` proporciona detección básica, Platform Channels para info detallada de red. |
+| **Capacidades (SÍ permite)** | Detectar tipo de red (WiFi/Celular/VPN). Clasificar WiFi segura vs insegura por cifrado. Step-up authentication en redes no confiables. Vincular sesión a fingerprint de red ([Session Binding](#term-session-binding)). Limitar operaciones por nivel de confianza. Sugerir VPN. |
+| **Restricciones Duras (NO permite)** | **Certeza absoluta:** No garantiza que una red “privada” no esté comprometida. **VPN detection:** No siempre confiable. **iOS:** APIs limitadas para inspección detallada. **Consumo:** Monitoreo continuo impacta batería si no se optimiza. |
+| **Criterio de Selección** | Se usa **[BLoC](#term-bloc)** porque el estado de red cambia dinámicamente y múltiples features deben reaccionar (transferencias, auth). `connectivity_plus` cubre lo básico; Platform Channels aportan detalles de seguridad de red. |
+
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Unit (CI) | Bloc cambia estados de red (trusted/untrusted/VPN) y notifica features dependientes | Equipo móvil, CI |
+| Integration (CI) | En WiFi abierto → step-up requerido/operaciones sensibles bloqueadas; en celular/VPN → flujo normal | Móvil/QA, CI + staging |
+| Seguridad manual | Sidejacking con rogue AP: token robado no reutilizable por session binding; warning visible y operaciones bloqueadas | Seguridad/QE en redes de prueba |
+| Observabilidad | Eventos `network.context` con tipo de red, cifrado y acción tomada; alertas si untrusted > umbral | Móvil/SRE, CI |
+
+### 3.2 UX y operación
+- Mensaje claro en WiFi abierto: “Red no confiable, solo consulta habilitada; usa datos móviles o VPN para operar”.
+- CTA para habilitar VPN de la empresa o cambiar a red segura.
+- Revalidar riesgo al cambiar de red; limpiar tokens si cambia fingerprint de red.
+
+### 3.3 Política de riesgo y límites
+- **Untrusted (abierta/WEP):** Solo consulta; operaciones sensibles bloqueadas; step-up para login.
+- **Trusted (WPA2/WPA3):** Operaciones permitidas; monitor de cambios rápidos de BSSID.
+- **VPN:** Considerar riesgo medio-bajo, pero revalidar al desconectarse.
+
+---
+
+## 4. Impacto esperado
+- Reducción de sesiones secuestradas en redes públicas ≥ 70% por binding y step-up.
+- Alertas de redes no confiables en < 5 s; operaciones sensibles bloqueadas automáticamente.
+- Soporte: tickets por “wifi bloqueada” controlados (<10 por semana) con mensajes claros.
 
 ---
 
@@ -66,12 +95,13 @@ Redes WiFi públicas son terreno fértil para ataques. ARP spoofing, rogue acces
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Session Hijacking | Toma de sesión mediante robo de tokens/cookies en tránsito. |
-| Rogue Access Point | Punto de acceso que suplanta una red legítima para interceptar tráfico. |
-| ARP Spoofing | Ataque de red local que redirige tráfico a un atacante en la misma LAN. |
-| SSL Stripping | Downgrade de HTTPS a HTTP para robar credenciales/sesiones. |
-| Session Binding a red | Asociar sesión a fingerprint de red (SSID/BSSID) y requerir revalidación al cambiar. |
-| Red no confiable | Clasificación de WiFi abierto/cautivo que dispara controles adicionales (OTP, bloqueo de operaciones). |
+| <a id="term-session-hijacking"></a>Session Hijacking | Toma de sesión mediante robo de tokens/cookies en tránsito. |
+| <a id="term-rogue-ap"></a>Rogue Access Point | Punto de acceso que suplanta una red legítima para interceptar tráfico. |
+| <a id="term-arp-spoof"></a>ARP Spoofing | Ataque de red local que redirige tráfico a un atacante en la misma LAN. |
+| <a id="term-ssl-stripping"></a>SSL Stripping | Downgrade de HTTPS a HTTP para robar credenciales/sesiones. |
+| <a id="term-session-binding"></a>Session Binding a red | Asociar sesión a fingerprint de red (SSID/BSSID) y requerir revalidación al cambiar. |
+| <a id="term-untrusted"></a>Red no confiable | Clasificación de WiFi abierto/cautivo que dispara controles adicionales (OTP, bloqueo de operaciones). |
+| <a id="term-bloc"></a>BLoC | Patrón basado en eventos/estados, adecuado para cambios dinámicos de red. |
 
 ---
 

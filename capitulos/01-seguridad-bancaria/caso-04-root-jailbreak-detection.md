@@ -16,21 +16,23 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- Detecciones locales de root/jailbreak son triviales de evadir (Magisk/Zygisk, hooking con Frida/Xposed); sin atestación server-side ([Play Integrity](#term-play-integrity), [App Attest](#term-app-attest)) el riesgo se subestima.
+- Bloqueo binario a todo dispositivo rooteado genera falsos positivos en devs o usuarios de ROMs seguras; se necesita respuesta graduada (lectura/consulta sí, operaciones sensibles no).
+- Sin telemetría de riesgo ni eventos de bypass, el SOC no detecta intentos de evasión ni patrones de fraude ligados a dispositivos comprometidos.
+
 ### Escenario de Negocio
 
 > *"Como oficial de seguridad del banco, quiero detectar dispositivos rooteados/jailbroken para evaluar el riesgo, pero sin bloquear usuarios legítimos que usan custom ROMs por privacidad."*
 
-El dilema: Bloquear 100% de dispositivos rooteados genera falsos positivos (desarrolladores, usuarios privacy-conscious). No detectarlos abre la puerta a malware y hooking.
+- Caso: cliente premium con ROM personalizada para privacidad es bloqueado al iniciar sesión → churn y ticket crítico.
+- Caso opuesto: dispositivo rooteado con malware Cerberus roba OTP y tokens; sin controles server-side, el fraude prospera.
 
-### Evidencia de Industria
+### Incidentes reportados
 
-**Caso Cerberus Banking Trojan (2020-2023):** Malware Android que requiere root. Intercepta SMS OTP, captura credenciales via overlay attacks, extrae datos de apps bancarias. Ha afectado bancos en España, México, Brasil.
-
-**Magisk "MagiskHide" (ahora Zygisk):** Permite ocultar root de apps específicas. Usuarios legítimos la usan, pero también atacantes para evadir detección.
-
-**Estudio Promon (2022):** El 50% de las apps bancarias top 100 pueden tener protecciones bypaseadas en dispositivos rooteados con Frida/Xposed.
-
-**Estadística clave:** Solo ~2% de dispositivos están rooteados, pero representan ~30% de intentos de fraude en apps bancarias.
+- **Cerberus Banking Trojan (2020-2023):** Malware Android que requiere root. Intercepta SMS OTP y extrae datos de apps bancarias (España, México, Brasil).
+- **MagiskHide/Zygisk:** Ocultamiento de root a apps específicas; usado por atacantes para evadir detecciones superficiales.
+- **Promon (2022):** 50% de apps bancarias top 100 pueden ser bypaseadas en root con Frida/Xposed. Rooteados ~2% de base, pero ~30% de intentos de fraude.
 
 ### Riesgos
 
@@ -56,9 +58,34 @@ El dilema: Bloquear 100% de dispositivos rooteados genera falsos positivos (desa
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Detectar root/jailbreak con múltiples técnicas. Verificación criptográfica server-side (Play Integrity). Risk scoring continuo. Respuestas granulares (permitir lectura, bloquear escritura). Detectar hooking frameworks (Frida, Xposed). |
-| **Restricciones Duras (NO permite)** | **100% infalible:** Siempre existirán bypasses con suficiente esfuerzo. **Offline:** Play Integrity requiere conexión. **Emuladores:** Detectados como riesgo, afecta devs. **Play Services:** Play Integrity requiere Google Play Services. |
-| **Criterio de Selección** | Se usa **Riverpod** con `DeviceSecurityProvider` porque: estado de seguridad se consulta desde múltiples features, Riverpod permite dependency injection limpio, fácil testing con overrides. Play Integrity sobre SafetyNet porque SafetyNet está deprecated. |
+| **Capacidades (SÍ permite)** | Detectar root/jailbreak con múltiples técnicas. Verificación criptográfica server-side ([Play Integrity](#term-play-integrity), [App Attest](#term-app-attest)). Risk scoring continuo. Respuestas granulares (lectura permitida, operaciones sensibles bloqueadas). Detectar hooking frameworks (Frida, Xposed). |
+| **Restricciones Duras (NO permite)** | **100% infalible:** Siempre habrá bypasses avanzados. **Offline:** [Play Integrity](#term-play-integrity) requiere conexión. **Emuladores:** Clasificados como alto riesgo; afecta devs. **Dependencias:** Play Integrity depende de Google Play Services. |
+| **Criterio de Selección** | Se usa **[Riverpod](#term-riverpod)** porque el estado de seguridad se consume en múltiples features y requiere DI/test fácil. [Play Integrity](#term-play-integrity) sobre SafetyNet por deprecación. Respuesta adaptativa evita falsos positivos masivos. |
+
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Unit (CI) | Provider entrega estados consistentes (secure → degraded → blocked) ante flags simulados | Equipo móvil, CI |
+| Integration (CI) | Token de [Play Integrity](#term-play-integrity) inválido → backend degrada operaciones; token válido → operaciones completas | Móvil/Backend, CI + staging |
+| Seguridad manual | Bypass con Magisk/Frida se detecta; operaciones sensibles bloqueadas con mensaje claro | Seguridad/QE, dispositivos rooteados |
+| Observabilidad | Evento `device.risk` con tipo (root, bypass), score y acción tomada | Móvil/SRE, CI |
+
+### 3.2 UX, accesibilidad y respuesta adaptativa
+- Mensajes claros diferenciando **consulta permitida** vs **operaciones bloqueadas**; CTA para usar dispositivo no comprometido.
+- Registrar consentimiento cuando el usuario decide continuar en modo degradado (solo consulta).
+- Limitar reintentos y mostrar motivos (root detectado, atestación fallida, hooking sospechado).
+
+### 3.3 Operación y riesgo
+- Política de riesgo: root/jailbreak = riesgo alto → solo lectura; integridad válida = operaciones completas.
+- Revalidar integridad en operaciones sensibles (transferencias, cambio de límites).
+- Alertar al SOC al detectar bypass repetido (>3 intentos/hora).
+
+---
+
+## 4. Impacto esperado
+- Reducción de fraudes originados en dispositivos comprometidos ≥ 60%.
+- Falsos positivos controlados: usuarios legítimos en modo consulta sin bloqueo total; tickets de soporte ↓ 20%.
+- Tasa de atestación exitosa > 98% en dispositivos compliant; eventos de bypass detectados y alertados en < 5 s.
 
 ---
 
@@ -68,12 +95,13 @@ El dilema: Bloquear 100% de dispositivos rooteados genera falsos positivos (desa
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Root/Jailbreak Detection | Conjunto de técnicas para identificar dispositivos comprometidos (su binary, build tags, rutas sospechosas). |
-| Play Integrity / SafetyNet | Servicio Android de atestación criptográfica server-side para validar integridad del dispositivo. |
-| DeviceCheck / App Attest | Equivalentes en iOS para verificar estado de dispositivo y apps. |
-| Risk-Based Authentication | Ajustar controles (permitir/limitar/bloquear) según nivel de riesgo del dispositivo. |
-| Hooking Frameworks | Herramientas como Frida/Xposed que interceptan/alteran código en runtime. |
-| Attestation Token | Evidencia firmada usada por backend para decidir si permite operaciones sensibles. |
+| <a id="term-root-detection"></a>Root/Jailbreak Detection | Técnicas para identificar dispositivos comprometidos (su binary, build tags, rutas sospechosas). |
+| <a id="term-play-integrity"></a>Play Integrity | Atestación criptográfica Android (reemplaza SafetyNet) para validar integridad del dispositivo. |
+| <a id="term-app-attest"></a>App Attest / DeviceCheck | Atestación y signals de integridad en iOS. |
+| <a id="term-risk-auth"></a>Risk-Based Authentication | Ajustar controles (permitir/limitar/bloquear) según riesgo del dispositivo. |
+| <a id="term-hooking"></a>Hooking Frameworks | Herramientas como Frida/Xposed que interceptan/alteran código en runtime. |
+| <a id="term-attestation-token"></a>Attestation Token | Evidencia firmada usada por backend para decidir si permite operaciones sensibles. |
+| <a id="term-riverpod"></a>Riverpod | Contenedor de DI/estado reactivo usado para compartir estado de seguridad entre features. |
 
 ---
 
