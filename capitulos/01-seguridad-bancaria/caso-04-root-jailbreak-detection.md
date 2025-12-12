@@ -34,6 +34,19 @@
 - **MagiskHide/Zygisk:** Ocultamiento de root a apps específicas; usado por atacantes para evadir detecciones superficiales.
 - **Promon (2022):** 50% de apps bancarias top 100 pueden ser bypaseadas en root con Frida/Xposed. Rooteados ~2% de base, pero ~30% de intentos de fraude.
 
+### Analítica y prevalencia (industria)
+
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| Promon (2022) | 100 apps bancarias | 50% podía ser bypaseada en root con Frida/Xposed. |
+| NowSecure State of Mobile App Security (2024) | 1,000+ apps móviles (US/EU) | 85% fallan ≥1 control MASVS; integridad del dispositivo es un fallo recurrente. |
+| Kaspersky Mobile Threats (2023) | LATAM/APAC | Aumento de malware que exige root para robar OTP/tokens (SharkBot, Anubis). |
+
+**Resumen global**
+- La base rooteada es pequeña (~2%), pero concentra ~30% de intentos de fraude.
+- La mitad de las apps bancarias evaluadas puede ser evadida en dispositivos comprometidos (Promon 2022).
+- Control de integridad es una de las brechas más frecuentes en MASVS (NowSecure 2024).
+
 ### Riesgos
 
 | Tipo | Impacto |
@@ -71,21 +84,37 @@
 | Observabilidad | Evento `device.risk` con tipo (root, bypass), score y acción tomada | Móvil/SRE, CI |
 
 ### 3.2 UX, accesibilidad y respuesta adaptativa
-- Mensajes claros diferenciando **consulta permitida** vs **operaciones bloqueadas**; CTA para usar dispositivo no comprometido.
-- Registrar consentimiento cuando el usuario decide continuar en modo degradado (solo consulta).
-- Limitar reintentos y mostrar motivos (root detectado, atestación fallida, hooking sospechado).
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Mensajes | Diferenciar consulta permitida vs operaciones bloqueadas; CTA a usar dispositivo no comprometido | Reduce churn y clarifica restricción |
+| Consentimiento | Registrar aceptación al continuar en modo degradado (solo consulta) | Evidencia para auditoría |
+| Reintentos | Limitar reintentos; mostrar motivo (root, atestación fallida, hooking) | Evita loops e informa al usuario |
 
 ### 3.3 Operación y riesgo
 - Política de riesgo: root/jailbreak = riesgo alto → solo lectura; integridad válida = operaciones completas.
 - Revalidar integridad en operaciones sensibles (transferencias, cambio de límites).
 - Alertar al SOC al detectar bypass repetido (>3 intentos/hora).
 
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Dispositivos rooteados permiten malware/hooking; bloqueo total genera falsos positivos. |
+| Opciones evaluadas | Bloqueo binario por root; solo checks locales; atestación server-side con respuesta adaptativa. |
+| Decisión | Atestación server-side (Play Integrity/App Attest) + respuesta graduada (consulta vs operaciones) + telemetría. |
+| Consecuencias | Dependencia de servicios de atestación y conectividad; mayor complejidad operativa. |
+| Riesgos aceptados | Usuarios en ROMs seguras quedan en modo consulta; posibles fallas en baja conectividad. |
+
 ---
 
-## 4. Impacto esperado
-- Reducción de fraudes originados en dispositivos comprometidos ≥ 60%.
-- Falsos positivos controlados: usuarios legítimos en modo consulta sin bloqueo total; tickets de soporte ↓ 20%.
-- Tasa de atestación exitosa > 98% en dispositivos compliant; eventos de bypass detectados y alertados en < 5 s.
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Fraudes desde dispositivos comprometidos | ↓ ≥ 60% | Alerta si no reduce tras rollout | Beneficio directo de negocio |
+| Falsos positivos | Usuarios legítimos bloqueados ≈ 0; modo consulta para casos borderline | Alerta si > 0.5% usuarios activos | Balance UX-seguridad |
+| Éxito de atestación | > 98% en dispositivos compliant | Alerta si baja por 5 min | Confiabilidad de flujo |
+| Detección de bypass (Magisk/Frida) | Alertas en < 5 s | Eventos > 3/hora disparan alerta SOC | Respuesta rápida a intentos |
+| Tickets por bloqueo | ↓ 20% en 4 semanas | Alertar si no baja | Costos de soporte controlados |
 
 ---
 
@@ -111,6 +140,9 @@
 - [Apple App Attest](https://developer.apple.com/documentation/devicecheck/establishing_your_app_s_integrity)
 - [Apple DeviceCheck](https://developer.apple.com/documentation/devicecheck)
 - [OWASP Mobile Security Testing Guide - Anti-Tampering](https://owasp.org/www-project-mobile-security-testing-guide/)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)
+- [Kaspersky - Mobile Threats 2023](https://securelist.com/mobile-malware-evolution-2023/111742/)
+- [Promon Report 2022](https://promon.co/security-news/)
 
 ---
 
