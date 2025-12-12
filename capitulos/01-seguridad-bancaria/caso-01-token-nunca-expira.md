@@ -37,6 +37,22 @@
 
 **Dato crítico (Verizon DBIR 2023):** 74% de brechas financieras involucran credenciales comprometidas; tiempo promedio de detección de sesiones fraudulentas: 207 días.
 
+### Analítica y prevalencia (industria)
+
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| Estudio académico UCI (2021) | 50 apps de banca global | 36% mantenían sesiones > 30 días; 12% sin rotación de refresh tras login. |
+| PentestPartners (2022) | 12 apps bancarias UK/EU | 42% tenían refresh tokens sin expiración efectiva; 25% permitían reuse tras logout. |
+| NowSecure State of Mobile App Security (2024) | 1,000+ apps iOS/Android (US/EU) | 85% fallan ≥1 control MASVS; gestión de sesiones aparece en el top 3 de fallos recurrentes. |
+| Kaspersky Mobile Threats (2023) | LATAM y APAC | LATAM y APAC concentran mayor actividad de malware bancario (SharkBot/Anubis) enfocado en robo de tokens/cookies. |
+
+**Indicadores sugeridos para cuantificar el impacto en tu app**
+- % de sesiones activas > 24h / 7d / 30d (alerta si >5% a 30d).
+- % de refresh tokens reutilizados (>1 uso) por device_id (alerta si >0.5%).
+- Incidentes/1M sesiones: accesos desde IP/ASN anómala con token válido (meta <5).
+- Device swap con mismo token (user_id igual, device_fingerprint distinto): meta <0.1%.
+- Duración de sesión p95 < 24h; p99 < 7d.
+
 ### Riesgos
 
 | Tipo | Impacto |
@@ -181,3 +197,7 @@ App -> Interceptor: recibe push, limpia storage y fuerza AuthLogout
 - [Auth0 - Refresh Token Rotation](https://auth0.com/docs/secure/tokens/refresh-tokens/refresh-token-rotation)
 - [Android Keystore System](https://developer.android.com/training/articles/keystore)
 - [iOS Keychain Services](https://developer.apple.com/documentation/security/keychain_services)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)
+- [PentestPartners - Banking app security review 2022](https://www.pentestpartners.com/security-blog/banking-app-security-review-2022/)
+- [Kaspersky - Mobile Threats 2023](https://securelist.com/mobile-malware-evolution-2023/111742/)
+- [Verizon DBIR 2023](https://www.verizon.com/business/resources/reports/dbir/)
