@@ -1,0 +1,43 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build outputs
+build/
+dist/
+out/
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Node (si se usa algún tooling)
+node_modules/
+
+# Python (si se usa algún script)
+__pycache__/
+*.py[cod]
+.env
+.venv/
+
+# Backup files
+*.bak
+*.backup
+
+# Draft files
+drafts/
+*.draft.md
