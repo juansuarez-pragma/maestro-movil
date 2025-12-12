@@ -46,6 +46,12 @@
 | NowSecure State of Mobile App Security (2024) | 1,000+ apps iOS/Android (US/EU) | 85% fallan ≥1 control MASVS; gestión de sesiones aparece en el top 3 de fallos recurrentes. |
 | Kaspersky Mobile Threats (2023) | LATAM y APAC | LATAM y APAC concentran mayor actividad de malware bancario (SharkBot/Anubis) enfocado en robo de tokens/cookies. |
 
+**Resumen global de hallazgos (fuentes arriba)**
+- Entre 30% y 40% de apps bancarias evaluadas presentan sesiones largas o sin rotación de refresh (UCI 2021, PentestPartners 2022).
+- Al menos 25% permiten reuse de refresh tras logout, creando “sesiones zombi” (PentestPartners 2022).
+- 85% de apps móviles analizadas fallan en ≥1 control MASVS; sesión/gestión de tokens es uno de los 3 fallos más comunes (NowSecure 2024).
+- LATAM y APAC muestran mayor actividad de malware de robo de tokens (SharkBot/Anubis), elevando el riesgo regional (Kaspersky 2023).
+
 **Indicadores sugeridos para cuantificar el impacto en tu app**
 - % de sesiones activas > 24h / 7d / 30d (alerta si >5% a 30d).
 - % de refresh tokens reutilizados (>1 uso) por device_id (alerta si >0.5%).
