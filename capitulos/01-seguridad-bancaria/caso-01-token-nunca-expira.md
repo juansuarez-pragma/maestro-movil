@@ -77,10 +77,14 @@ Esta historia de usuario, aparentemente inocente, esconde uno de los vectores de
 - Politica UX: si remote logout llega, se fuerza limpieza de storage y se muestra motivo claro.
 
 ### 3.4 Decisiones arquitectónicas (vs alternativas)
-- **flutter_secure_storage** sobre Hive/SharedPreferences: evita gestionar claves maestras y cumple cifrado en reposo exigido por banca.
-- **Token Rotation** sobre sliding session simple: reduce impacto de robo y permite revocación granular.
-- **BLoC** sobre Provider/Riverpod en auth: trazabilidad de eventos y estados para auditoría y observabilidad.
-- **Device Binding** sobre binding por IP/geo: más estable para redes móviles y protege contra replays cross-device.
+
+| Opción elegida | Por qué se eligió | Alternativa descartada | Por qué no |
+|:---------------|:------------------|:-----------------------|:-----------|
+| flutter_secure_storage (Keychain/Keystore) | Cifrado at-rest respaldado por hardware; evita gestionar claves maestras; alineado con [OWASP MASVS](https://owasp.org/www-project-mobile-security-testing-guide/) y cumplimiento regulatorio. | Hive/SharedPreferences con cifrado propio | Requiere manejar key de cifrado (chicken-egg), mayor superficie de error, sin HSM. |
+| Token Rotation (refresh single-use) | Cierra ventana de reuso; permite invalidar familias completas ante reuse, recomendado por [Auth0 Rotation](https://auth0.com/docs/secure/tokens/refresh-tokens/refresh-token-rotation). | Sliding session sin rotation | Refresh robado sigue siendo válido hasta expirar; no detecta reuse. |
+| BLoC para auth | Estados y eventos auditables; fácil instrumentación con logging/tracing; separación clara de UI/negocio. | Provider/Riverpod para auth | Menor trazabilidad de transiciones; patrones más acoplados a UI. |
+| Device Binding (fingerprint hash) | Bloquea replay cross-device; combina identificadores estables del dispositivo. | Binding por IP/Geo | IP móvil es volátil, genera falsos positivos; no previene replay en mismo país/ISP. |
+| Queued Interceptor para refresh | Serializa refresh y evita storms de refresh concurrentes; reduce condiciones de carrera. | Refresh ad-hoc por request | Multiplica llamadas /refresh y riesgo de inconsistencias en storage. |
 
 ## Glosario de Términos Clave
 
