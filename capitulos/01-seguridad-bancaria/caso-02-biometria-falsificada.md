@@ -87,11 +87,20 @@
 | Seguridad manual | Ataque de foto impresa/video grabado debe ser rechazado; permisos de cámara manejados correctamente | Seguridad/QE, dispositivos reales |
 | Observabilidad (CI) | Eventos `biometric.*` con motivo de fallo (low_light, spoof_detected, user_abort) y métricas de score/liveness | Equipo móvil, CI |
 
-### 3.5 UX, accesibilidad y condiciones — checklist
-- Fallback seguro cuando no hay biometría enrollada o `LAError/BIOMETRIC_ERROR` → PIN/OTP con mensajes claros.
-- Permisos de cámara: CTA a Settings si se deniega; explicar motivo.
-- Condiciones de captura: guías de luz (>50 lux), no lentes oscuros, estabilidad del rostro; reintentos limitados.
-- Accesibilidad: mensajes compatibles con lectores de pantalla; instrucciones concisas.
+### 3.5 UX, accesibilidad y condiciones — tabla
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Fallback | Si no hay biometría enrollada o error (`LAError/BIOMETRIC_ERROR`) → PIN/OTP con mensajes claros | Evita bloqueos y mantiene seguridad |
+| Permisos de cámara | CTA a Settings si se deniega; explicar motivo y uso | Transparencia y reducción de abandono |
+| Condiciones de captura | Luz > 50 lux, sin lentes oscuros, rostro estable; reintentos limitados | Mejora tasas de éxito y reduce falsos rechazos |
+| Accesibilidad | Mensajes compatibles con lectores de pantalla; instrucciones concisas | Inclusión y reducción de fricción |
+
+### 3.7 Contratos y evidencias
+| Componente | Request/Evidencia | Validación | Nota |
+|:-----------|:------------------|:-----------|:-----|
+| Captura selfie liveness | Frame + metadata (luz, movimiento) | SDK PAD certificado iBeta/NIST | No persistir en app; envío cifrado |
+| Comparación 1:1 | Selfie vs foto KYC | Score ≥ umbral; firma del proveedor | Loguear motivo de fallo (spoof, low_light) |
+| Evento de resultado | `biometric.result` con score, liveness, motivo | Observabilidad en CI/producción | No registrar imágenes; solo metadatos |
 
 ### 3.6 Privacidad y custodia de datos — tabla sintética
 | Tema | Requisito | Notas |
@@ -99,6 +108,15 @@
 | Almacenamiento | No persistir biometría en app; FaceMap/en evidencias solo cifradas y efímeras | Uso exclusivo para verificación; limpiar tras decisión |
 | Transmisión | Encriptar evidencias (TLS/mTLS) y firmar payloads | Validar integridad en backend |
 | Retención | Mínima necesaria para auditoría; cumplir regulaciones de datos biométricos | Borrado/expurgo programado |
+
+### 3.8 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Biometría del dispositivo sin liveness no valida titular ni detecta spoof (fotos/deepfakes). |
+| Opciones evaluadas | Solo `local_auth`; `local_auth` + selfie backend; SDK PAD certificado + comparación 1:1 + fallback. |
+| Decisión | SDK con PAD certificado (ISO 30107-3) via Platform Channels + comparación 1:1 KYC + fallback seguro (PIN/OTP). |
+| Consecuencias | Dependencia de SDK nativo y red; mayor latencia que `local_auth` solo; costo de licenciamiento. |
+| Riesgos aceptados | Fallos en baja luz/oclusiones; dependencia de conectividad para validación server-side. |
 
 ---
 

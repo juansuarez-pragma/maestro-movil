@@ -90,14 +90,18 @@ Config firmada (remota): rota pins cada 90 días; backup pin siempre presente
 | Observabilidad | Evento `pinning.blocked` con hash del cert presentado, motivo y endpoint | Equipo móvil/SRE, CI |
 
 ### 3.3 Operación y resiliencia
-- **Rollover planificado:** mantener 2–3 SPKI en Base64; agregar nuevo pin 2 semanas antes del cambio, retirar el antiguo tras validar.
-- **Fallback:** `fail-closed` por defecto; `fail-open` solo durante ventana de rotación aprobada y monitoreada.
-- **Manejo de debug:** pinning desactivado únicamente en `debug` build; `release` siempre con pinning activo.
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Rollover | 2–3 SPKI activos; agregar nuevo pin 2 semanas antes, retirar viejo tras validar | Minimiza downtime por rotación |
+| Fallback | `fail-closed` por defecto; `fail-open` solo en ventana aprobada y monitoreada | Controla indisponibilidad sin abrir MITM |
+| Debug | Pinning desactivado solo en `debug`; `release` siempre activo | Facilita pruebas sin comprometer producción |
 
 ### 3.4 Observabilidad y seguridad
-- Eventos: `pinning.blocked`, `pinning.matched`, `pinning.failopen_enabled`.
-- Métricas: p95 handshake TLS < 500 ms; porcentaje de pin-match esperado > 99.9%.
-- Alertas SOC cuando `pinning.blocked` supera umbral (ej. 3 eventos/hora por dispositivo).
+| Elemento | Detalle | Umbral/Alerta |
+|:---------|:--------|:--------------|
+| Eventos | `pinning.blocked`, `pinning.matched`, `pinning.failopen_enabled` | Alertar al SOC en bloqueos |
+| Métricas | p95 handshake TLS < 500 ms; pin-match > 99.9% | Warning si se acerca a límites |
+| Alertas SOC | `pinning.blocked` > 3 eventos/hora/dispositivo | Indica MITM/debug indebido |
 
 ### 3.5 Política de pins (rotación y custodia)
 | Aspecto | Política |
@@ -107,6 +111,15 @@ Config firmada (remota): rota pins cada 90 días; backup pin siempre presente
 | Rotación | Cada 90 días o al rotar key pair; agregar pin nuevo antes de retirar el viejo |
 | Fallback | `fail-closed` salvo ventana de rotación aprobada; revertir si `pinning.blocked` se dispara |
 | Publicación | Config remota firmada (JWKS/firmware) con `kid`, algoritmo y expiración |
+
+### 3.6 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | MITM posible con CA instalada; caída de app al rotar cert único. |
+| Opciones evaluadas | HTTPS estándar; pinning por certificado único; pinning por SPKI con backup y config remota. |
+| Decisión | Pinning por SPKI con 2–3 pins, backup, config remota firmada, detección de proxy/root/JB. |
+| Consecuencias | Necesita gestión de pins en backend/config; posible bloqueo en proxies corporativos (política fail-closed). |
+| Riesgos aceptados | Debug restringido; usuarios en proxies SSL legítimos pueden verse bloqueados (política de seguridad). |
 
 ---
 
