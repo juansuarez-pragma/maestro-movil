@@ -109,11 +109,13 @@
 | <a href="#glosario-de-terminos-clave" title="Serializa refreshes para evitar concurrencia">Queued Interceptor</a> para refresh | Serializa refresh y evita storms de refresh concurrentes; reduce condiciones de carrera. | Refresh ad-hoc por request | Multiplica llamadas /refresh y riesgo de inconsistencias en storage. |
 
 ### 3.5 Mini-ADR (Decisión de Arquitectura)
-- Problema: tokens comprometidos con ventana larga y sin detección de reuse.
-- Opciones evaluadas: sliding sessions sin rotación, rotation single-use con device binding, sesiones cortas sin refresh.
-- Decisión: rotation single-use + device binding + revocación remota + BLoC auditable.
-- Consecuencias: mayor complejidad en backend (familia de tokens, invalidación); UX depende de conectividad para revocación.
-- Riesgos aceptados: funcionalidad limitada offline; dependencia de push para logout remoto.
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Tokens comprometidos con ventana larga y sin detección de reuse. |
+| Opciones evaluadas | Sliding sessions sin rotación; rotation single-use con device binding; sesiones cortas sin refresh. |
+| Decisión | Rotation single-use + device binding + revocación remota + BLoC auditable. |
+| Consecuencias | Complejidad en backend (familia/invalidación); UX depende de conectividad para revocación. |
+| Riesgos aceptados | Funcionalidad limitada offline; dependencia de push para logout remoto. |
 
 ### 3.6 NFRs y objetivos medibles
 | Categoría | Objetivo | Cómo se mide |
@@ -124,9 +126,10 @@
 | UX | Reintentos de refresh ≤ 1 antes de pedir login | Contador de reintentos en interceptor; alerta si promedio > 1 |
 
 ### 3.7 Contratos de API (backend)
-- `POST /auth/login`: `{username, password, device_fingerprint}` → `{access_token, refresh_token, token_family_id, expires_in}`; errores 401 credenciales, 423 dispositivo bloqueado.
-- `POST /auth/refresh`: `{refresh_token, device_fingerprint}` → `{new_access_token, new_refresh_token, token_family_id, expires_in}`; errores 401 inválido, 403 `token_family_revoked`, 429 rate-limit.
-- Política de rate-limit sugerida: 5 req/min por usuario para `/auth/refresh`; manejar `Retry-After`.
+| Endpoint | Request | Response | Errores/Notas |
+|:---------|:--------|:---------|:--------------|
+| `POST /auth/login` | `{username, password, device_fingerprint}` | `{access_token, refresh_token, token_family_id, expires_in}` | 401 credenciales; 423 dispositivo bloqueado |
+| `POST /auth/refresh` | `{refresh_token, device_fingerprint}` | `{new_access_token, new_refresh_token, token_family_id, expires_in}` | 401 inválido; 403 `token_family_revoked`; 429 rate-limit; rate-limit sugerido 5 req/min y `Retry-After` |
 
 ### 3.8 Diagrama de flujo (texto)
 ```
@@ -156,10 +159,12 @@ App -> Interceptor: recibe push, limpia storage y fuerza AuthLogout
 | Seguridad manual | Extracción backup con `allowBackup=false`; root/JB bloquea operaciones sensibles | Seguridad/QE, dispositivos reales |
 | Observabilidad (CI) | Eventos `auth.*` con atributos (trace_id, device_hash, family_id, app_version) | Equipo móvil, CI |
 
-### 3.11 UX y política offline — checklist rápido
-- Operaciones sensibles bloqueadas sin conectividad; mensaje claro y call to action para reconectar.
-- Manejo de reloj: tolerancia ±2 min de skew; si hay desalineación, guiar al usuario a sincronizar hora.
-- Refresh: un único reintento por error de red; luego pedir login.
+### 3.11 UX y política offline — tabla rápida
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Operaciones sin conectividad | Bloquear operaciones sensibles; mostrar motivo y CTA para reconectar | Evita ejecución sin revocación posible |
+| Skew de reloj | Tolerancia ±2 min; si excede, guiar a sincronizar hora | Previene falsos 401/expiraciones |
+| Reintentos de refresh | Un reintento por error de red; luego pedir login | Limita loops y mejora trazabilidad |
 
 ### 3.12 Notas de seguridad TLS y claves — tabla sintética
 | Tema | Requisito | Notas |
