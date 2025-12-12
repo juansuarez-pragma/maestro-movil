@@ -52,13 +52,6 @@
 - 85% de apps móviles analizadas fallan en ≥1 control MASVS; sesión/gestión de tokens es uno de los 3 fallos más comunes (NowSecure 2024).
 - LATAM y APAC muestran mayor actividad de malware de robo de tokens (SharkBot/Anubis), elevando el riesgo regional (Kaspersky 2023).
 
-**Indicadores sugeridos para cuantificar el impacto en tu app**
-- % de sesiones activas > 24h / 7d / 30d (alerta si >5% a 30d).
-- % de refresh tokens reutilizados (>1 uso) por device_id (alerta si >0.5%).
-- Incidentes/1M sesiones: accesos desde IP/ASN anómala con token válido (meta <5).
-- Device swap con mismo token (user_id igual, device_fingerprint distinto): meta <0.1%.
-- Duración de sesión p95 < 24h; p99 < 7d.
-
 ### Riesgos
 
 | Tipo | Impacto |
@@ -180,6 +173,11 @@ App -> Interceptor: recibe push, limpia storage y fuerza AuthLogout
 - p95 de `/auth/refresh` < 500 ms (warning ≥ 650 ms; crítico ≥ 800 ms) → UX fluida.
 - Éxito de refresh > 99.5% (rolling 7d; alerta si <99.5% por 5 min) → confiabilidad de sesión.
 - Tickets de soporte por “sesión perdida” ↓ 30% en 4 semanas post-rollout → eficiencia operativa y mejor NPS.
+- % de sesiones activas > 24h / 7d / 30d (alerta si >5% a 30d) → exposición controlada.
+- % de refresh tokens reutilizados (>1 uso) por device_id (alerta si >0.5%) → detección temprana de reuse.
+- Incidentes/1M sesiones: accesos desde IP/ASN anómala con token válido (meta <5) → anomalías contenidas.
+- Device swap con mismo token (user_id igual, device_fingerprint distinto) <0.1% → evita replay cross-device.
+- Duración de sesión p95 < 24h; p99 < 7d → ventana de ataque acotada.
 
 <a id="glosario-de-terminos-clave"></a>
 ## Glosario de Términos Clave

@@ -45,12 +45,6 @@
 - 85% de apps móviles fallan en ≥1 control MASVS; pinning/ATS figura entre los fallos más frecuentes (NowSecure 2024).
 - Uso de un solo cert sin pins de respaldo es un patrón común que causa caídas en rotación y expone a MITM (OWASP MASVS tests 2023).
 
-**Indicadores sugeridos**
-- % de handshakes con pin match > 99.9%; alertas si mismatches > 0.1%.
-- Tiempo de handshake p95 < 500 ms; overhead de pinning < 30 ms.
-- Eventos `pinning.blocked` por dispositivo/hora; alerta si >3.
-- % de endpoints críticos cubiertos por pinning = 100%.
-
 ### Riesgos
 
 | Tipo | Impacto |
@@ -121,6 +115,8 @@ Config firmada (remota): rota pins cada 90 días; backup pin siempre presente
 - Disponibilidad: cero caídas por rotación de cert si se mantiene ≥2 SPKI activos; ventana de rotación controlada < 24 h.
 - Rendimiento: handshake TLS p95 < 500 ms; overhead de pinning < 30 ms.
 - Seguridad operacional: intentos de proxying detectados en < 5 s y enviados a SIEM con huella del cert.
+- Cobertura de pinning: 100% de endpoints críticos; alertar si mismatches > 0.1%.
+- Eventos `pinning.blocked` por dispositivo/hora (alerta si >3) → detección de MITM/debug indebido.
 
 ---
 

@@ -49,12 +49,6 @@
 - 85% de apps móviles fallan ≥1 control MASVS; biometría sin liveness es un fallo recurrente (NowSecure 2024).
 - LATAM/APAC presentan mayor actividad de malware que captura imágenes y abusa accesibilidad (Kaspersky 2023).
 
-**Indicadores sugeridos**
-- Tasa de spoof detectado > 99%; FAR < 0.1%.  
-- % de sesiones aprobadas sin PAD (alerta si > 0%).  
-- Incidentes/1M verificaciones: deepfake/spoof aceptado (meta 0).  
-- Tiempo de verificación p95 < 10 s; reintentos promedio ≤ 1.
-
 ### Riesgos
 
 | Tipo | Impacto |
@@ -113,6 +107,8 @@
 - Tiempo de verificación biométrica p95 < 10 s; reintentos promedio ≤ 1.
 - Reducción de fraude en onboarding/credit approvals: meta ↓ incidents en ≥ 80% vs baseline.
 - Tickets de soporte por fallas de biometría ↓ 25% en 4 semanas post-rollout.
+- % de sesiones aprobadas sin PAD (alerta si > 0) → control de exposición.
+- Incidentes/1M verificaciones: deepfake/spoof aceptado (meta 0) → tolerancia cero a ataques de presentación.
 
 ---
 
