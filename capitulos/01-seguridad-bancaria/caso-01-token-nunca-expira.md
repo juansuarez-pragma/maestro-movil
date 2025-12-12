@@ -96,10 +96,10 @@ Esta historia de usuario, aparentemente inocente, esconde uno de los vectores de
 ### 3.6 NFRs y objetivos medibles
 | Categoría | Objetivo | Cómo se mide |
 |:----------|:---------|:-------------|
-| Seguridad | 0 incidentes de token reuse/día | Métrica `auth.security.token_reuse` + alerta crítica |
-| Rendimiento | p95 `/auth/refresh` < 500 ms | APM backend + trazas en interceptor |
-| Confiabilidad | Éxito refresh > 99.5% | Métrica `auth.token.refresh_success_rate` |
-| UX | Reintentos de refresh ≤ 1 antes de pedir login | Contador de reintentos en interceptor |
+| Seguridad | 0 incidentes de token reuse/día | Métrica `auth.security.token_reuse` + alerta crítica inmediata |
+| Rendimiento | p95 `/auth/refresh` < 500 ms (warning ≥ 650 ms, crítica ≥ 800 ms) | APM backend + trazas en interceptor |
+| Confiabilidad | Éxito refresh > 99.5% rolling 7d | Métrica `auth.token.refresh_success_rate` con alerta si baja de 99.5% 5 min |
+| UX | Reintentos de refresh ≤ 1 antes de pedir login | Contador de reintentos en interceptor; alerta si promedio > 1 |
 
 ### 3.7 Contratos de API (backend)
 - `POST /auth/login`: `{username, password, device_fingerprint}` → `{access_token, refresh_token, token_family_id, expires_in}`; errores 401 credenciales, 423 dispositivo bloqueado.
@@ -114,6 +114,8 @@ Interceptor -> Backend /auth/refresh {refresh_token, fingerprint}
 Backend: valida familia, invalida refresh anterior, emite nuevo par
 Backend -> Interceptor: {access, refresh}
 Interceptor: reintenta request original
+Backend -> FCM/APNS: push de logout remoto
+App -> Interceptor: recibe push, limpia storage y fuerza AuthLogout
 ```
 
 ### 3.9 Riesgo → Control → Métrica
@@ -125,15 +127,20 @@ Interceptor: reintenta request original
 | Revocación tardía | TTL corto y push de logout | `auth.session.expired` p95 < 15m |
 
 ### 3.10 Plan de verificación (V&V)
-- Unit: interceptor serializa refresh; BLoC registra transiciones.
-- Integration: backend responde `token_family_revoked` → app limpia storage y pide login.
-- Security/manual: backup extraction en Android con `allowBackup=false`; prueba en root/JB bloquea operaciones.
-- Observabilidad: validar que eventos `auth.*` se envían con trazas y atributos (user, device_hash, family_id).
+- Unit (CI): interceptor serializa refresh; BLoC registra transiciones y estados sin carreras.
+- Integration (CI): backend responde `token_family_revoked` → app limpia storage y pide login; reintentos no exceden 1.
+- Seguridad manual: backup extraction en Android con `allowBackup=false`; prueba en root/JB bloquea operaciones sensibles.
+- Observabilidad (CI): validar eventos `auth.*` con atributos obligatorios (trace_id, device_hash hash, family_id, app_version).
 
-### 3.11 Notas de seguridad TLS y claves
-- Pinning: aplicar certificate/public key pinning (Dio/Native) y rotación coordinada (al menos 2 pines activos).
+### 3.11 UX y política offline
+- Operaciones sensibles se bloquean sin conectividad; se muestra mensaje claro y se invita a reconectar.
+- Manejo de reloj: tolerancia ±2 min de skew para expiración/refresh; si se detecta desalineación, guiar al usuario a sincronizar hora.
+- Si el refresh falla por red, se hace un único reintento; luego se pide login.
+
+### 3.12 Notas de seguridad TLS y claves
+- Pinning: 2–3 pines SPKI activos en base64, rotación cada 90 días, fail-closed salvo ventana de rotación planificada; soportar doble pin en cliente.
 - Skew de reloj: tolerancia ±2 min en expiración para evitar falsos 401.
-- Claves backend: rotar claves de firma JWT y revocar familias vinculadas a claves comprometidas; exponer `kid` en header.
+- Claves backend: publicar JWKS con `kid`, usar RS256/ES256, rotar claves de firma JWT con solapamiento; revocar familias asociadas a claves comprometidas.
 
 <a id="glosario-de-terminos-clave"></a>
 ## Glosario de Términos Clave
