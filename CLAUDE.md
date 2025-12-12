@@ -36,60 +36,22 @@ maestro-movil/
 
 Cada archivo `caso-XX-*.md` DEBE seguir esta estructura (agnóstica y sin código):
 
-- **Sección 0: Metadata para Indexación (AI-Tags)**
-  - Palabras Clave de Negocio, Patrón Técnico, Stack Seleccionado, Nivel de Criticidad.
-- **Sección 1: Planteamiento del Problema (El "Trigger")**
-  - Escenario de negocio (quote), evidencia de industria, riesgos (tabla).
-- **Sección 2: Matriz de Soluciones y Selección de Herramientas**
-  - BAJA / ACEPTABLE / ENTERPRISE con trade-offs (NO usar “junior/senior/architect”).
-- **Sección 3: Profundización**
-  - Tabla de Capacidades (SÍ), Restricciones Duras (NO), Criterio de Selección.
-- **Glosario de Términos Clave**
-  - Tabla con definiciones y ancla `#glosario-de-terminos-clave` para tooltips internos.
-- **Referencias**
-  - Fuentes externas relevantes.
+- **Sección 0: Metadata para Indexación (AI-Tags)**  
+  Palabras clave de negocio, patrón técnico, stack seleccionado, criticidad.
+- **Sección 1: Planteamiento del Problema (El "Trigger")**  
+  Problema técnico + escenario de negocio (quote), incidentes reportados y riesgos (tabla).
+- **Sección 2: Matriz de Soluciones y Selección de Herramientas**  
+  BAJA / ACEPTABLE / ENTERPRISE con trade-offs claros.
+- **Sección 3: Profundización**  
+  Capacidades (SÍ), restricciones (NO), criterio de selección y tablas de V&V/UX/seguridad/operación cuando apliquen.
+- **Sección 4: Impacto esperado**  
+  KPIs/umbrales y resultado de negocio.
+- **Glosario de Términos Clave**  
+  Tabla con ancla `#glosario-de-terminos-clave`; cada término debe tener su propio `id` (`#term-*`) y los términos del texto deben enlazar a esos anchors para habilitar tooltips.
+- **Referencias**  
+  3–5 fuentes externas relevantes (incidentes, normas, guías).
 
-**Regla NO-CODE (se mantiene):** No incluir bloques de código de implementación (Dart/Kotlin/Swift). Usa tablas, descripciones paso a paso, contratos de datos y diagramas sugeridos si aplica.
-
-1. **Justificación del Plan** (OBLIGATORIO)
-   - Explicar cómo se deriva el plan del análisis del problema
-   - Listar 3-4 puntos conectando problema → solución
-
-2. **Fase 1: Diseño**
-   - Tabla de Componentes y Responsabilidades
-   - Contrato de Datos
-   - Diagrama sugerido de arquitectura
-
-3. **Fase 2: Implementación por Plataforma** (SEPARAR POR PLATAFORMA)
-   - **2.1 Flutter (Cross-Platform)** — Tablas de definición, estados, eventos, algoritmos
-   - **2.2 Android** — Tablas de configuración, algoritmos específicos
-   - **2.3 iOS** — Tablas de configuración, algoritmos específicos
-
-4. **Fase 3: Observability**
-   - Métricas
-   - Alertas
-
-### Sección 5: Salida para el Agente: Criterios de Aceptación Técnicos (TACs)
-
-**SEPARAR POR PLATAFORMA:**
-
-```markdown
-### TACs Flutter (Cross-Platform)
-[ ] TAC-X.Y-FLUTTER: Descripción...
-
-### TACs Android
-[ ] TAC-X.Y-ANDROID: Descripción...
-
-### TACs iOS
-[ ] TAC-X.Y-IOS: Descripción...
-
-### TACs Backend (Referencia)
-[ ] TAC-X.Y-BACKEND: Descripción...
-```
-
-### Sección 6: Estrategia de Pruebas (Shift-Left)
-- Stack de Testing
-- Tabla de escenarios con columna **Plataforma**
+**Regla NO-CODE (se mantiene):** No incluir bloques de código de implementación (Dart/Kotlin/Swift). Usa tablas, descripciones paso a paso, contratos de datos y diagramas ASCII si aplica.
 
 ---
 
@@ -98,20 +60,6 @@ Cada archivo `caso-XX-*.md` DEBE seguir esta estructura (agnóstica y sin códig
 ### Archivos
 - `caso-XX-nombre-en-kebab-case.md`
 - Ejemplo: `caso-01-token-nunca-expira.md`
-
-### TACs
-```
-TAC-{NumCaso}.{NumTAC}-{PLATAFORMA}: Descripción
-```
-Ejemplo: `TAC-1.3-FLUTTER`, `TAC-1.7-ANDROID`, `TAC-1.11-IOS`
-
-### Plataformas válidas
-- `FLUTTER` - Código Dart cross-platform
-- `ANDROID` - Configuración/código nativo Android
-- `IOS` - Configuración/código nativo iOS
-- `BACKEND` - Referencia para equipo backend
-
----
 
 ## Stack Tecnológico Preferido
 
@@ -193,40 +141,21 @@ Tipos:
 
 ---
 
-## Tareas Pendientes del Proyecto
-
-### Completados
-- [x] Capítulo 1: Seguridad Bancaria (casos 1-10)
-
-### Pendientes
-- [ ] Capítulo 2: Gestión de Estado (casos 11-20)
-- [ ] Capítulo 3: Rendimiento (casos 21-30)
-- [ ] Capítulo 4: Offline-First (casos 31-40)
-- [ ] Capítulo 5: Networking (casos 41-50)
-- [ ] Capítulo 6: Arquitectura Modular (casos 51-60)
-- [ ] Capítulo 7: Integración Nativa (casos 61-70)
-- [ ] Capítulo 8: DevOps/CI-CD (casos 71-80)
-- [ ] Capítulo 9: Hardware/IoT (casos 81-90)
-- [ ] Capítulo 10: Migración Legacy (casos 91-100)
-
----
-
 ## Instrucciones para Claude
 
 Cuando trabajes en este proyecto:
 
 1. **Al crear nuevos casos:**
-   - Seguir EXACTAMENTE el formato de 6 secciones
-   - Usar BAJA/ACEPTABLE/ENTERPRISE (no Junior/Senior/Architect)
-   - Incluir "Justificación del Plan" en sección 4
-   - Separar implementación por plataforma (Flutter, Android, iOS)
-   - Separar TACs por plataforma
-   - Incluir 2-3 referencias de industria reales
+   - Seguir el formato 0–4 + glosario + referencias (sin código de implementación).
+   - Usar BAJA/ACEPTABLE/ENTERPRISE (no Junior/Senior/Architect).
+   - Incluir incidentes reportados y riesgos en la sección 1.
+   - Usar tablas para capacidades/limitaciones y V&V/operación; mantener KPIs en la sección 4.
+   - Anclar cada término del glosario con `id` único (`#term-*`) y enlazarlo desde el cuerpo del caso.
 
 2. **Al modificar casos existentes:**
-   - Mantener la estructura de 6 secciones
-   - No mezclar configuraciones de diferentes plataformas
-   - Verificar que TACs tengan el formato correcto
+   - Mantener la estructura descrita y los anchors del glosario.
+   - No introducir código de app; priorizar tablas, diagramas ASCII y métricas claras.
+   - Validar coherencia de KPIs/umbrales y referencias externas.
 
 3. **Al hacer commits:**
    - Usar conventional commits
@@ -234,9 +163,9 @@ Cuando trabajes en este proyecto:
    - Push al finalizar cambios
 
 4. **Rotación de stack:**
-   - Variar gestores de estado entre casos (BLoC, Cubit, Riverpod, Provider)
-   - Usar diferentes tecnologías de persistencia según el caso
-   - No repetir el mismo stack en casos consecutivos
+   - Variar gestores de estado entre casos (BLoC, Cubit, Riverpod, Provider).
+   - Usar diferentes tecnologías de persistencia según el caso.
+   - Evitar repetir el mismo stack en casos consecutivos.
 
 ---
 

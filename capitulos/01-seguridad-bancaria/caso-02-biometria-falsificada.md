@@ -16,19 +16,23 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
-### Escenario de Negocio
+### Problema detectado (técnico)
+- Biometría del sistema ([local_auth](#term-local_auth)) solo valida que el rostro/huella está inscrito en el dispositivo, no la identidad real del titular ni liveness.
+- Sin PAD ([Liveness Detection](#term-liveness-detection)) robusto, fotos/videos/deepfakes pasan como válidos; riesgo alto de fraude en aprobaciones de crédito.
 
+### Escenario de negocio
 > *"Como usuario, quiero aprobar mi solicitud de crédito de $50,000 usando Face ID para no tener que ir a una sucursal."*
 
-El problema: Face ID/Touch ID del sistema operativo solo verifica que "un rostro/huella registrado en el dispositivo" coincide. NO verifica que sea el rostro del titular de la cuenta bancaria, ni que sea una persona viva frente a la cámara.
+**Incidente reportado (ejemplo realista):**
+- Solicitud de crédito aprobada con deepfake (foto de foto); el sistema aceptó el Face ID del dispositivo.
+- Monto fraudulento: > $50K; reclamaciones y revisión manual costosa.
+- Regulación PSD2/SCA exige SCA con biometría anti-spoofing; el flujo actual no cumple.
 
-### Evidencia de Industria
+### Incidentes reportados
 
-**Caso Deepfake Banking Fraud (2023):** Un grupo criminal en Hong Kong usó deepfakes para engañar sistemas de verificación facial en múltiples bancos, obteniendo préstamos por más de $25 millones.
-
-**Ataque de Presentation Attack (Spoofing):** En 2021, investigadores demostraron que el 20% de los sistemas de reconocimiento facial en apps bancarias europeas podían ser engañados con una foto impresa.
-
-**Regulación PSD2/SCA:** La directiva requiere Strong Customer Authentication para transacciones > €30. La biometría DEBE incluir protección anti-spoofing según estándares EBA.
+- **Deepfake Banking Fraud (2023):** grupo criminal en Hong Kong usó deepfakes para engañar verificación facial en varios bancos, obteniendo > $25M en préstamos.
+- **Presentation attacks (2021):** 20% de sistemas de reconocimiento facial en apps bancarias europeas fueron engañados con fotos impresas.
+- **PSD2/SCA:** exige liveness y anti-spoofing; no cumplir expone a multas KYC/AML y denegación de SCA.
 
 ### Riesgos
 
@@ -54,9 +58,40 @@ El problema: Face ID/Touch ID del sistema operativo solo verifica que "un rostro
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Detección de ataques 2D (fotos, pantallas) y 3D (máscaras). Verificación de liveness con challenge-response. Comparación 1:1 selfie vs documento. FaceMap encriptado para auditoría. Funciona con cámara frontal estándar. Cumple ISO 30107-3 y NIST FRVT. |
+| **Capacidades (SÍ permite)** | Detección de ataques 2D (fotos, pantallas) y 3D (máscaras). Verificación de liveness con challenge-response. Comparación [1:1](#term-face-match) selfie vs documento. FaceMap encriptado para auditoría. Funciona con cámara frontal estándar. Cumple ISO 30107-3 y NIST FRVT. |
 | **Restricciones Duras (NO permite)** | **local_auth SOLO:** No distingue entre titular y otra persona del dispositivo. **Sin red:** Algunos SDKs requieren validación server-side. **Condiciones extremas:** Liveness falla con luz < 50 lux, lentes muy oscuros, barbas > 50% rostro. **Simulador:** Biometría no disponible. |
-| **Criterio de Selección** | Se usa **Cubit** en lugar de BLoC porque el flujo es secuencial sin eventos complejos (captura→análisis→resultado). Cubit reduce boilerplate. Se usan **Platform Channels** para SDK nativo porque Facetec/iProov solo existen en Kotlin/Swift, procesamiento de imagen más eficiente nativo. |
+| **Criterio de Selección** | Se usa **[Cubit](#term-cubit)** en lugar de BLoC porque el flujo es secuencial sin eventos complejos (captura→análisis→resultado). Cubit reduce boilerplate. Se usan **[Platform Channels](#term-platform-channels)** para SDK nativo porque Facetec/iProov solo existen en Kotlin/Swift, procesamiento de imagen más eficiente nativo. |
+
+---
+
+### 3.4 Plan de verificación (V&V) — vista comparativa
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Unit (CI) | Cubit de biometría transita estados secuenciales y maneja errores | Equipo móvil, CI |
+| Integration (CI) | SDK de liveness responde spoof → app rechaza y no aprueba; fallback a PIN/OTP cuando biometría falla/enroll no disponible | Equipo móvil/backend, CI |
+| Seguridad manual | Ataque de foto impresa/video grabado debe ser rechazado; permisos de cámara manejados correctamente | Seguridad/QE, dispositivos reales |
+| Observabilidad (CI) | Eventos `biometric.*` con motivo de fallo (low_light, spoof_detected, user_abort) y métricas de score/liveness | Equipo móvil, CI |
+
+### 3.5 UX, accesibilidad y condiciones — checklist
+- Fallback seguro cuando no hay biometría enrollada o `LAError/BIOMETRIC_ERROR` → PIN/OTP con mensajes claros.
+- Permisos de cámara: CTA a Settings si se deniega; explicar motivo.
+- Condiciones de captura: guías de luz (>50 lux), no lentes oscuros, estabilidad del rostro; reintentos limitados.
+- Accesibilidad: mensajes compatibles con lectores de pantalla; instrucciones concisas.
+
+### 3.6 Privacidad y custodia de datos — tabla sintética
+| Tema | Requisito | Notas |
+|:-----|:----------|:------|
+| Almacenamiento | No persistir biometría en app; FaceMap/en evidencias solo cifradas y efímeras | Uso exclusivo para verificación; limpiar tras decisión |
+| Transmisión | Encriptar evidencias (TLS/mTLS) y firmar payloads | Validar integridad en backend |
+| Retención | Mínima necesaria para auditoría; cumplir regulaciones de datos biométricos | Borrado/expurgo programado |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+- Tasa de spoof detectado > 99% en PAD 2D/3D; falsos positivos (FAR) < 0.1%.
+- Tiempo de verificación biométrica p95 < 10 s; reintentos promedio ≤ 1.
+- Reducción de fraude en onboarding/credit approvals: meta ↓ incidents en ≥ 80% vs baseline.
+- Tickets de soporte por fallas de biometría ↓ 25% en 4 semanas post-rollout.
 
 ---
 
@@ -66,12 +101,13 @@ El problema: Face ID/Touch ID del sistema operativo solo verifica que "un rostro
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| local_auth | Plugin de biometría del sistema (Face ID/Touch ID/BiometricPrompt) sin verificación de identidad del titular. |
-| Liveness Detection | Pruebas anti-spoofing (2D/3D) para asegurar que hay una persona viva frente a la cámara. |
-| Platform Channels | Puente Flutter ↔ nativo para integrar SDKs que no existen en Dart. |
-| Face Match 1:1 | Comparación de selfie vs foto de documento KYC con umbral de score mínimo. |
-| ISO 30107-3 / PAD | Estándar de pruebas de Presentation Attack Detection para biometría. |
-| Step-up Authentication | Escalar factores (OTP/PIN/biometría avanzada) según riesgo de la operación. |
+| <a id="term-local_auth"></a>local_auth | Plugin de biometría del sistema (Face ID/Touch ID/BiometricPrompt) sin verificación de identidad del titular. |
+| <a id="term-liveness-detection"></a>Liveness Detection | Pruebas anti-spoofing (2D/3D) para asegurar que hay una persona viva frente a la cámara. |
+| <a id="term-platform-channels"></a>Platform Channels | Puente Flutter ↔ nativo para integrar SDKs que no existen en Dart. |
+| <a id="term-face-match"></a>Face Match 1:1 | Comparación de selfie vs foto de documento KYC con umbral de score mínimo. |
+| <a id="term-iso-pad"></a>ISO 30107-3 / PAD | Estándar de pruebas de Presentation Attack Detection para biometría. |
+| <a id="term-step-up"></a>Step-up Authentication | Escalar factores (OTP/PIN/biometría avanzada) según riesgo de la operación. |
+| <a id="term-cubit"></a>Cubit | Patrón de estado ligero basado en flujos secuenciales sin eventos complejos. |
 
 ---
 

@@ -54,13 +54,14 @@ maestro-movil/
 
 ## Formato de Cada Caso
 
-Estructura común optimizada para indexación RAG:
+Estructura común optimizada para indexación RAG (sin código de implementación):
 - **0. Metadata (AI-Tags):** Palabras clave de negocio, patrón técnico, stack, criticidad.
-- **1. Planteamiento del Problema:** Escenario, evidencia de industria, riesgos.
+- **1. Planteamiento del Problema:** Problema técnico + escenario de negocio, incidentes reportados y riesgos.
 - **2. Matriz de Soluciones:** BAJA / ACEPTABLE / ENTERPRISE con análisis de trade-offs.
-- **3. Profundización:** Capacidades, límites, criterio de selección.
-- **Glosario de términos clave:** Definiciones con ancla para tooltips internos.
-- **Referencias:** Fuentes externas relevantes.
+- **3. Profundización:** Capacidades vs límites, criterio de selección y tablas de V&V/UX/seguridad/operación cuando apliquen.
+- **4. Impacto esperado:** KPIs y resultados de negocio.
+- **Glosario de términos clave:** Tabla con ancla `#glosario-de-terminos-clave`; cada término define su `id` (`#term-*`) y el texto del caso debe enlazar a esos términos para habilitar tooltips internos.
+- **Referencias:** 3–5 fuentes externas (incidentes, normas, guías).
 
 ---
 
@@ -105,17 +106,17 @@ Estructura común optimizada para indexación RAG:
 | # | Capítulo | Casos | Estado |
 |:-:|:---------|:-----:|:------:|
 | 1 | Seguridad Bancaria y Gestión de Identidad | 1-10 | ✅ Completado |
-| 2 | Gestión de Estado Compleja | 11-20 | 📋 Pendiente |
-| 3 | Optimización de Rendimiento | 21-30 | 📋 Pendiente |
-| 4 | Estrategias Offline-First | 31-40 | 📋 Pendiente |
-| 5 | Networking Avanzado | 41-50 | 📋 Pendiente |
-| 6 | Arquitectura Modular | 51-60 | 📋 Pendiente |
-| 7 | Integración Nativa | 61-70 | 📋 Pendiente |
-| 8 | DevOps y CI/CD | 71-80 | 📋 Pendiente |
-| 9 | Hardware, IoT y Biometría | 81-90 | 📋 Pendiente |
-| 10 | Migración de Legacy | 91-100 | 📋 Pendiente |
+| 2 | Gestión de Estado Compleja | 11-20 | ✅ Completado |
+| 3 | Optimización de Rendimiento | 21-30 | ✅ Completado |
+| 4 | Estrategias Offline-First | 31-40 | ✅ Completado |
+| 5 | Networking Avanzado | 41-50 | ✅ Completado |
+| 6 | Arquitectura Modular | 51-60 | ✅ Completado |
+| 7 | Integración Nativa | 61-70 | ✅ Completado |
+| 8 | DevOps y CI/CD | 71-80 | ✅ Completado |
+| 9 | Hardware, IoT y Biometría | 81-90 | ✅ Completado |
+| 10 | Migración de Legacy | 91-100 | ✅ Completado |
 
-**Leyenda:** ✅ Completado | 📋 Pendiente
+**Leyenda:** ✅ Completado
 
 ---
 
@@ -147,17 +148,8 @@ Agente: [Busca: "certificate pinning", "iOS", "ATS"]
 - `caso-XX-nombre-descriptivo.md` donde XX es el número del caso
 - Nombres en kebab-case, descriptivos del problema
 
-### Estructura de TACs
-```
-[ ] TAC-X.Y-PLATAFORMA: Descripción del criterio de aceptación.
-```
-Donde:
-- `X` = Número de caso
-- `Y` = Número de TAC dentro del caso
-- `PLATAFORMA` = FLUTTER, ANDROID, IOS, o BACKEND
-
 ### Referencias a Casos Reales
-Cada caso incluye al menos 2-3 referencias a:
+Cada caso incluye 3–5 referencias a:
 - Incidentes de seguridad documentados
 - Estadísticas de industria (Verizon, Kaspersky, ACFE)
 - Normativas (PCI-DSS, GDPR, PSD2, NIST)

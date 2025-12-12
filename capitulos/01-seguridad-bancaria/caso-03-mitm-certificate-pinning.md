@@ -9,34 +9,36 @@
 |:------|:------|
 | **Palabras Clave de Negocio** | certificate pinning, SSL pinning, MITM attack, transferencia interbancaria, SPEI, ACH, seguridad en tránsito |
 | **Patrón Técnico** | Certificate Pinning, Public Key Pinning, Trust on First Use (TOFU) |
-| **Stack Seleccionado** | Dio + dio_http2_adapter + certificados hardcodeados + BLoC (TransferBloc) |
+| **Stack Seleccionado** | Dio + dio_http2_adapter + certificados/pins en config firmada + BLoC (TransferBloc) |
 | **Nivel de Criticidad** | Alto |
 
 ---
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
-### Escenario de Negocio
+### Problema detectado (técnico)
+- TLS estándar confía en cualquier CA instalada en el dispositivo. Con un proxy + CA maliciosa, el atacante lee credenciales, tokens y payloads de transferencias.
+- Implementaciones con **un solo certificado** fallan al rotar el cert: dejan la app inoperable o fuerzan a desactivar pinning para “arreglarlo”.
+- Sin telemetría, los eventos de bypass de pinning no generan alertas: el SOC no detecta intentos de MITM ni debugging indebido.
 
-> *"Como usuario, quiero realizar transferencias interbancarias desde la app móvil con la confianza de que mis datos están protegidos en tránsito."*
+### Escenario de negocio
+> *"Como tesorero corporativo, quiero enviar una transferencia SPEI de $250,000 desde la app, sabiendo que nadie puede interceptar ni modificar los datos en tránsito."*
 
-El problema real: HTTPS estándar confía en cualquier Certificate Authority (CA) instalado en el dispositivo. Un atacante que instala un certificado malicioso puede interceptar todo el tráfico "cifrado".
+- Caso realista: empleado con dispositivo rooteado instala cert corporativo para navegar. Sin pinning, un malware en la misma red capta tokens y payloads de transferencia.
+- Resultado: transferencia redirigida a cuenta del atacante; cliente reporta fraude y exige reverso → costo directo y pérdida de confianza.
 
-### Evidencia de Industria
-
-**Caso DigiNotar 2011:** Una CA holandesa fue comprometida, emitiendo certificados fraudulentos para google.com, permitiendo ataques MITM masivos en Irán.
-
-**Operación Socialist (GCHQ):** Documentos filtrados revelaron uso de proxies MITM con certificados válidos para interceptar tráfico de apps bancarias.
-
-**Estudio académico (2019):** El 73% de las apps bancarias Android no implementaban certificate pinning correctamente.
+### Incidentes reportados
+- **DigiNotar (2011):** CA comprometida emitió >500 certificados falsos; tráfico bancario interceptado en Irán.
+- **Lenovo Superfish (2015):** CA preinstalada permitía MITM en HTTPS para millones de equipos; evidencia del riesgo de confiar en “cualquier” CA.
+- **Estudio académico (2019):** 73% de apps bancarias Android fallaban en pinning; proxies como mitmproxy/Charles leían credenciales y tokens.
 
 ### Riesgos
 
 | Tipo | Impacto |
 |:-----|:--------|
-| **Económico** | Transferencias fraudulentas interceptadas, robo de credenciales |
-| **Regulatorio** | Incumplimiento PCI-DSS Req. 4.1 (cifrado en tránsito) |
-| **Legal** | Responsabilidad del banco si no tomó medidas "razonables" |
+| **Económico** | Transferencias redirigidas; pérdidas potenciales > $250K por incidente; robo de credenciales reutilizables |
+| **Regulatorio** | Incumplimiento PCI-DSS 4.1/PSD2 (cifrado en tránsito robusto); exposición a sanciones |
+| **Legal/Reputacional** | Responsabilidad civil por negligencia si no se adoptó pinning; pérdida de confianza y fuga de clientes |
 
 ---
 
@@ -44,9 +46,9 @@ El problema real: HTTPS estándar confía en cualquier Certificate Authority (CA
 
 | Nivel de Madurez | Solución y Herramienta | Análisis de Decisión (Trade-offs) |
 |:-----------------|:-----------------------|:----------------------------------|
-| **BAJA** | HTTPS estándar con Dio, confiar en CAs del sistema | **INADECUADO:** Vulnerable a cualquier CA comprometida. Proxy (Charles, mitmproxy) + certificado instalado ve todo en texto plano. |
-| **ACEPTABLE** | Certificate pinning con `SecurityContext` y certificado en assets | **CUMPLE MÍNIMOS:** Bloquea CAs desconocidas. PERO: si certificado expira, app muere. Sin actualización dinámica. |
-| **ENTERPRISE** | **Multi-layer pinning:** 1) Pin de Public Key (no certificado), 2) Backup pins para rollover, 3) Fallback con alertas, 4) Actualización dinámica via config firmada, 5) Detección de proxy | **ÓPTIMO PARA BANCA:** Resistente a rotación de certs, detecta intercepción, alerta al SOC, cumple PCI-DSS. |
+| **BAJA** | HTTPS estándar con Dio, confiar en CAs del sistema | **INADECUADO:** Vulnerable a cualquier CA comprometida. Proxy (Charles/mitmproxy) + certificado instalado lee todo en claro. |
+| **ACEPTABLE** | [Certificate pinning](#term-cert-pinning) con `SecurityContext` y certificado en assets | **CUMPLE MÍNIMOS:** Bloquea CAs desconocidas. PERO: si cert expira, app muere; sin pins de respaldo ni rotación planificada. |
+| **ENTERPRISE** | **Multi-layer pinning:** 1) [Public Key pinning](#term-spki) (2–3 SPKI en Base64), 2) Backup pins para rollover 90 días, 3) Fallback controlado (`fail-closed` salvo ventana de rotación), 4) Config remota firmada para actualizar pins, 5) Detección de proxy/root/jailbreak y alertas SOC | **ÓPTIMO PARA BANCA:** Sobrevive rotaciones, minimiza indisponibilidad, bloquea MITM y genera telemetría accionable. Cumple PCI-DSS 4.1 y OWASP MAS. |
 
 ---
 
@@ -54,9 +56,52 @@ El problema real: HTTPS estándar confía en cualquier Certificate Authority (CA
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Bloquear certificados no autorizados incluso de CAs "confiables". Sobrevivir rotación de certs con pin de Public Key (SPKI). Detectar proxies de debug. Actualizar pins sin release via config firmada. Backup pins para rollover. |
-| **Restricciones Duras (NO permite)** | **Debugging:** Certificate pinning dificulta debug (deshabilitar en debug builds). **Proxies corporativos:** Usuarios en redes con proxy SSL legítimo serán bloqueados. **Expiración:** Si todos los pins expiran, app inoperable. **iOS ATS:** Puede conflictuar. |
-| **Criterio de Selección** | Se usa **Public Key pinning** sobre certificate pinning porque las claves públicas sobreviven renovaciones si se usa misma key pair. Se usa **BLoC** para TransferBloc porque transferencias tienen flujo complejo con múltiples eventos y necesitan auditabilidad. |
+| **Capacidades (SÍ permite)** | Bloquear certificados no autorizados incluso de CAs “confiables”. Sobrevivir rotación con [Public Key pinning](#term-spki) y 2–3 pins activos. Detección de proxies de debug/root/jailbreak. Actualización de pins sin release via config firmada. |
+| **Restricciones Duras (NO permite)** | **Debugging:** Pinning complica tráfico vía proxy (habilitar solo en debug). **Proxies corporativos:** Usuarios con proxy SSL legítimo se bloquean por política. **Expiración:** Si vencen todos los pins sin rollover, la app queda inoperable. **ATS:** Configurar excepciones iOS si el endpoint usa TLS intermedio. |
+| **Criterio de Selección** | Se usa **[Public Key pinning](#term-spki)** sobre certificate pinning porque la clave pública sobrevive renovaciones. Se elige **[BLoC](#term-bloc)** para `TransferBloc` por flujo con múltiples eventos y necesidad de auditoría de estados. |
+
+### 3.1 Arquitectura práctica (flujo resumido)
+```
+App móvil → Handshake TLS → Valida SPKI contra pins (2-3 activos)
+    ↳ Pin match: continúa
+    ↳ Pin mismatch: bloquea, emite evento SOC, registra fingerprint del cert
+Config firmada (remota): rota pins cada 90 días; backup pin siempre presente
+```
+
+### 3.2 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Unit (CI) | Interceptor de Dio aplica pinning y rechaza cert no autorizado | Equipo móvil, CI |
+| Integration (CI) | Cert expirado → se usa backup pin; config remota firma válida antes de aplicar | Móvil/Backend, CI + staging |
+| Seguridad manual | Proxy MITM (Charles/mitmproxy) con CA instalada debe ser bloqueado; alerta generada | Seguridad/QE en dispositivos reales |
+| Observabilidad | Evento `pinning.blocked` con hash del cert presentado, motivo y endpoint | Equipo móvil/SRE, CI |
+
+### 3.3 Operación y resiliencia
+- **Rollover planificado:** mantener 2–3 SPKI en Base64; agregar nuevo pin 2 semanas antes del cambio, retirar el antiguo tras validar.
+- **Fallback:** `fail-closed` por defecto; `fail-open` solo durante ventana de rotación aprobada y monitoreada.
+- **Manejo de debug:** pinning desactivado únicamente en `debug` build; `release` siempre con pinning activo.
+
+### 3.4 Observabilidad y seguridad
+- Eventos: `pinning.blocked`, `pinning.matched`, `pinning.failopen_enabled`.
+- Métricas: p95 handshake TLS < 500 ms; porcentaje de pin-match esperado > 99.9%.
+- Alertas SOC cuando `pinning.blocked` supera umbral (ej. 3 eventos/hora por dispositivo).
+
+### 3.5 Política de pins (rotación y custodia)
+| Aspecto | Política |
+|:--------|:---------|
+| Cantidad de pins activos | 2–3 SPKI simultáneos |
+| Formato | SPKI en Base64 (RSA/ECDSA) |
+| Rotación | Cada 90 días o al rotar key pair; agregar pin nuevo antes de retirar el viejo |
+| Fallback | `fail-closed` salvo ventana de rotación aprobada; revertir si `pinning.blocked` se dispara |
+| Publicación | Config remota firmada (JWKS/firmware) con `kid`, algoritmo y expiración |
+
+---
+
+## 4. Impacto esperado
+- Bloqueo de MITM: > 99.9% de sesiones con pin match; alertas en mismatches enviadas al SOC.
+- Disponibilidad: cero caídas por rotación de cert si se mantiene ≥2 SPKI activos; ventana de rotación controlada < 24 h.
+- Rendimiento: handshake TLS p95 < 500 ms; overhead de pinning < 30 ms.
+- Seguridad operacional: intentos de proxying detectados en < 5 s y enviados a SIEM con huella del cert.
 
 ---
 
@@ -66,12 +111,13 @@ El problema real: HTTPS estándar confía en cualquier Certificate Authority (CA
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Certificate Pinning | Validar que el certificado presentado coincide con uno o varios pins definidos en la app. |
-| Public Key Pinning (SPKI) | Pin sobre la clave pública del certificado, sobrevive renovaciones si la key pair se mantiene. |
-| Backup Pins | Pins adicionales para rollover seguro cuando cambia el certificado o la clave. |
-| TOFU | Trust On First Use; confiar en el primer certificado visto y fijarlo para sesiones futuras. |
-| HTTPS Interception | Uso de proxies/CA adicionales para inspeccionar tráfico; pinning lo bloquea. |
-| ATS (iOS) | App Transport Security; configuración de seguridad de red en iOS que interactúa con pinning. |
+| <a id="term-cert-pinning"></a>Certificate Pinning | Validar que el certificado presentado coincide con pins definidos en la app. |
+| <a id="term-spki"></a>Public Key Pinning (SPKI) | Pin sobre la clave pública del certificado, sobrevive renovaciones si la key pair se mantiene. |
+| <a id="term-backup"></a>Backup Pins | Pins adicionales para rollover seguro cuando cambia el certificado o la clave. |
+| <a id="term-tofu"></a>TOFU | Trust On First Use; confiar en el primer certificado visto y fijarlo para sesiones futuras. |
+| <a id="term-https-intercept"></a>HTTPS Interception | Uso de proxies/CA adicionales para inspeccionar tráfico; pinning lo bloquea. |
+| <a id="term-ats"></a>ATS (iOS) | App Transport Security; configuración de seguridad de red en iOS que interactúa con pinning. |
+| <a id="term-bloc"></a>BLoC | Patrón de estado basado en eventos y transición de estados con auditoría. |
 
 ---
 
@@ -81,6 +127,7 @@ El problema real: HTTPS estándar confía en cualquier Certificate Authority (CA
 - [Android Network Security Config](https://developer.android.com/training/articles/security-config)
 - [iOS App Transport Security](https://developer.apple.com/documentation/bundleresources/information_property_list/nsapptransportsecurity)
 - [PCI-DSS Requirement 4.1](https://www.pcisecuritystandards.org/)
+- [OWASP MASVS/MASTG - Network Communication](https://mas.owasp.org/)
 
 ---
 
