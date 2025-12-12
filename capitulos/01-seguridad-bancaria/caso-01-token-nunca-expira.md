@@ -142,6 +142,22 @@ App -> Interceptor: recibe push, limpia storage y fuerza AuthLogout
 - Skew de reloj: tolerancia ±2 min en expiración para evitar falsos 401.
 - Claves backend: publicar JWKS con `kid`, usar RS256/ES256, rotar claves de firma JWT con solapamiento; revocar familias asociadas a claves comprometidas.
 
+### 3.13 Caso problema e impacto al negocio
+- Escenario: tokens sin expiración ni rotación permiten sesiones zombis que generan fraude directo (> $2.4M en incidentes similares), aumento de reclamos y churn (65% de usuarios abandonan tras una brecha).
+- Afectación: riesgo regulatorio (PSD2/SCA), costos de soporte por “sesión perdida”, pérdida de confianza y auditorías fallidas si no hay trazabilidad de sesiones.
+
+### 3.14 Impacto esperado y KPIs
+- 0 incidentes de token reuse/día (alerta crítica si >0).
+- p95 de `/auth/refresh` < 500 ms; warning ≥ 650 ms; crítico ≥ 800 ms.
+- Éxito de refresh > 99.5% (rolling 7d); alerta si baja de 99.5% por 5 min.
+- Tickets de soporte por “sesión perdida” ↓ 30% en 4 semanas post-rollout.
+
+### 3.15 Rollout y validación
+- Flag de activación: 10% → 50% → 100% en 2 semanas.
+- Monitoreo: `auth.*` (token_reuse, refresh_success_rate, latency p95) + crash-free sessions en flujos de auth.
+- Rollback vía flag si `token_reuse > 0` o `refresh_success_rate < 99%` sostenido 15 min.
+- Cohortes: comparar NPS y tickets vs baseline; validar que la ventana de sesión no afecta UX (reintentos ≤ 1).
+
 <a id="glosario-de-terminos-clave"></a>
 ## Glosario de Términos Clave
 
