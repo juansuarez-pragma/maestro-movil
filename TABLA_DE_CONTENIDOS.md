@@ -18,16 +18,16 @@
 
 | Caso | Título | Archivo |
 |:----:|:-------|:--------|
-| 1 | **Cómo una Sesión Zombie Costó $2.4M en Fraude** | [caso-01-token-nunca-expira](capitulos/01-seguridad-bancaria/caso-01-token-nunca-expira.md) |
-| 2 | **Cuando Face ID No Es Suficiente para Aprobar un Crédito** | [caso-02-biometria-falsificada](capitulos/01-seguridad-bancaria/caso-02-biometria-falsificada.md) |
-| 3 | **Certificate Pinning en Transferencias Interbancarias** | [caso-03-mitm-certificate-pinning](capitulos/01-seguridad-bancaria/caso-03-mitm-certificate-pinning.md) |
-| 4 | **Detectar Dispositivos Comprometidos sin Bloquear Usuarios Legítimos** | [caso-04-root-jailbreak-detection](capitulos/01-seguridad-bancaria/caso-04-root-jailbreak-detection.md) |
-| 5 | **Protegiendo PINs en Apps de Banca Móvil** | [caso-05-secure-pin-pad](capitulos/01-seguridad-bancaria/caso-05-secure-pin-pad.md) |
-| 6 | **El Caso del Café que Vació Cuentas** | [caso-06-session-hijacking-wifi](capitulos/01-seguridad-bancaria/caso-06-session-hijacking-wifi.md) |
-| 7 | **Persistencia Segura de Credenciales en E-commerce** | [caso-07-remember-me-seguro](capitulos/01-seguridad-bancaria/caso-07-remember-me-seguro.md) |
-| 8 | **Implementando MFA Resistente a SIM Swapping** | [caso-08-mfa-sim-swapping](capitulos/01-seguridad-bancaria/caso-08-mfa-sim-swapping.md) |
-| 9 | **Tokenización de Tarjetas sin Tocar Datos Sensibles** | [caso-09-pci-dss-tokenizacion](capitulos/01-seguridad-bancaria/caso-09-pci-dss-tokenizacion.md) |
-| 10 | **Auditoría y Trazabilidad de Acciones en Apps Internas** | [caso-10-auditoria-trazabilidad](capitulos/01-seguridad-bancaria/caso-10-auditoria-trazabilidad.md) |
+| 1 | **Cómo una Sesión Zombie Costó $2.4M en Fraude** | [caso-01-token-nunca-expira](capitulos/01-seguridad/caso-01-token-nunca-expira.md) |
+| 2 | **Cuando Face ID No Es Suficiente para Aprobar un Crédito** | [caso-02-biometria-falsificada](capitulos/01-seguridad/caso-02-biometria-falsificada.md) |
+| 3 | **Certificate Pinning en Transferencias Interbancarias** | [caso-03-mitm-certificate-pinning](capitulos/01-seguridad/caso-03-mitm-certificate-pinning.md) |
+| 4 | **Detectar Dispositivos Comprometidos sin Bloquear Usuarios Legítimos** | [caso-04-root-jailbreak-detection](capitulos/01-seguridad/caso-04-root-jailbreak-detection.md) |
+| 5 | **Protegiendo PINs en Apps de Banca Móvil** | [caso-05-secure-pin-pad](capitulos/01-seguridad/caso-05-secure-pin-pad.md) |
+| 6 | **El Caso del Café que Vació Cuentas** | [caso-06-session-hijacking-wifi](capitulos/01-seguridad/caso-06-session-hijacking-wifi.md) |
+| 7 | **Persistencia Segura de Credenciales en E-commerce** | [caso-07-remember-me-seguro](capitulos/01-seguridad/caso-07-remember-me-seguro.md) |
+| 8 | **Implementando MFA Resistente a SIM Swapping** | [caso-08-mfa-sim-swapping](capitulos/01-seguridad/caso-08-mfa-sim-swapping.md) |
+| 9 | **Tokenización de Tarjetas sin Tocar Datos Sensibles** | [caso-09-pci-dss-tokenizacion](capitulos/01-seguridad/caso-09-pci-dss-tokenizacion.md) |
+| 10 | **Auditoría y Trazabilidad de Acciones en Apps Internas** | [caso-10-auditoria-trazabilidad](capitulos/01-seguridad/caso-10-auditoria-trazabilidad.md) |
 
 ---
 
@@ -178,4 +178,3 @@
 | 100 | **Checklist de Decommissioning Seguro** | [caso-100-decommissioning](capitulos/10-migracion-legacy/caso-100-decommissioning.md) |
 
 ---
-

@@ -37,7 +37,7 @@ maestro-movil/
 ├── CLAUDE.md                          # Contexto para Claude AI
 ├── TABLA_DE_CONTENIDOS.md             # Índice completo de los 100 casos
 ├── capitulos/
-│   ├── 01-seguridad-bancaria/         # Casos 1-10
+│   ├── 01-seguridad/                  # Casos 1-10
 │   ├── 02-gestion-estado/             # Casos 11-20
 │   ├── 03-rendimiento/                # Casos 21-30
 │   ├── 04-offline-first/              # Casos 31-40
