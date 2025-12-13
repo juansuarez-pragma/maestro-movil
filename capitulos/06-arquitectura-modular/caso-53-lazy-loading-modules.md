@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | lazy loading, módulos, tamaño de app, on-demand |
-| **Patrón Técnico** | Dynamic Feature Loading, Code Splitting, Deferred Components |
+| **Patrón Técnico** | [Dynamic Feature](#term-dynamic-feature "Módulo descargable de Android App Bundle.") Loading, Code Splitting, Deferred Components |
 | **Stack Seleccionado** | Flutter + deferred imports + Android Dynamic Features + Riverpod para gating |
 | **Nivel de Criticidad** | Alto |
 
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Deferred Import | Carga de librería Dart bajo demanda. |
-| Dynamic Feature | Módulo descargable de Android App Bundle. |
-| Gate/Flag | Condición que habilita la carga de un módulo. |
-| Preload | Descargar anticipadamente basado en señal de uso probable. |
-| Split per ABI | Generar artefactos por arquitectura para reducir tamaño. |
+| <a id="term-deferred-import"></a>Deferred Import | Carga de librería Dart bajo demanda. |
+| <a id="term-dynamic-feature"></a>Dynamic Feature | Módulo descargable de Android App Bundle. |
+| <a id="term-gate-flag"></a>Gate/Flag | Condición que habilita la carga de un módulo. |
+| <a id="term-preload"></a>Preload | Descargar anticipadamente basado en señal de uso probable. |
+| <a id="term-split-per-abi"></a>Split per ABI | Generar artefactos por arquitectura para reducir tamaño. |
 
 ---
 

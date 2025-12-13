@@ -1,5 +1,5 @@
 # Caso 10: El Empleado Deshonesto
-## Auditoría y Trazabilidad de Acciones en Apps Internas
+## [Auditoría](#term-auditoria "Registro fiable y ordenado de eventos para investigación forense y cumplimiento.") y [Trazabilidad](#term-trazabilidad "Capacidad de seguir el ciclo completo de una operación (quién, qué, cuándo, desde dónde).") de Acciones en Apps Internas
 
 ---
 
@@ -91,9 +91,9 @@ Apps internas manejan operaciones sensibles. Sin audit trail robusto, es imposib
 ### 3.3 Operación y riesgo
 | Tema | Política | Nota |
 |:-----|:--------|:-----|
-| Retención | Definir TTL y archivado (WORM en backend) | Cumple requerimientos regulatorios |
+| [Retención](#term-retencion "Política de cuánto tiempo se almacenan logs/eventos según regulación y costo.") | Definir TTL y archivado (WORM en backend) | Cumple requerimientos regulatorios |
 | Integridad | Hash chain + firma/clave app para cada evento | Evidencia tamper-evident |
-| Correlación | Incluir trace_id, device_id, user_id pseudoanon, timestamp preciso | Facilita investigación |
+| [Correlación](#term-correlacion "Enlazar eventos con ids comunes (trace_id, session_id, user_id pseudoanon) para reconstruir flujos.") | Incluir trace_id, device_id, user_id pseudoanon, timestamp preciso | Facilita investigación |
 
 ### 3.4 Mini-ADR (Decisión de Arquitectura)
 | Aspecto | Detalle |
@@ -124,12 +124,12 @@ Apps internas manejan operaciones sensibles. Sin audit trail robusto, es imposib
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Auditoría | Registro fiable y ordenado de eventos para investigación forense y cumplimiento. |
-| Trazabilidad | Capacidad de seguir el ciclo completo de una operación (quién, qué, cuándo, desde dónde). |
-| Correlación | Enlazar eventos con ids comunes (trace_id, session_id, user_id pseudoanon) para reconstruir flujos. |
-| Retención | Política de cuánto tiempo se almacenan logs/eventos según regulación y costo. |
-| Inmutabilidad | Garantía de que los registros no han sido alterados (WORM, firmas, hash chain). |
-| PII Minimization | Registrar solo lo necesario, pseudoanonimizar datos para cumplir privacidad. |
+| <a id="term-auditoria"></a>Auditoría | Registro fiable y ordenado de eventos para investigación forense y cumplimiento. |
+| <a id="term-trazabilidad"></a>Trazabilidad | Capacidad de seguir el ciclo completo de una operación (quién, qué, cuándo, desde dónde). |
+| <a id="term-correlacion"></a>Correlación | Enlazar eventos con ids comunes (trace_id, session_id, user_id pseudoanon) para reconstruir flujos. |
+| <a id="term-retencion"></a>Retención | Política de cuánto tiempo se almacenan logs/eventos según regulación y costo. |
+| <a id="term-inmutabilidad"></a>Inmutabilidad | Garantía de que los registros no han sido alterados (WORM, firmas, hash chain). |
+| <a id="term-pii-minimization"></a>PII Minimization | Registrar solo lo necesario, pseudoanonimizar datos para cumplir privacidad. |
 
 ---
 

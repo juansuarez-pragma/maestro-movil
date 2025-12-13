@@ -1,4 +1,4 @@
-# Caso 81: BLE Seguro para Wearables
+# Caso 81: [BLE](#term-ble "Bluetooth Low Energy.") Seguro para Wearables
 ## Sincronizar Dispositivos sin Exponer Datos
 
 ---
@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | BLE, wearables, seguridad, pairing, cifrado |
-| **Patrón Técnico** | Secure BLE Pairing, GATT Permissions, Data Encryption |
+| **Patrón Técnico** | Secure BLE [Pairing](#term-pairing "Proceso de establecimiento de clave compartida."), [GATT](#term-gatt "Perfil de atributos genéricos en BLE.") Permissions, Data Encryption |
 | **Stack Seleccionado** | Flutter + plugins BLE nativos + pairing seguro + cifrado app-layer |
 | **Nivel de Criticidad** | Alto |
 
@@ -64,7 +64,7 @@
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Pairing seguro (Just Works no recomendado; usar Passkey/Numeric Comparison). Whitelist de dispositivos pareados. Cifrado a nivel app de datos sensibles. Firmas/HMAC en payload. Validar servicios/características esperadas. |
+| **Capacidades (SÍ permite)** | Pairing seguro (Just Works no recomendado; usar Passkey/Numeric Comparison). [Whitelist](#term-whitelist "Lista de dispositivos autorizados.") de dispositivos pareados. Cifrado a nivel app de datos sensibles. Firmas/[HMAC](#term-hmac "Código de autenticación de mensajes basado en hash.") en payload. Validar servicios/características esperadas. |
 | **Restricciones Duras (NO permite)** | **Hardware limitado:** Algunos wearables no soportan pairing fuerte. **Canales inseguros:** BLE puede ser jammeado. **UX:** Pairing demasiado estricto puede frustrar usuarios. |
 | **Criterio de Selección** | Pairing autenticado, cifrado app-layer, validación de servicios GATT, rotación de claves; Riverpod para estado de conexión. |
 
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| BLE | Bluetooth Low Energy. |
-| GATT | Perfil de atributos genéricos en BLE. |
-| Pairing | Proceso de establecimiento de clave compartida. |
-| Whitelist | Lista de dispositivos autorizados. |
-| HMAC | Código de autenticación de mensajes basado en hash. |
+| <a id="term-ble"></a>BLE | Bluetooth Low Energy. |
+| <a id="term-gatt"></a>GATT | Perfil de atributos genéricos en BLE. |
+| <a id="term-pairing"></a>Pairing | Proceso de establecimiento de clave compartida. |
+| <a id="term-whitelist"></a>Whitelist | Lista de dispositivos autorizados. |
+| <a id="term-hmac"></a>HMAC | Código de autenticación de mensajes basado en hash. |
 
 ---
 

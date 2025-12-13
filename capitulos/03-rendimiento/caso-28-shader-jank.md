@@ -9,7 +9,7 @@
 |:------|:------|
 | **Palabras Clave de Negocio** | shader jank, prewarming, animaciones, rendimiento |
 | **Patrón Técnico** | Shader Precompilation, Warmup, Pipeline Caching |
-| **Stack Seleccionado** | Flutter + `ShaderWarmUp`/`SkSL warmup` + `impeller` (cuando aplique) |
+| **Stack Seleccionado** | Flutter + `[ShaderWarmUp](#term-shaderwarmup "Hook para renderizar escenas y precalentar shaders.")`/`[SkSL](#term-sksl "Shading Language de Skia, se puede capturar y reutilizar.") warmup` + `impeller` (cuando aplique) |
 | **Nivel de Criticidad** | Alto |
 
 ---
@@ -56,7 +56,7 @@
 |:-----------------|:-----------------------|:----------------------------------|
 | **BAJA** | No hacer nada; aceptar jank inicial | **INADECUADO:** UX pobre. |
 | **ACEPTABLE** | Capturar SkSL en debug y empaquetar | **MEJORA:** Reduce jank, pero depende de rutas ejercitadas en captura. |
-| **ENTERPRISE** | **Pre-warm estructurado:** `ShaderWarmUp`, SkSL capturado en staging con rutas críticas, carga en splash, monitoreo en prod; usar Impeller cuando disponible | **ÓPTIMO:** Minimiza jank inicial en animaciones críticas. |
+| **ENTERPRISE** | **Pre-warm estructurado:** `ShaderWarmUp`, SkSL capturado en staging con rutas críticas, carga en splash, monitoreo en prod; usar [Impeller](#term-impeller "Nuevo render engine de Flutter que reduce jank de shaders.") cuando disponible | **ÓPTIMO:** Minimiza jank inicial en animaciones críticas. |
 
 ---
 
@@ -116,12 +116,12 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Shader Jank | Saltos en animaciones por compilación de shaders en runtime. |
-| SkSL | Shading Language de Skia, se puede capturar y reutilizar. |
-| ShaderWarmUp | Hook para renderizar escenas y precalentar shaders. |
-| Impeller | Nuevo render engine de Flutter que reduce jank de shaders. |
-| Pipeline Cache | Cache de pipelines de render para reutilizar compilaciones. |
-| SkSL | Shading Language de Skia capturable para warmup. |
+| <a id="term-shader-jank"></a>Shader Jank | Saltos en animaciones por compilación de shaders en runtime. |
+| <a id="term-sksl"></a>SkSL | Shading Language de Skia, se puede capturar y reutilizar. |
+| <a id="term-shaderwarmup"></a>ShaderWarmUp | Hook para renderizar escenas y precalentar shaders. |
+| <a id="term-impeller"></a>Impeller | Nuevo render engine de Flutter que reduce jank de shaders. |
+| <a id="term-pipeline-cache"></a>Pipeline Cache | Cache de pipelines de render para reutilizar compilaciones. |
+| <a id="term-sksl"></a>SkSL | Shading Language de Skia capturable para warmup. |
 
 ---
 

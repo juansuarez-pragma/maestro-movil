@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | autenticación biométrica, Face ID, Touch ID, aprobación de crédito, fraude de identidad, liveness detection |
-| **Patrón Técnico** | Multi-Layer Biometric Authentication, Step-up Authentication, Liveness Detection |
+| **Patrón Técnico** | Multi-Layer Biometric Authentication, [Step-up Authentication](#term-step-up "Escalar factores (OTP/PIN/biometría avanzada) según riesgo de la operación."), Liveness Detection |
 | **Stack Seleccionado** | local_auth + platform channels para SDK nativo (Facetec/iProov) + Cubit (BiometricCubit) |
 | **Nivel de Criticidad** | Alto |
 
@@ -71,21 +71,36 @@
 
 ## 3. Profundización: Capacidades, Límites y Restricciones
 
-| Dimensión | Detalle Técnico |
-|:----------|:----------------|
-| **Capacidades (SÍ permite)** | Detección de ataques 2D (fotos, pantallas) y 3D (máscaras). Verificación de liveness con challenge-response. Comparación [1:1](#term-face-match) selfie vs documento. FaceMap encriptado para auditoría. Funciona con cámara frontal estándar. Cumple ISO 30107-3 y NIST FRVT. |
-| **Restricciones Duras (NO permite)** | **local_auth SOLO:** No distingue entre titular y otra persona del dispositivo. **Sin red:** Algunos SDKs requieren validación server-side. **Condiciones extremas:** Liveness falla con luz < 50 lux, lentes muy oscuros, barbas > 50% rostro. **Simulador:** Biometría no disponible. |
-| **Criterio de Selección** | Se usa **[Cubit](#term-cubit)** en lugar de BLoC porque el flujo es secuencial sin eventos complejos (captura→análisis→resultado). Cubit reduce boilerplate. Se usan **[Platform Channels](#term-platform-channels)** para SDK nativo porque Facetec/iProov solo existen en Kotlin/Swift, procesamiento de imagen más eficiente nativo. |
-
----
-
-### 3.4 Plan de verificación (V&V) — vista comparativa
+### 3.1 Plan de verificación (V&V)
 | Tipo de verificación | Qué valida | Responsable/Entorno |
 |:---------------------|:-----------|:--------------------|
 | Unit (CI) | Cubit de biometría transita estados secuenciales y maneja errores | Equipo móvil, CI |
 | Integration (CI) | SDK de liveness responde spoof → app rechaza y no aprueba; fallback a PIN/OTP cuando biometría falla/enroll no disponible | Equipo móvil/backend, CI |
 | Seguridad manual | Ataque de foto impresa/video grabado debe ser rechazado; permisos de cámara manejados correctamente | Seguridad/QE, dispositivos reales |
 | Observabilidad (CI) | Eventos `biometric.*` con motivo de fallo (low_light, spoof_detected, user_abort) y métricas de score/liveness | Equipo móvil, CI |
+
+### 3.2 Capacidades, límites y restricciones — tabla
+| Dimensión | Detalle Técnico |
+|:----------|:----------------|
+| **Capacidades (SÍ permite)** | Detección de ataques 2D (fotos, pantallas) y 3D (máscaras). Verificación de liveness con challenge-response. Comparación [1:1](#term-face-match) selfie vs documento. FaceMap encriptado para auditoría. Funciona con cámara frontal estándar. Cumple ISO 30107-3 y NIST FRVT. |
+| **Restricciones Duras (NO permite)** | **local_auth SOLO:** No distingue entre titular y otra persona del dispositivo. **Sin red:** Algunos SDKs requieren validación server-side. **Condiciones extremas:** Liveness falla con luz < 50 lux, lentes muy oscuros, barbas > 50% rostro. **Simulador:** Biometría no disponible. |
+| **Criterio de Selección** | Se usa **[Cubit](#term-cubit)** en lugar de BLoC porque el flujo es secuencial sin eventos complejos (captura→análisis→resultado). Cubit reduce boilerplate. Se usan **[Platform Channels](#term-platform-channels)** para SDK nativo porque Facetec/iProov solo existen en Kotlin/Swift, procesamiento de imagen más eficiente nativo. |
+
+### 3.3 Privacidad y custodia de datos — tabla sintética
+| Tema | Requisito | Notas |
+|:-----|:----------|:------|
+| Almacenamiento | No persistir biometría en app; FaceMap/en evidencias solo cifradas y efímeras | Uso exclusivo para verificación; limpiar tras decisión |
+| Transmisión | Encriptar evidencias (TLS/mTLS) y firmar payloads | Validar integridad en backend |
+| Retención | Mínima necesaria para auditoría; cumplir regulaciones de datos biométricos | Borrado/expurgo programado |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Biometría del dispositivo sin liveness no valida titular ni detecta spoof (fotos/deepfakes). |
+| Opciones evaluadas | Solo `local_auth`; `local_auth` + selfie backend; SDK PAD certificado + comparación 1:1 + fallback. |
+| Decisión | SDK con PAD certificado (ISO 30107-3) via Platform Channels + comparación 1:1 KYC + fallback seguro (PIN/OTP). |
+| Consecuencias | Dependencia de SDK nativo y red; mayor latencia que `local_auth` solo; costo de licenciamiento. |
+| Riesgos aceptados | Fallos en baja luz/oclusiones; dependencia de conectividad para validación server-side. |
 
 ### 3.5 UX, accesibilidad y condiciones — tabla
 | Tema | Política | Nota |
@@ -95,28 +110,12 @@
 | Condiciones de captura | Luz > 50 lux, sin lentes oscuros, rostro estable; reintentos limitados | Mejora tasas de éxito y reduce falsos rechazos |
 | Accesibilidad | Mensajes compatibles con lectores de pantalla; instrucciones concisas | Inclusión y reducción de fricción |
 
-### 3.7 Contratos y evidencias
+### 3.6 Contratos y evidencias
 | Componente | Request/Evidencia | Validación | Nota |
 |:-----------|:------------------|:-----------|:-----|
 | Captura selfie liveness | Frame + metadata (luz, movimiento) | SDK PAD certificado iBeta/NIST | No persistir en app; envío cifrado |
 | Comparación 1:1 | Selfie vs foto KYC | Score ≥ umbral; firma del proveedor | Loguear motivo de fallo (spoof, low_light) |
 | Evento de resultado | `biometric.result` con score, liveness, motivo | Observabilidad en CI/producción | No registrar imágenes; solo metadatos |
-
-### 3.6 Privacidad y custodia de datos — tabla sintética
-| Tema | Requisito | Notas |
-|:-----|:----------|:------|
-| Almacenamiento | No persistir biometría en app; FaceMap/en evidencias solo cifradas y efímeras | Uso exclusivo para verificación; limpiar tras decisión |
-| Transmisión | Encriptar evidencias (TLS/mTLS) y firmar payloads | Validar integridad en backend |
-| Retención | Mínima necesaria para auditoría; cumplir regulaciones de datos biométricos | Borrado/expurgo programado |
-
-### 3.8 Mini-ADR (Decisión de Arquitectura)
-| Aspecto | Detalle |
-|:--------|:--------|
-| Problema | Biometría del dispositivo sin liveness no valida titular ni detecta spoof (fotos/deepfakes). |
-| Opciones evaluadas | Solo `local_auth`; `local_auth` + selfie backend; SDK PAD certificado + comparación 1:1 + fallback. |
-| Decisión | SDK con PAD certificado (ISO 30107-3) via Platform Channels + comparación 1:1 KYC + fallback seguro (PIN/OTP). |
-| Consecuencias | Dependencia de SDK nativo y red; mayor latencia que `local_auth` solo; costo de licenciamiento. |
-| Riesgos aceptados | Fallos en baja luz/oclusiones; dependencia de conectividad para validación server-side. |
 
 ---
 

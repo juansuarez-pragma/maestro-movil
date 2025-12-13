@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | websocket, resiliencia, reconexión, chat soporte |
-| **Patrón Técnico** | Reconnection Strategy, Heartbeat/Ping-Pong, Message Queue |
+| **Patrón Técnico** | Reconnection Strategy, [Heartbeat](#term-heartbeat "Ping/pong para verificar que la conexión sigue viva.")/Ping-Pong, Message Queue |
 | **Stack Seleccionado** | Flutter + WebSocket channel + interceptors + Riverpod estado de conexión |
 | **Nivel de Criticidad** | Alto |
 
@@ -64,9 +64,9 @@
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Detectar desconexión y reconectar con backoff+jitter. Heartbeat/ping-pong para salud. Buffer de mensajes salientes y re-envío tras reconectar. Re-sync de históricos desde último ID. Deduplicación por message ID. |
+| **Capacidades (SÍ permite)** | Detectar desconexión y reconectar con backoff+jitter. Heartbeat/ping-pong para salud. [Buffer de mensajes](#term-buffer-de-mensajes "Cola temporal de mensajes pendientes de envío.") salientes y re-envío tras reconectar. [Re-sync](#term-re-sync "Recuperar mensajes faltantes tras reconectar.") de históricos desde último ID. [Deduplicación](#term-deduplicacion "Evitar procesar dos veces el mismo mensaje.") por message ID. |
 | **Restricciones Duras (NO permite)** | **Red sin estabilidad:** No garantiza entrega sin soporte backend (acks). **Batería:** Heartbeats frecuentes consumen energía. **Background:** iOS/Android pueden suspender; requiere estrategias de foreground. |
-| **Criterio de Selección** | Backoff + jitter; heartbeats ajustados; cola persistente opcional; IDs para dedup; re-sync al reconectar. |
+| **Criterio de Selección** | [Backoff + jitter](#term-backoff-jitter "Reconexión con espera creciente y aleatoria."); heartbeats ajustados; cola persistente opcional; IDs para dedup; re-sync al reconectar. |
 
 ### 3.1 Plan de verificación (V&V)
 | Tipo de verificación | Qué valida | Responsable/Entorno |
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Heartbeat | Ping/pong para verificar que la conexión sigue viva. |
-| Backoff + jitter | Reconexión con espera creciente y aleatoria. |
-| Deduplicación | Evitar procesar dos veces el mismo mensaje. |
-| Buffer de mensajes | Cola temporal de mensajes pendientes de envío. |
-| Re-sync | Recuperar mensajes faltantes tras reconectar. |
+| <a id="term-heartbeat"></a>Heartbeat | Ping/pong para verificar que la conexión sigue viva. |
+| <a id="term-backoff-jitter"></a>Backoff + jitter | Reconexión con espera creciente y aleatoria. |
+| <a id="term-deduplicacion"></a>Deduplicación | Evitar procesar dos veces el mismo mensaje. |
+| <a id="term-buffer-de-mensajes"></a>Buffer de mensajes | Cola temporal de mensajes pendientes de envío. |
+| <a id="term-re-sync"></a>Re-sync | Recuperar mensajes faltantes tras reconectar. |
 
 ---
 

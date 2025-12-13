@@ -71,7 +71,7 @@
 ### 3.1 Plan de verificación (V&V)
 | Tipo de verificación | Qué valida | Responsable/Entorno |
 |:---------------------|:-----------|:--------------------|
-| Unit/Integration (CI) | Chunking/resume de sync; constraints aplicadas | Móvil/Backend, CI |
+| Unit/Integration (CI) | [Chunking](#term-chunking "Dividir datos en partes pequeñas para procesar/enviar.")/resume de sync; constraints aplicadas | Móvil/Backend, CI |
 | Performance | Medir duración/consumo en condiciones simuladas | QA/Perf |
 | Observabilidad | Eventos `sync.bg` con duración, bytes, éxito | Móvil/SRE |
 
@@ -79,7 +79,7 @@
 | Tema | Política | Nota |
 |:-----|:---------|:-----|
 | Feedback | Mostrar progreso/resume; reintento en foreground si falla BG | UX clara |
-| Constraints | WiFi/carga cuando aplique; fallback documentado | Balance consumo/entrega |
+| [Constraints](#term-constraints "Condiciones (WiFi, carga, idle) para ejecutar tareas.") | WiFi/carga cuando aplique; fallback documentado | Balance consumo/entrega |
 | Batching | Agrupar operaciones para minimizar wakeups | Eficiencia |
 
 ### 3.3 Operación y riesgo
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Chunking | Dividir datos en partes pequeñas para procesar/enviar. |
-| Constraints | Condiciones (WiFi, carga, idle) para ejecutar tareas. |
-| Resume | Reanudar sync desde el último punto procesado. |
-| Backoff | Espera creciente entre reintentos. |
-| Telemetría de sync | Métricas de duración, éxito, consumo. |
+| <a id="term-chunking"></a>Chunking | Dividir datos en partes pequeñas para procesar/enviar. |
+| <a id="term-constraints"></a>Constraints | Condiciones (WiFi, carga, idle) para ejecutar tareas. |
+| <a id="term-resume"></a>Resume | Reanudar sync desde el último punto procesado. |
+| <a id="term-backoff"></a>Backoff | Espera creciente entre reintentos. |
+| <a id="term-telemetria-de-sync"></a>Telemetría de sync | Métricas de duración, éxito, consumo. |
 
 ---
 

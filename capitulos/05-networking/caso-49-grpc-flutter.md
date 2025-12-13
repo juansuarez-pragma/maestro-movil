@@ -1,4 +1,4 @@
-# Caso 49: gRPC en Flutter
+# Caso 49: [gRPC](#term-grpc "Framework RPC con HTTP/2 y protobuf.") en Flutter
 ## Comunicación de Alta Performance para Fintech
 
 ---
@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | grpc, streaming, baja latencia, fintech |
-| **Patrón Técnico** | Bidirectional Streaming, Proto Contracts, TLS mTLS |
+| **Patrón Técnico** | [Bidirectional Streaming](#term-bidirectional-streaming "Cliente y servidor envían streams simultáneos."), [Proto](#term-proto "Archivo de definición de mensajes/servicios.") Contracts, TLS [mTLS](#term-mtls "Mutual TLS; verifica cliente y servidor.") |
 | **Stack Seleccionado** | Flutter + gRPC/protobuf + interceptors + Riverpod para estados |
 | **Nivel de Criticidad** | Alto |
 
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| gRPC | Framework RPC con HTTP/2 y protobuf. |
-| Bidirectional Streaming | Cliente y servidor envían streams simultáneos. |
-| mTLS | Mutual TLS; verifica cliente y servidor. |
-| Proto | Archivo de definición de mensajes/servicios. |
-| Interceptor | Hook para añadir auth/tracing/logging en gRPC. |
+| <a id="term-grpc"></a>gRPC | Framework RPC con HTTP/2 y protobuf. |
+| <a id="term-bidirectional-streaming"></a>Bidirectional Streaming | Cliente y servidor envían streams simultáneos. |
+| <a id="term-mtls"></a>mTLS | Mutual TLS; verifica cliente y servidor. |
+| <a id="term-proto"></a>Proto | Archivo de definición de mensajes/servicios. |
+| <a id="term-interceptor"></a>Interceptor | Hook para añadir auth/tracing/logging en gRPC. |
 
 ---
 

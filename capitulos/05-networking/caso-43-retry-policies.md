@@ -1,4 +1,4 @@
-# Caso 43: El Timeout que Quebró el Banco
+# Caso 43: El [Timeout](#term-timeout "Tiempo límite para abortar una operación.") que Quebró el Banco
 ## Configurar Retry Policies Inteligentes
 
 ---
@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | retry, timeout, resiliencia, políticas de reintento |
-| **Patrón Técnico** | Exponential Backoff, Jitter, Circuit Breaker Light |
+| **Patrón Técnico** | Exponential Backoff, [Jitter](#term-jitter "Aleatorizar intervalos para evitar sincronía."), Circuit Breaker Light |
 | **Stack Seleccionado** | Flutter + Dio interceptors + Riverpod para estado de red + backoff con jitter |
 | **Nivel de Criticidad** | Crítico |
 
@@ -54,9 +54,9 @@
 
 | Nivel de Madurez | Solución y Herramienta | Análisis de Decisión (Trade-offs) |
 |:-----------------|:-----------------------|:----------------------------------|
-| **BAJA** | Retries infinitos o sin backoff | **INADECUADO:** Thundering herd, más fallos. |
+| **BAJA** | Retries infinitos o sin backoff | **INADECUADO:** [Thundering herd](#term-thundering-herd "Multiples clientes reintentando a la vez causando pico de carga."), más fallos. |
 | **ACEPTABLE** | Retries fijos (pocos) | **MEJORA:** Menos riesgo, pero sin adaptación a latencia/errores. |
-| **ENTERPRISE** | **Backoff exponencial con jitter + límites:** retries limitados, timeouts adecuados por operación, idempotencia garantizada, cancelación si sin red | **ÓPTIMO:** Resiliencia sin tormentas ni duplicados. |
+| **ENTERPRISE** | **[Backoff exponencial](#term-backoff-exponencial "Incrementar el intervalo entre reintentos.") con jitter + límites:** retries limitados, timeouts adecuados por operación, idempotencia garantizada, cancelación si sin red | **ÓPTIMO:** Resiliencia sin tormentas ni duplicados. |
 
 ---
 
@@ -87,7 +87,7 @@
 |:-----|:--------|:-----|
 | Timeouts | Por operación (pago vs consulta) | Ajuste fino |
 | Límites | Máx. intentos; evitar loops | Seguridad |
-| Idempotencia | Requerida en mutaciones críticas | Evita duplicados |
+| [Idempotencia](#term-idempotencia "Misma operación repetida no cambia el resultado final.") | Requerida en mutaciones críticas | Evita duplicados |
 
 ### 3.4 Mini-ADR (Decisión de Arquitectura)
 | Aspecto | Detalle |
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Backoff exponencial | Incrementar el intervalo entre reintentos. |
-| Jitter | Aleatorizar intervalos para evitar sincronía. |
-| Idempotencia | Misma operación repetida no cambia el resultado final. |
-| Thundering herd | Multiples clientes reintentando a la vez causando pico de carga. |
-| Timeout | Tiempo límite para abortar una operación. |
+| <a id="term-backoff-exponencial"></a>Backoff exponencial | Incrementar el intervalo entre reintentos. |
+| <a id="term-jitter"></a>Jitter | Aleatorizar intervalos para evitar sincronía. |
+| <a id="term-idempotencia"></a>Idempotencia | Misma operación repetida no cambia el resultado final. |
+| <a id="term-thundering-herd"></a>Thundering herd | Multiples clientes reintentando a la vez causando pico de carga. |
+| <a id="term-timeout"></a>Timeout | Tiempo límite para abortar una operación. |
 
 ---
 

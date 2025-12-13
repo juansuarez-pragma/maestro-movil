@@ -1,4 +1,4 @@
-# Caso 46: Cursor vs Offset Pagination
+# Caso 46: [Cursor](#term-cursor "Puntero/clave a la posición en una lista para la siguiente página.") vs [Offset](#term-offset "Desplazamiento numérico de filas a saltar.") Pagination
 ## Navegar Millones de Productos Eficientemente
 
 ---
@@ -78,9 +78,9 @@
 ### 3.2 UX y operación
 | Tema | Política | Nota |
 |:-----|:---------|:-----|
-| Orden estable | Usar campo fijo (fecha/id) | Scroll predecible |
+| [Orden estable](#term-orden-estable "Campo que mantiene el orden aunque haya inserciones/borrados.") | Usar campo fijo (fecha/id) | Scroll predecible |
 | Reintentos | Misma clave de página en retry | Idempotencia |
-| Cache local | Reusar páginas para back/forward | UX suave |
+| [Cache local](#term-cache-local "Almacenar páginas para reutilizarlas offline o al volver.") | Reusar páginas para back/forward | UX suave |
 
 ### 3.3 Operación y riesgo
 | Tema | Política | Nota |
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Cursor | Puntero/clave a la posición en una lista para la siguiente página. |
-| Offset | Desplazamiento numérico de filas a saltar. |
-| Orden estable | Campo que mantiene el orden aunque haya inserciones/borrados. |
-| Paginación | Dividir resultados en bloques solicitables. |
-| Cache local | Almacenar páginas para reutilizarlas offline o al volver. |
+| <a id="term-cursor"></a>Cursor | Puntero/clave a la posición en una lista para la siguiente página. |
+| <a id="term-offset"></a>Offset | Desplazamiento numérico de filas a saltar. |
+| <a id="term-orden-estable"></a>Orden estable | Campo que mantiene el orden aunque haya inserciones/borrados. |
+| <a id="term-paginacion"></a>Paginación | Dividir resultados en bloques solicitables. |
+| <a id="term-cache-local"></a>Cache local | Almacenar páginas para reutilizarlas offline o al volver. |
 
 ---
 

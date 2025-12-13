@@ -1,5 +1,5 @@
 # Caso 100: El Día que Apagamos el Legacy
-## Checklist de Decommissioning Seguro
+## Checklist de [Decommissioning](#term-decommissioning "Apagado definitivo de un sistema.") Seguro
 
 ---
 
@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | decommissioning, apagado legacy, checklist, riesgo |
-| **Patrón Técnico** | Decommission Plan, Sunset Checklist, Rollback Preparedness |
+| **Patrón Técnico** | Decommission Plan, [Sunset](#term-sunset "Proceso de retiro planificado.") Checklist, [Rollback](#term-rollback "Reversión a estado previo si falla.") Preparedness |
 | **Stack Seleccionado** | Flutter (flags para rutas legacy) + backend de sunset + monitoreo/rollback |
 | **Nivel de Criticidad** | Crítico |
 
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Decommissioning | Apagado definitivo de un sistema. |
-| Sunset | Proceso de retiro planificado. |
-| Rollback | Reversión a estado previo si falla. |
-| Backup/Restore | Copia y recuperación de datos. |
-| Paridad funcional | Validación de que el nuevo sistema cubre funcionalidades previas. |
+| <a id="term-decommissioning"></a>Decommissioning | Apagado definitivo de un sistema. |
+| <a id="term-sunset"></a>Sunset | Proceso de retiro planificado. |
+| <a id="term-rollback"></a>Rollback | Reversión a estado previo si falla. |
+| <a id="term-backup-restore"></a>Backup/Restore | Copia y recuperación de datos. |
+| <a id="term-paridad-funcional"></a>Paridad funcional | Validación de que el nuevo sistema cubre funcionalidades previas. |
 
 ---
 

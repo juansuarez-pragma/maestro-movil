@@ -1,4 +1,4 @@
-# Caso 7: El Dilema del Remember Me
+# Caso 7: El Dilema del [Remember Me](#term-remember-me "Opción de sesión persistente sin pedir credenciales en cada inicio.")
 ## Persistencia Segura de Credenciales en E-commerce
 
 ---

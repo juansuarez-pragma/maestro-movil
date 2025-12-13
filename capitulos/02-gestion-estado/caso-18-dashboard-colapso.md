@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | dashboard, streams múltiples, backpressure, prioridad de datos |
-| **Patrón Técnico** | Stream Multiplexing, Backpressure Handling, Priority Scheduling |
+| **Patrón Técnico** | [Stream Multiplexing](#term-stream-multiplexing "Gestionar múltiples flujos y combinarlos con prioridad."), [Backpressure](#term-backpressure "Estrategia para manejar flujos más rápidos que el consumidor (drop, buffer, latest).") Handling, Priority Scheduling |
 | **Stack Seleccionado** | Flutter + Riverpod Streams + Isolates para parsing + WebSockets/HTTP2 |
 | **Nivel de Criticidad** | Alto |
 
@@ -65,8 +65,8 @@
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Clasificar feeds (p. ej., alertas y saldos como alta prioridad; banners como baja). Aplicar `debounce/throttle` por stream. Usar `latest` para descartar datos viejos en secundarios. Parsing JSON pesado en Isolate. Selectors para evitar rebuilds masivos. |
-| **Restricciones Duras (NO permite)** | **Consistencia fuerte entre feeds:** Llegada asíncrona puede mostrar datos ligeramente desalineados. **Sin server-side throttling:** Cliente solo mitiga; el backend debe soportar QoS. **Battery/CPU:** Streams constantes consumen recursos; requiere políticas de pausa en background. |
+| **Capacidades (SÍ permite)** | Clasificar feeds (p. ej., alertas y saldos como alta prioridad; banners como baja). Aplicar `debounce/throttle` por stream. Usar `latest` para descartar datos viejos en secundarios. Parsing JSON pesado en [Isolate](#term-isolate "Hilo ligero de Dart para procesamiento paralelo sin bloquear UI."). Selectors para evitar rebuilds masivos. |
+| **Restricciones Duras (NO permite)** | **Consistencia fuerte entre feeds:** Llegada asíncrona puede mostrar datos ligeramente desalineados. **Sin server-side throttling:** Cliente solo mitiga; el backend debe soportar [QoS](#term-qos "Calidad de servicio; priorización y límites de entrega."). **Battery/CPU:** Streams constantes consumen recursos; requiere políticas de pausa en background. |
 | **Criterio de Selección** | Riverpod Streams para control fino y cancelación; Isolates para parsing; priorización inspirada en sistemas de trading para balancear frescura vs costo. |
 
 ### 3.1 Plan de verificación (V&V)
@@ -120,12 +120,12 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Backpressure | Estrategia para manejar flujos más rápidos que el consumidor (drop, buffer, latest). |
-| Throttling/Debounce | Limitar frecuencia de eventos para reducir carga y jank. |
-| Stream Multiplexing | Gestionar múltiples flujos y combinarlos con prioridad. |
-| Selector | Derivar porciones de estado/stream para minimizar rebuild. |
-| Isolate | Hilo ligero de Dart para procesamiento paralelo sin bloquear UI. |
-| QoS | Calidad de servicio; priorización y límites de entrega. |
+| <a id="term-backpressure"></a>Backpressure | Estrategia para manejar flujos más rápidos que el consumidor (drop, buffer, latest). |
+| <a id="term-throttling-debounce"></a>Throttling/Debounce | Limitar frecuencia de eventos para reducir carga y jank. |
+| <a id="term-stream-multiplexing"></a>Stream Multiplexing | Gestionar múltiples flujos y combinarlos con prioridad. |
+| <a id="term-selector"></a>Selector | Derivar porciones de estado/stream para minimizar rebuild. |
+| <a id="term-isolate"></a>Isolate | Hilo ligero de Dart para procesamiento paralelo sin bloquear UI. |
+| <a id="term-qos"></a>QoS | Calidad de servicio; priorización y límites de entrega. |
 
 ---
 

@@ -1,4 +1,4 @@
-# Caso 41: BFF — El Guardián del Móvil
+# Caso 41: [BFF](#term-bff "Backend for Frontend; capa dedicada para un cliente (móvil/web).") — El Guardián del Móvil
 ## Orquestar 7 Microservicios en Una Llamada
 
 ---
@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | BFF, orquestación, microservicios, latencia, agregación |
-| **Patrón Técnico** | Backend for Frontend (BFF), Aggregation, Response Shaping |
+| **Patrón Técnico** | Backend for Frontend (BFF), [Aggregation](#term-aggregation "Combinar respuestas de múltiples servicios en una sola."), [Response Shaping](#term-response-shaping "Ajustar payloads a las necesidades del cliente.") |
 | **Stack Seleccionado** | Flutter + Dio + BFF REST/GraphQL + Riverpod para cache |
 | **Nivel de Criticidad** | Crítico |
 
@@ -80,7 +80,7 @@
 | Tema | Política | Nota |
 |:-----|:---------|:-----|
 | Loading parcial | Placeholder por sección; degradar si faltan datos | UX estable |
-| Cache server-side | E-Tag/stale-while-revalidate donde aplique | Menos latencia |
+| Cache server-side | [E-Tag](#term-e-tag "Hash de recurso para validar/inutilizar cache.")/stale-while-revalidate donde aplique | Menos latencia |
 | Versionado | Headers de versión; flags para activar nuevos contratos | Migraciones seguras |
 
 ### 3.3 Operación y riesgo
@@ -118,11 +118,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| BFF | Backend for Frontend; capa dedicada para un cliente (móvil/web). |
-| Aggregation | Combinar respuestas de múltiples servicios en una sola. |
-| Response Shaping | Ajustar payloads a las necesidades del cliente. |
-| E-Tag | Hash de recurso para validar/inutilizar cache. |
-| Latencia percibida | Tiempo que el usuario percibe antes de ver datos útiles. |
+| <a id="term-bff"></a>BFF | Backend for Frontend; capa dedicada para un cliente (móvil/web). |
+| <a id="term-aggregation"></a>Aggregation | Combinar respuestas de múltiples servicios en una sola. |
+| <a id="term-response-shaping"></a>Response Shaping | Ajustar payloads a las necesidades del cliente. |
+| <a id="term-e-tag"></a>E-Tag | Hash de recurso para validar/inutilizar cache. |
+| <a id="term-latencia-percibida"></a>Latencia percibida | Tiempo que el usuario percibe antes de ver datos útiles. |
 
 ---
 

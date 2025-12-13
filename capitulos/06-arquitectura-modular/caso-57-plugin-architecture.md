@@ -1,4 +1,4 @@
-# Caso 57: Plugin Architecture
+# Caso 57: [Plugin](#term-plugin "Módulo externo que amplía funcionalidad del host.") Architecture
 ## Permitir que Terceros Extiendan tu App Bancaria
 
 ---
@@ -71,7 +71,7 @@
 ### 3.1 Plan de verificación (V&V)
 | Tipo de verificación | Qué valida | Responsable/Entorno |
 |:---------------------|:-----------|:--------------------|
-| Seguridad | Permisos y acceso a APIs respetados | Seguridad/QA |
+| Seguridad | [Permisos](#term-permisos "Declaración explícita de acciones/datos permitidos.") y acceso a APIs respetados | Seguridad/QA |
 | Integration (CI) | Compatibilidad de contratos plugin-host | Móvil/QA |
 | Observabilidad | Telemetría `plugin.*` (latencia, errores, permisos usados) | Móvil/SRE |
 
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Plugin | Módulo externo que amplía funcionalidad del host. |
-| Sandbox lógico | Restricción de capacidades y APIs disponibles. |
-| Permisos | Declaración explícita de acciones/datos permitidos. |
-| Firma/verificación | Garantizar integridad y autoría del plugin. |
-| Revocación | Deshabilitar un plugin que viola políticas o falla. |
+| <a id="term-plugin"></a>Plugin | Módulo externo que amplía funcionalidad del host. |
+| <a id="term-sandbox-logico"></a>Sandbox lógico | Restricción de capacidades y APIs disponibles. |
+| <a id="term-permisos"></a>Permisos | Declaración explícita de acciones/datos permitidos. |
+| <a id="term-firma-verificacion"></a>Firma/verificación | Garantizar integridad y autoría del plugin. |
+| <a id="term-revocacion"></a>Revocación | Deshabilitar un plugin que viola políticas o falla. |
 
 ---
 

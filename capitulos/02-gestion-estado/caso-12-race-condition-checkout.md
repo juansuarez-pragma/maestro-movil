@@ -1,4 +1,4 @@
-# Caso 12: Race Condition en el Checkout
+# Caso 12: Race Condition en el [Checkout](#term-checkout "Proceso de cobro de una orden; crítico en e-commerce/fintech.")
 ## Cuando Dos Hilos Debitan la Misma Cuenta
 
 ---
@@ -8,8 +8,8 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | checkout, condición de carrera, doble débito, consistencia transaccional |
-| **Patrón Técnico** | Optimistic Concurrency Control, Idempotent Operations, Transactional Outbox |
-| **Stack Seleccionado** | Flutter + Riverpod/StateNotifier + HTTP idempotente (Idempotency-Key) + SQLite cache |
+| **Patrón Técnico** | [Optimistic Concurrency Control](#term-optimistic-concurrency-control "Validar versiones antes de aplicar cambios; si la versión cambia, se rechaza o reintenta."), Idempotent Operations, [Transactional Outbox](#term-transactional-outbox "Patrón para asegurar que eventos y cambios de DB se publican de forma atómica.") |
+| **Stack Seleccionado** | Flutter + Riverpod/StateNotifier + HTTP idempotente ([Idempotency-Key](#term-idempotency-key "Identificador único de operación que garantiza que múltiples requests producen un solo efecto.")) + SQLite cache |
 | **Nivel de Criticidad** | Crítico |
 
 ---
@@ -120,12 +120,12 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Idempotency-Key | Identificador único de operación que garantiza que múltiples requests producen un solo efecto. |
-| Optimistic Concurrency Control | Validar versiones antes de aplicar cambios; si la versión cambia, se rechaza o reintenta. |
-| Transactional Outbox | Patrón para asegurar que eventos y cambios de DB se publican de forma atómica. |
-| Backoff exponencial | Estrategia de reintentos con tiempos crecientes para reducir carga y colisiones. |
-| Checkout | Proceso de cobro de una orden; crítico en e-commerce/fintech. |
-| Idempotency-Key | Identificador único de operación para garantizar un solo efecto. |
+| <a id="term-idempotency-key"></a>Idempotency-Key | Identificador único de operación que garantiza que múltiples requests producen un solo efecto. |
+| <a id="term-optimistic-concurrency-control"></a>Optimistic Concurrency Control | Validar versiones antes de aplicar cambios; si la versión cambia, se rechaza o reintenta. |
+| <a id="term-transactional-outbox"></a>Transactional Outbox | Patrón para asegurar que eventos y cambios de DB se publican de forma atómica. |
+| <a id="term-backoff-exponencial"></a>Backoff exponencial | Estrategia de reintentos con tiempos crecientes para reducir carga y colisiones. |
+| <a id="term-checkout"></a>Checkout | Proceso de cobro de una orden; crítico en e-commerce/fintech. |
+| <a id="term-idempotency-key"></a>Idempotency-Key | Identificador único de operación para garantizar un solo efecto. |
 
 ---
 

@@ -1,4 +1,4 @@
-# Caso 79: App Size Budget
+# Caso 79: App [Size Budget](#term-size-budget "Límite de tamaño permitido para el artefacto.")
 ## Alertar Cuando el Bundle Supera 100MB
 
 ---
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Size Budget | Límite de tamaño permitido para el artefacto. |
-| Split per ABI | Generar binarios separados por arquitectura. |
-| Shrink Resources | Remover recursos no usados en build. |
-| Deferred Components | Cargar partes del app on-demand para reducir bundle inicial. |
-| Gate CI | Paso que falla el pipeline si no se cumple el presupuesto. |
+| <a id="term-size-budget"></a>Size Budget | Límite de tamaño permitido para el artefacto. |
+| <a id="term-split-per-abi"></a>Split per ABI | Generar binarios separados por arquitectura. |
+| <a id="term-shrink-resources"></a>Shrink Resources | Remover recursos no usados en build. |
+| <a id="term-deferred-components"></a>Deferred Components | Cargar partes del app on-demand para reducir bundle inicial. |
+| <a id="term-gate-ci"></a>Gate CI | Paso que falla el pipeline si no se cumple el presupuesto. |
 
 ---
 

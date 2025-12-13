@@ -8,8 +8,8 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | memory leak, sesiones largas, perfilado, gc |
-| **Patrón Técnico** | Leak Detection, Resource Disposal, Profiling |
-| **Stack Seleccionado** | Flutter DevTools (Memory/CPU), Riverpod autoDispose, WeakReference patterns |
+| **Patrón Técnico** | [Leak](#term-leak "Retención de memoria no liberada tras uso.") Detection, Resource Disposal, Profiling |
+| **Stack Seleccionado** | Flutter DevTools (Memory/CPU), Riverpod [autoDispose](#term-autodispose "Opción de Riverpod para liberar providers al no tener oyentes."), WeakReference patterns |
 | **Nivel de Criticidad** | Alto |
 
 ---
@@ -17,7 +17,7 @@
 ## 1. Planteamiento del Problema (El "Trigger")
 
 ### Problema detectado (técnico)
-- Streams, controllers y caches sin liberar en sesiones largas provocan crecimiento de memoria y OOM.
+- Streams, controllers y caches sin liberar en sesiones largas provocan crecimiento de memoria y [OOM](#term-oom "Out Of Memory; cierre por falta de memoria.").
 - Singletons/listeners estáticos retienen contexto; sin autoDispose ni límites, los leaks son silenciosos.
 - Falta de profiling/snapshots hace difícil detectarlos hasta que la app ya degrada.
 
@@ -120,12 +120,12 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| OOM | Out Of Memory; cierre por falta de memoria. |
-| autoDispose | Opción de Riverpod para liberar providers al no tener oyentes. |
-| Heap snapshot | Captura de memoria para comparar leaks. |
-| Listener | Suscriptor a stream/cambio que debe liberarse. |
-| Cache TTL | Tiempo máximo de retención de elementos en cache. |
-| Leak | Retención de memoria no liberada tras uso. |
+| <a id="term-oom"></a>OOM | Out Of Memory; cierre por falta de memoria. |
+| <a id="term-autodispose"></a>autoDispose | Opción de Riverpod para liberar providers al no tener oyentes. |
+| <a id="term-heap-snapshot"></a>Heap snapshot | Captura de memoria para comparar leaks. |
+| <a id="term-listener"></a>Listener | Suscriptor a stream/cambio que debe liberarse. |
+| <a id="term-cache-ttl"></a>Cache TTL | Tiempo máximo de retención de elementos en cache. |
+| <a id="term-leak"></a>Leak | Retención de memoria no liberada tras uso. |
 
 ---
 

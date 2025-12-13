@@ -1,5 +1,5 @@
 # Caso 20: State Machine Financiera
-## Modelar el Ciclo de Vida de una Transferencia SPEI/ACH
+## Modelar el Ciclo de Vida de una Transferencia [SPEI/ACH](#term-spei-ach "Sistemas de pagos interbancarios (MX/US).")
 
 ---
 
@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | state machine, transferencia SPEI, ACH, ciclo de vida, estados transaccionales |
-| **Patrón Técnico** | Finite State Machine (FSM), Event-Driven Architecture, Retry/Dead-letter |
+| **Patrón Técnico** | Finite State Machine ([FSM](#term-fsm "Máquina de estados finitos con transiciones y eventos definidos.")), Event-Driven Architecture, Retry/Dead-letter |
 | **Stack Seleccionado** | Flutter + Riverpod StateNotifier + FSM declarativa + WebSockets/Push para eventos |
 | **Nivel de Criticidad** | Crítico |
 
@@ -120,12 +120,12 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| FSM | Máquina de estados finitos con transiciones y eventos definidos. |
-| Guard | Condición que debe cumplirse para permitir una transición. |
-| DLQ (Dead-letter Queue) | Cola de mensajes que no pudieron procesarse tras reintentos. |
-| SPEI/ACH | Sistemas de pagos interbancarios (MX/US). |
-| Evento firmado | Mensaje con firma/verificación para asegurar integridad y origen. |
-| Traceability | Capacidad de reconstruir el historial de estados con evidencia verificable. |
+| <a id="term-fsm"></a>FSM | Máquina de estados finitos con transiciones y eventos definidos. |
+| <a id="term-guard"></a>Guard | Condición que debe cumplirse para permitir una transición. |
+| <a id="term-dlq-dead-letter-queue"></a>DLQ (Dead-letter Queue) | Cola de mensajes que no pudieron procesarse tras reintentos. |
+| <a id="term-spei-ach"></a>SPEI/ACH | Sistemas de pagos interbancarios (MX/US). |
+| <a id="term-evento-firmado"></a>Evento firmado | Mensaje con firma/verificación para asegurar integridad y origen. |
+| <a id="term-traceability"></a>Traceability | Capacidad de reconstruir el historial de estados con evidencia verificable. |
 
 ---
 

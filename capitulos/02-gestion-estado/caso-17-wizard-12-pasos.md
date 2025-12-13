@@ -1,4 +1,4 @@
-# Caso 17: Wizard de 12 Pasos
+# Caso 17: [Wizard](#term-wizard "Flujo multi-paso guiado para completar un proceso largo.") de 12 Pasos
 ## Persistir Progreso de Solicitud de Crédito Hipotecario
 
 ---
@@ -8,8 +8,8 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | wizard, progreso persistente, onboarding largo, formularios multi-paso |
-| **Patrón Técnico** | Stepper State Machine, Draft Persistence, Checkpointing |
-| **Stack Seleccionado** | Flutter + Riverpod/StateNotifier + Hive/SQLite para drafts + Finite State Machine (FSM) |
+| **Patrón Técnico** | Stepper State Machine, [Draft](#term-draft "Borrador persistente del progreso parcial del usuario.") Persistence, Checkpointing |
+| **Stack Seleccionado** | Flutter + Riverpod/StateNotifier + Hive/SQLite para drafts + Finite State Machine ([FSM](#term-fsm "Máquina de estados finitos que define transiciones válidas entre pasos.")) |
 | **Nivel de Criticidad** | Alto |
 
 ---
@@ -80,7 +80,7 @@
 ### 3.2 UX y operación
 | Tema | Política | Nota |
 |:-----|:---------|:-----|
-| Autosave | Guardar al salir de cada paso y en background | Minimiza pérdida |
+| [Autosave](#term-autosave "Guardado automático tras cambios sin acción explícita del usuario.") | Guardar al salir de cada paso y en background | Minimiza pérdida |
 | Reanudación | Mostrar “continuar donde quedaste” con paso actual | Reduce abandono |
 | Validación | Validar por paso y cross-step en checkpoints | Calidad de datos |
 | Multi-dispositivo | Merge último cambio o bloquear edición simultánea | Consistencia |
@@ -121,12 +121,12 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Wizard | Flujo multi-paso guiado para completar un proceso largo. |
-| FSM | Máquina de estados finitos que define transiciones válidas entre pasos. |
-| Draft | Borrador persistente del progreso parcial del usuario. |
-| Checkpoint | Punto de guardado con validaciones parciales antes de avanzar. |
-| Autosave | Guardado automático tras cambios sin acción explícita del usuario. |
-| TTL de draft | Tiempo máximo que se conserva un borrador antes de expirar. |
+| <a id="term-wizard"></a>Wizard | Flujo multi-paso guiado para completar un proceso largo. |
+| <a id="term-fsm"></a>FSM | Máquina de estados finitos que define transiciones válidas entre pasos. |
+| <a id="term-draft"></a>Draft | Borrador persistente del progreso parcial del usuario. |
+| <a id="term-checkpoint"></a>Checkpoint | Punto de guardado con validaciones parciales antes de avanzar. |
+| <a id="term-autosave"></a>Autosave | Guardado automático tras cambios sin acción explícita del usuario. |
+| <a id="term-ttl-de-draft"></a>TTL de draft | Tiempo máximo que se conserva un borrador antes de expirar. |
 
 ---
 

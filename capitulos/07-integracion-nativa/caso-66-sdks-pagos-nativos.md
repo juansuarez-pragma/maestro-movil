@@ -8,8 +8,8 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | sdk pagos, platform views, webview, nativo, UX |
-| **Patrón Técnico** | Platform Views, Hybrid Composition, Safe Area Handling |
-| **Stack Seleccionado** | Flutter + Platform Views (Hybrid/Virtual Display) + payment SDK nativo + Riverpod |
+| **Patrón Técnico** | Platform Views, [Hybrid Composition](#term-hybrid-composition "Estrategia que compone views nativas sobre Flutter; más compatible."), Safe Area Handling |
+| **Stack Seleccionado** | Flutter + Platform Views (Hybrid/[Virtual Display](#term-virtual-display "Renderiza view en textura; mejor perf en algunos dispositivos.")) + payment SDK nativo + Riverpod |
 | **Nivel de Criticidad** | Alto |
 
 ---
@@ -65,7 +65,7 @@
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
 | **Capacidades (SÍ permite)** | Usar hybrid composition para compatibilidad, virtual display para mejor perf en dispositivos soportados. Aislar Platform Views en pantallas modales. Manejar z-order y focus/teclado. Limitar animaciones detrás de views. |
-| **Restricciones Duras (NO permite)** | **Android viejos:** Hybrid composition puede jankear. **Gestos superpuestos:** Requiere manejo de hit testing. **A11y:** Debe integrarse con Semantics. |
+| **Restricciones Duras (NO permite)** | **Android viejos:** Hybrid composition puede jankear. **Gestos superpuestos:** Requiere manejo de hit testing. **A11y:** Debe integrarse con [Semantics](#term-semantics "Información de accesibilidad para lectores de pantalla."). |
 | **Criterio de Selección** | Elegir composición según dispositivo/SO; encapsular vistas; pruebas en dispositivos representativos; fallback a WebView nativa si necesario. |
 
 ### 3.1 Plan de verificación (V&V)
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Platform View | Vista nativa embebida en Flutter. |
-| Hybrid Composition | Estrategia que compone views nativas sobre Flutter; más compatible. |
-| Virtual Display | Renderiza view en textura; mejor perf en algunos dispositivos. |
-| Z-order | Orden de apilamiento de vistas. |
-| Semantics | Información de accesibilidad para lectores de pantalla. |
+| <a id="term-platform-view"></a>Platform View | Vista nativa embebida en Flutter. |
+| <a id="term-hybrid-composition"></a>Hybrid Composition | Estrategia que compone views nativas sobre Flutter; más compatible. |
+| <a id="term-virtual-display"></a>Virtual Display | Renderiza view en textura; mejor perf en algunos dispositivos. |
+| <a id="term-z-order"></a>Z-order | Orden de apilamiento de vistas. |
+| <a id="term-semantics"></a>Semantics | Información de accesibilidad para lectores de pantalla. |
 
 ---
 

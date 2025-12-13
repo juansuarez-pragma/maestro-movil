@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | CI/CD, pipelines móviles, reproducibilidad, release |
-| **Patrón Técnico** | Pipeline as Code, Caching, Artifact Management |
+| **Patrón Técnico** | [Pipeline as Code](#term-pipeline-as-code "Definir CI/CD en archivos versionados."), Caching, [Artifact](#term-artifact "Resultado de build (APK/AAB/IPA) almacenado y versionado.") Management |
 | **Stack Seleccionado** | Flutter + Fastlane/Codemagic/GitHub Actions + caches Gradle/pub + firmas automatizadas |
 | **Nivel de Criticidad** | Crítico |
 
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Pipeline as Code | Definir CI/CD en archivos versionados. |
-| Cache de build | Reutilizar dependencias y outputs para acelerar. |
-| Vault/Secret Manager | Almacén seguro para llaves y secretos. |
-| Artifact | Resultado de build (APK/AAB/IPA) almacenado y versionado. |
-| Gate | Paso obligatorio (tests/linters) antes de avanzar. |
+| <a id="term-pipeline-as-code"></a>Pipeline as Code | Definir CI/CD en archivos versionados. |
+| <a id="term-cache-de-build"></a>Cache de build | Reutilizar dependencias y outputs para acelerar. |
+| <a id="term-vault-secret-manager"></a>Vault/Secret Manager | Almacén seguro para llaves y secretos. |
+| <a id="term-artifact"></a>Artifact | Resultado de build (APK/AAB/IPA) almacenado y versionado. |
+| <a id="term-gate"></a>Gate | Paso obligatorio (tests/linters) antes de avanzar. |
 
 ---
 

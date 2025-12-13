@@ -33,7 +33,7 @@
 
 | Fuente | Muestra / Región | Hallazgos relevantes |
 |:-------|:-----------------|:---------------------|
-| Migraciones urgentes | Global | Dual stack con flags reduce riesgo en ventanas cortas. |
+| Migraciones urgentes | Global | [Dual stack](#term-dual-stack "Ejecutar dos implementaciones en paralelo.") con flags reduce riesgo en ventanas cortas. |
 | Postmortems de terceros | Varios | Big bang tardío generó outages. |
 | NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; dependencias obsoletas son comunes. |
 
@@ -72,7 +72,7 @@
 | Tipo de verificación | Qué valida | Responsable/Entorno |
 |:---------------------|:-----------|:--------------------|
 | Comparativa | Errores/latencia viejo vs nuevo | Móvil/SRE |
-| Cutover | Flags por cohorte y rollback operan | QA/Móvil |
+| [Cutover](#term-cutover "Cambiar definitivamente a la nueva implementación.") | Flags por cohorte y rollback operan | QA/Móvil |
 | Seguridad | Dependencias y permisos del nuevo SDK | Seguridad |
 
 ### 3.2 UX y operación
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| SDK deprecated | SDK en fin de vida sin soporte. |
-| Dual stack | Ejecutar dos implementaciones en paralelo. |
-| Cutover | Cambiar definitivamente a la nueva implementación. |
-| Telemetría comparativa | Métricas lado a lado para decidir cutover. |
-| Sunset plan | Plan de retiro del SDK viejo. |
+| <a id="term-sdk-deprecated"></a>SDK deprecated | SDK en fin de vida sin soporte. |
+| <a id="term-dual-stack"></a>Dual stack | Ejecutar dos implementaciones en paralelo. |
+| <a id="term-cutover"></a>Cutover | Cambiar definitivamente a la nueva implementación. |
+| <a id="term-telemetria-comparativa"></a>Telemetría comparativa | Métricas lado a lado para decidir cutover. |
+| <a id="term-sunset-plan"></a>Sunset plan | Plan de retiro del SDK viejo. |
 
 ---
 

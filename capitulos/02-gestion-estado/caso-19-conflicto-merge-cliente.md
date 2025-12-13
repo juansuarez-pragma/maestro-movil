@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | ediciones concurrentes, offline, merge, conflicto, sincronización |
-| **Patrón Técnico** | Conflict Resolution Policies, CRDT/OT, Last Writer Wins con contexto |
+| **Patrón Técnico** | Conflict Resolution Policies, [CRDT](#term-crdt "Estructuras replicadas sin conflicto, merge determinista.")/OT, Last Writer Wins con contexto |
 | **Stack Seleccionado** | Flutter + Riverpod + SQLite/Isar para cola offline + CRDT/patches JSON |
 | **Nivel de Criticidad** | Alto |
 
@@ -18,7 +18,7 @@
 
 ### Problema detectado (técnico)
 - Sin política de merge/CRDT/OT, los parches offline sobrescriben o pierden datos al sincronizar.
-- LWW sin contexto (solo timestamp) descarta ediciones válidas y depende de reloj (skew).
+- [LWW](#term-lww "Last Writer Wins, estrategia basada en timestamps/versiones.") sin contexto (solo timestamp) descarta ediciones válidas y depende de reloj (skew).
 - Sin log de conflictos ni prompts, los usuarios no saben qué cambios ganaron/perdieron.
 
 ### Escenario de Negocio
@@ -120,12 +120,12 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| CRDT | Estructuras replicadas sin conflicto, merge determinista. |
-| OT (Operational Transformation) | Transformación de operaciones concurrentes para mantener consistencia. |
-| LWW | Last Writer Wins, estrategia basada en timestamps/versiones. |
-| Patch JSON | Conjunto de cambios aplicables sobre un documento (diff). |
-| Resolución semántica | Decisión basada en reglas de negocio cuando el merge automático no es suficiente. |
-| Vector/Lamport clock | Relojes lógicos para ordenar eventos sin depender del reloj de dispositivo. |
+| <a id="term-crdt"></a>CRDT | Estructuras replicadas sin conflicto, merge determinista. |
+| <a id="term-ot-operational-transformation"></a>OT (Operational Transformation) | Transformación de operaciones concurrentes para mantener consistencia. |
+| <a id="term-lww"></a>LWW | Last Writer Wins, estrategia basada en timestamps/versiones. |
+| <a id="term-patch-json"></a>Patch JSON | Conjunto de cambios aplicables sobre un documento (diff). |
+| <a id="term-resolucion-semantica"></a>Resolución semántica | Decisión basada en reglas de negocio cuando el merge automático no es suficiente. |
+| <a id="term-vector-lamport-clock"></a>Vector/Lamport clock | Relojes lógicos para ordenar eventos sin depender del reloj de dispositivo. |
 
 ---
 

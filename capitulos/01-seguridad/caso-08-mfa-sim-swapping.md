@@ -1,5 +1,5 @@
 # Caso 8: OTP Interceptado
-## Implementando MFA Resistente a SIM Swapping
+## Implementando [MFA](#term-mfa "Autenticación multifactor; combina algo que sabes, tienes o eres.") Resistente a [SIM Swapping](#term-sim-swapping "Robo o duplicado de SIM para recibir OTP/SMS y tomar control de cuentas.")
 
 ---
 
@@ -7,9 +7,9 @@
 
 | Campo | Valor |
 |:------|:------|
-| **Palabras Clave de Negocio** | OTP, SMS, SIM swapping, MFA, autenticación multifactor, TOTP, push notification |
+| **Palabras Clave de Negocio** | OTP, SMS, SIM swapping, MFA, autenticación multifactor, [TOTP](#term-totp "OTP basado en tiempo (RFC 6238), menos dependiente de la red móvil."), push notification |
 | **Patrón Técnico** | TOTP (RFC 6238), Push-based MFA, Hardware Tokens |
-| **Stack Seleccionado** | otp (TOTP) + firebase_messaging (Push MFA) + BLoC (MFABloc) |
+| **Stack Seleccionado** | otp (TOTP) + firebase_messaging ([Push MFA](#term-push-mfa "Aprobación de login mediante notificación push con contexto de riesgo.")) + BLoC (MFABloc) |
 | **Nivel de Criticidad** | Alto |
 
 ---
@@ -25,7 +25,7 @@
 
 > *"Como usuario, quiero recibir un código de verificación para aprobar transacciones importantes, pero me preocupa la seguridad de los SMS."*
 
-- Caso: SIM swap en carrier, OTP SMS redirigido, se aprueban transferencias.
+- Caso: SIM swap en carrier, [OTP SMS](#term-otp-sms "One-Time Password enviado por SMS; vulnerable a SIM swap y malware de SMS.") redirigido, se aprueban transferencias.
 - Caso: usuario sin datos (offline) necesita alternativa (TOTP) para no bloquear operaciones legítimas.
 
 ### Incidentes reportados
@@ -127,13 +127,13 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| SIM Swapping | Robo o duplicado de SIM para recibir OTP/SMS y tomar control de cuentas. |
-| MFA | Autenticación multifactor; combina algo que sabes, tienes o eres. |
-| OTP SMS | One-Time Password enviado por SMS; vulnerable a SIM swap y malware de SMS. |
-| TOTP | OTP basado en tiempo (RFC 6238), menos dependiente de la red móvil. |
-| Push MFA | Aprobación de login mediante notificación push con contexto de riesgo. |
-| WebAuthn/Passkeys | Autenticación sin contraseña usando llaves FIDO2 y biometría del dispositivo. |
-| Backup Codes | Códigos de recuperación para acceso offline o pérdida de dispositivo principal. |
+| <a id="term-sim-swapping"></a>SIM Swapping | Robo o duplicado de SIM para recibir OTP/SMS y tomar control de cuentas. |
+| <a id="term-mfa"></a>MFA | Autenticación multifactor; combina algo que sabes, tienes o eres. |
+| <a id="term-otp-sms"></a>OTP SMS | One-Time Password enviado por SMS; vulnerable a SIM swap y malware de SMS. |
+| <a id="term-totp"></a>TOTP | OTP basado en tiempo (RFC 6238), menos dependiente de la red móvil. |
+| <a id="term-push-mfa"></a>Push MFA | Aprobación de login mediante notificación push con contexto de riesgo. |
+| <a id="term-webauthn-passkeys"></a>WebAuthn/Passkeys | Autenticación sin contraseña usando llaves FIDO2 y biometría del dispositivo. |
+| <a id="term-backup-codes"></a>Backup Codes | Códigos de recuperación para acceso offline o pérdida de dispositivo principal. |
 
 ---
 

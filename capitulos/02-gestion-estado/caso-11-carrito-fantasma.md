@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | carrito compartido, multi-dispositivo, sincronización en tiempo real, consistencia eventual |
-| **Patrón Técnico** | Conflict-free Replicated Data Types (CRDT), Event Sourcing, State Streaming |
+| **Patrón Técnico** | Conflict-free Replicated Data Types ([CRDT](#term-crdt "Estructura de datos replicada sin conflicto; merge conmutativo y asociativo.")), [Event Sourcing](#term-event-sourcing "Persistir cambios como eventos inmutables y reconstruir estado reproduciéndolos."), State Streaming |
 | **Stack Seleccionado** | Flutter + Riverpod + WebSockets/GraphQL Subscriptions + SQLite para cache |
 | **Nivel de Criticidad** | Alto |
 
@@ -65,7 +65,7 @@
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Consistencia eventual multi-dispositivo con CRDT (p. ej., GCounter/OR-Set) para items/cantidades. Rehidratación del estado desde Event Store al iniciar. Reconexión automática con replay de eventos pendientes. Caché local en SQLite para funcionamiento offline breve. |
+| **Capacidades (SÍ permite)** | [Consistencia eventual](#term-consistencia-eventual "Estado converge después de propagar y reconciliar eventos.") multi-dispositivo con CRDT (p. ej., GCounter/OR-Set) para items/cantidades. Rehidratación del estado desde Event Store al iniciar. Reconexión automática con replay de eventos pendientes. Caché local en SQLite para funcionamiento offline breve. |
 | **Restricciones Duras (NO permite)** | **Orden total:** No garantiza orden global de eventos, solo merge conmutativo. **Conflictos de negocio:** Reglas de inventario/stock deben resolverse en backend; el cliente no puede validar stock definitivo. **Offline prolongado:** Riesgo de expiración de items/promos. |
 | **Criterio de Selección** | Riverpod por simplicidad de dependencias y providers selectivos; CRDT sobre locking optimista/pesimista para evitar bloqueos y ofrecer merge determinista; Event Sourcing por trazabilidad y replay. |
 
@@ -73,7 +73,7 @@
 | Tipo de verificación | Qué valida | Responsable/Entorno |
 |:---------------------|:-----------|:--------------------|
 | Unit (CI) | CRDT merge produce estado convergente; providers notifican sin fugas | Equipo móvil, CI |
-| Integration (CI) | Replay de eventos tras reconexión reconstruye carrito igual en 3 dispositivos | Móvil/Backend, CI + staging |
+| Integration (CI) | [Replay de eventos](#term-replay-de-eventos "Reaplicar eventos desde el log para reconstruir el estado actual.") tras reconexión reconstruye carrito igual en 3 dispositivos | Móvil/Backend, CI + staging |
 | Seguridad/consistencia | Eventos duplicados/idempotencia no duplican items | QA/Seguridad, dispositivos reales |
 | Observabilidad | Eventos `cart.*` con device_id, trace_id; métricas de divergencia | Móvil/SRE, CI |
 
@@ -120,11 +120,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| CRDT | Estructura de datos replicada sin conflicto; merge conmutativo y asociativo. |
-| Event Sourcing | Persistir cambios como eventos inmutables y reconstruir estado reproduciéndolos. |
-| Consistencia eventual | Estado converge después de propagar y reconciliar eventos. |
-| Replay de eventos | Reaplicar eventos desde el log para reconstruir el estado actual. |
-| Idempotencia | Aplicar el mismo evento múltiples veces no cambia el resultado final. |
+| <a id="term-crdt"></a>CRDT | Estructura de datos replicada sin conflicto; merge conmutativo y asociativo. |
+| <a id="term-event-sourcing"></a>Event Sourcing | Persistir cambios como eventos inmutables y reconstruir estado reproduciéndolos. |
+| <a id="term-consistencia-eventual"></a>Consistencia eventual | Estado converge después de propagar y reconciliar eventos. |
+| <a id="term-replay-de-eventos"></a>Replay de eventos | Reaplicar eventos desde el log para reconstruir el estado actual. |
+| <a id="term-idempotencia"></a>Idempotencia | Aplicar el mismo evento múltiples veces no cambia el resultado final. |
 
 ---
 

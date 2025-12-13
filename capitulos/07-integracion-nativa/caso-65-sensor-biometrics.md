@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | biometría avanzada, sensores, sdk nativo, voz |
-| **Patrón Técnico** | Multi-factor Biometrics, Native SDK Integration, Liveness |
+| **Patrón Técnico** | Multi-factor Biometrics, Native SDK Integration, [Liveness](#term-liveness "Verificación de que hay una persona viva, no spoof.") |
 | **Stack Seleccionado** | Flutter + Platform Channels + SDKs nativos biométricos (Face/Voice) + Riverpod estado |
 | **Nivel de Criticidad** | Alto |
 
@@ -64,7 +64,7 @@
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Encapsular flujos de face/voice/fingerprint avanzados. Recepción de callbacks/eventos con estados. Recolección de evidencia (FaceMap/voz) según SDK. Manejo de permisos cámara/micrófono. |
+| **Capacidades (SÍ permite)** | Encapsular flujos de face/voice/fingerprint avanzados. Recepción de callbacks/eventos con estados. Recolección de evidencia ([FaceMap](#term-facemap "Representación biométrica generada por SDKs de rostro.")/voz) según SDK. Manejo de permisos cámara/micrófono. |
 | **Restricciones Duras (NO permite)** | **Dependencia del SDK:** APIs y licencias específicas. **Performance:** Procesamiento pesado puede requerir optimizaciones. **Compatibilidad:** No todos los dispositivos soportan sensores avanzados. |
 | **Criterio de Selección** | Wrapper por factor, contratos claros, pruebas E2E nativas, manejo de errores y permisos explícitos. |
 
@@ -79,7 +79,7 @@
 | Tema | Política | Nota |
 |:-----|:---------|:-----|
 | Guías UI | Instrucciones claras para cámara/micrófono | Reduce abandono |
-| Fallback | Step-up alternativo si sensor falla | Disponibilidad |
+| Fallback | [Step-up](#term-step-up "Aumentar el factor de autenticación según riesgo.") alternativo si sensor falla | Disponibilidad |
 | Permisos | Solicitar en contexto y justificar | Confianza |
 
 ### 3.3 Operación y riesgo
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Liveness | Verificación de que hay una persona viva, no spoof. |
-| FaceMap | Representación biométrica generada por SDKs de rostro. |
-| Callback tipado | Evento con estructura definida para resultados/errores. |
-| Step-up | Aumentar el factor de autenticación según riesgo. |
-| SDK certificado | SDK con validación/regulación (iBeta/NIST). |
+| <a id="term-liveness"></a>Liveness | Verificación de que hay una persona viva, no spoof. |
+| <a id="term-facemap"></a>FaceMap | Representación biométrica generada por SDKs de rostro. |
+| <a id="term-callback-tipado"></a>Callback tipado | Evento con estructura definida para resultados/errores. |
+| <a id="term-step-up"></a>Step-up | Aumentar el factor de autenticación según riesgo. |
+| <a id="term-sdk-certificado"></a>SDK certificado | SDK con validación/regulación (iBeta/NIST). |
 
 ---
 

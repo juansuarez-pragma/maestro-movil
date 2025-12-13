@@ -1,5 +1,5 @@
 # Caso 23: El Catálogo Pesado
-## Lazy Loading de Imágenes en MercadoLibre Scale
+## [Lazy Loading](#term-lazy-loading "Cargar recursos solo cuando están cerca de ser visibles.") de Imágenes en MercadoLibre Scale
 
 ---
 
@@ -18,7 +18,7 @@
 
 ### Problema detectado (técnico)
 - Imágenes pesadas sin resize/caching saturan la red y bloquean scroll.
-- Sin placeholders (blurhash) hay pop-in y LCP alto; sin multi-res, consumo de datos se dispara.
+- Sin placeholders (blurhash) hay pop-in y [LCP](#term-lcp "Largest Contentful Paint; métrica de rendimiento percibido.") alto; sin multi-res, consumo de datos se dispara.
 - Caches sin límites producen uso excesivo de memoria.
 
 ### Escenario de Negocio
@@ -39,7 +39,7 @@
 
 **Resumen global**
 - Imágenes sin optimización degradan LCP/UX y elevan costos de datos/CDN.
-- Blurhash/variantes multi-res y cache limitada son prácticas recomendadas.
+- [Blurhash](#term-blurhash "Placeholder generado a partir de la imagen para mostrar previo a la carga completa.")/variantes multi-res y cache limitada son prácticas recomendadas.
 
 ### Riesgos
 
@@ -65,7 +65,7 @@
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Seleccionar URL según densidad de pantalla. Usar placeholders blurhash para evitar pop-in. Prefetch de próximas imágenes cuando el usuario se acerca. Limitar tamaño de cache y uso de memoria. Soportar retry con backoff en errores de red. |
+| **Capacidades (SÍ permite)** | Seleccionar URL según densidad de pantalla. Usar placeholders blurhash para evitar pop-in. [Prefetch](#term-prefetch "Descargar recursos anticipadamente basados en el scroll.") de próximas imágenes cuando el usuario se acerca. Limitar tamaño de cache y uso de memoria. Soportar retry con backoff en errores de red. |
 | **Restricciones Duras (NO permite)** | **CDN sin variantes:** Si no hay multi-res, el ahorro es limitado. **Animaciones pesadas:** GIF/APNG grandes seguirán pesados; preferir videos/webp. **Red lenta:** UX depende de ancho de banda; placeholders mitigan pero no eliminan espera. |
 | **Criterio de Selección** | `cached_network_image` por facilidad y cache integrada; blurhash para placeholders rápidos; CDN multi-res para optimizar ancho de banda; prefetch controlado para balancear consumo. |
 
@@ -121,12 +121,12 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Lazy Loading | Cargar recursos solo cuando están cerca de ser visibles. |
-| Blurhash | Placeholder generado a partir de la imagen para mostrar previo a la carga completa. |
-| Multi-resolución | Variantes de imagen por densidad (1x/2x/3x) servidas desde CDN. |
-| Prefetch | Descargar recursos anticipadamente basados en el scroll. |
-| Cache TTL | Tiempo que una imagen permanece válida antes de volver a descargarse. |
-| LCP | Largest Contentful Paint; métrica de rendimiento percibido. |
+| <a id="term-lazy-loading"></a>Lazy Loading | Cargar recursos solo cuando están cerca de ser visibles. |
+| <a id="term-blurhash"></a>Blurhash | Placeholder generado a partir de la imagen para mostrar previo a la carga completa. |
+| <a id="term-multi-resolucion"></a>Multi-resolución | Variantes de imagen por densidad (1x/2x/3x) servidas desde CDN. |
+| <a id="term-prefetch"></a>Prefetch | Descargar recursos anticipadamente basados en el scroll. |
+| <a id="term-cache-ttl"></a>Cache TTL | Tiempo que una imagen permanece válida antes de volver a descargarse. |
+| <a id="term-lcp"></a>LCP | Largest Contentful Paint; métrica de rendimiento percibido. |
 
 ---
 

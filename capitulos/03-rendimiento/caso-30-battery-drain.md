@@ -9,7 +9,7 @@
 |:------|:------|
 | **Palabras Clave de Negocio** | battery drain, background tasks, eficiencia, consumo de energía |
 | **Patrón Técnico** | Work Scheduling, Doze/Aggressive App Standby, Rate Limiting |
-| **Stack Seleccionado** | Flutter + platform channels (WorkManager/BackgroundFetch) + Riverpod para políticas + batching |
+| **Stack Seleccionado** | Flutter + platform channels ([WorkManager](#term-workmanager "Scheduler Android que respeta políticas de energía y condiciones.")/BackgroundFetch) + Riverpod para políticas + batching |
 | **Nivel de Criticidad** | Alto |
 
 ---
@@ -27,7 +27,7 @@
 
 ### Incidentes reportados
 - **Estudios móviles:** Apps con consumo elevado son desinstaladas rápidamente.
-- **Android/iOS power policies:** Doze/App Standby y Background App Refresh limitan tareas.
+- **Android/iOS power policies:** [Doze/App Standby](#term-doze-app-standby "Modos de ahorro de energía que limitan tareas en segundo plano.") y Background App Refresh limitan tareas.
 
 ### Analítica y prevalencia (industria)
 
@@ -39,7 +39,7 @@
 
 **Resumen global**
 - Sin scheduling eficiente, el battery drain aumenta y el SO limita la app.
-- Push-to-sync y batching son claves para minimizar wakeups y consumo.
+- [Push-to-sync](#term-push-to-sync "Usar notificación push como trigger en lugar de polling.") y batching son claves para minimizar wakeups y consumo.
 
 ### Riesgos
 
@@ -65,7 +65,7 @@
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Configurar WorkManager con constraints (WiFi, charging). Batching de syncs en una sola tarea. Usar push para disparar sync en lugar de polling. Cancelar trabajos al logout. Monitorear consumo con herramientas nativas. |
+| **Capacidades (SÍ permite)** | Configurar WorkManager con constraints (WiFi, charging). [Batching](#term-batching "Agrupar múltiples trabajos en una sola ejecución para reducir wakeups.") de syncs en una sola tarea. Usar push para disparar sync en lugar de polling. Cancelar trabajos al logout. Monitorear consumo con herramientas nativas. |
 | **Restricciones Duras (NO permite)** | **Garantía de ejecución exacta:** SO puede diferir tareas. **iOS background limitado:** Ventanas cortas; requiere BGAppRefresh/Tasks y justificación. **Alarmas exactas:** Restringidas en Android 12+. |
 | **Criterio de Selección** | Preferir push + batch; intervalos mínimos compatibles con políticas; constraints razonables; observar métricas de consumo real. |
 
@@ -118,12 +118,12 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| WorkManager | Scheduler Android que respeta políticas de energía y condiciones. |
-| Background Fetch | Mecanismo iOS para tareas periódicas limitadas. |
-| Batching | Agrupar múltiples trabajos en una sola ejecución para reducir wakeups. |
-| Push-to-sync | Usar notificación push como trigger en lugar de polling. |
-| Doze/App Standby | Modos de ahorro de energía que limitan tareas en segundo plano. |
-| Wakeup | Evento que despierta la CPU; costoso energéticamente. |
+| <a id="term-workmanager"></a>WorkManager | Scheduler Android que respeta políticas de energía y condiciones. |
+| <a id="term-background-fetch"></a>Background Fetch | Mecanismo iOS para tareas periódicas limitadas. |
+| <a id="term-batching"></a>Batching | Agrupar múltiples trabajos en una sola ejecución para reducir wakeups. |
+| <a id="term-push-to-sync"></a>Push-to-sync | Usar notificación push como trigger en lugar de polling. |
+| <a id="term-doze-app-standby"></a>Doze/App Standby | Modos de ahorro de energía que limitan tareas en segundo plano. |
+| <a id="term-wakeup"></a>Wakeup | Evento que despierta la CPU; costoso energéticamente. |
 
 ---
 

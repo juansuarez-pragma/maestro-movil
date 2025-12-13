@@ -1,5 +1,5 @@
 # Caso 67: Deep Links Seguros
-## Universal Links / App Links sin Phishing ni Hijacking
+## [Universal Links](#term-universal-links "Enlaces iOS asociados a dominio que abren la app de forma segura.") / [App Links](#term-app-links "Enlaces Android verificados (assetlinks) para abrir app sin chooser.") sin Phishing ni [Hijacking](#term-hijacking "Captura del enlace por una app no autorizada.")
 
 ---
 
@@ -85,7 +85,7 @@
 ### 3.3 Operación y riesgo
 | Tema | Política | Nota |
 |:-----|:--------|:-----|
-| Allowlist | Rutas permitidas explícitas | Evita abuso |
+| [Allowlist](#term-allowlist "Lista explícita de rutas/acciones permitidas.") | Rutas permitidas explícitas | Evita abuso |
 | Rotación | Rotar llaves de firma y versionar payload | Seguridad |
 | Auditoría | Log de consumo de link (one-time) | Investigación |
 
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Universal Links | Enlaces iOS asociados a dominio que abren la app de forma segura. |
-| App Links | Enlaces Android verificados (assetlinks) para abrir app sin chooser. |
-| Hijacking | Captura del enlace por una app no autorizada. |
-| One-time token | Token consumible una sola vez para evitar replay. |
-| Allowlist | Lista explícita de rutas/acciones permitidas. |
+| <a id="term-universal-links"></a>Universal Links | Enlaces iOS asociados a dominio que abren la app de forma segura. |
+| <a id="term-app-links"></a>App Links | Enlaces Android verificados (assetlinks) para abrir app sin chooser. |
+| <a id="term-hijacking"></a>Hijacking | Captura del enlace por una app no autorizada. |
+| <a id="term-one-time-token"></a>One-time token | Token consumible una sola vez para evitar replay. |
+| <a id="term-allowlist"></a>Allowlist | Lista explícita de rutas/acciones permitidas. |
 
 ---
 

@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | certificate pinning, SSL pinning, MITM attack, transferencia interbancaria, SPEI, ACH, seguridad en tránsito |
-| **Patrón Técnico** | Certificate Pinning, Public Key Pinning, Trust on First Use (TOFU) |
+| **Patrón Técnico** | Certificate Pinning, Public Key Pinning, Trust on First Use ([TOFU](#term-tofu "Trust On First Use; confiar en el primer certificado visto y fijarlo para sesiones futuras.")) |
 | **Stack Seleccionado** | Dio + dio_http2_adapter + certificados/pins en config firmada + BLoC (TransferBloc) |
 | **Nivel de Criticidad** | Alto |
 
@@ -73,21 +73,21 @@
 | **Restricciones Duras (NO permite)** | **Debugging:** Pinning complica tráfico vía proxy (habilitar solo en debug). **Proxies corporativos:** Usuarios con proxy SSL legítimo se bloquean por política. **Expiración:** Si vencen todos los pins sin rollover, la app queda inoperable. **ATS:** Configurar excepciones iOS si el endpoint usa TLS intermedio. |
 | **Criterio de Selección** | Se usa **[Public Key pinning](#term-spki)** sobre certificate pinning porque la clave pública sobrevive renovaciones. Se elige **[BLoC](#term-bloc)** para `TransferBloc` por flujo con múltiples eventos y necesidad de auditoría de estados. |
 
-### 3.1 Arquitectura práctica (flujo resumido)
-```
-App móvil → Handshake TLS → Valida SPKI contra pins (2-3 activos)
-    ↳ Pin match: continúa
-    ↳ Pin mismatch: bloquea, emite evento SOC, registra fingerprint del cert
-Config firmada (remota): rota pins cada 90 días; backup pin siempre presente
-```
-
-### 3.2 Plan de verificación (V&V)
+### 3.1 Plan de verificación (V&V)
 | Tipo de verificación | Qué valida | Responsable/Entorno |
 |:---------------------|:-----------|:--------------------|
 | Unit (CI) | Interceptor de Dio aplica pinning y rechaza cert no autorizado | Equipo móvil, CI |
 | Integration (CI) | Cert expirado → se usa backup pin; config remota firma válida antes de aplicar | Móvil/Backend, CI + staging |
 | Seguridad manual | Proxy MITM (Charles/mitmproxy) con CA instalada debe ser bloqueado; alerta generada | Seguridad/QE en dispositivos reales |
 | Observabilidad | Evento `pinning.blocked` con hash del cert presentado, motivo y endpoint | Equipo móvil/SRE, CI |
+
+### 3.2 Arquitectura práctica (flujo resumido)
+```
+App móvil → Handshake TLS → Valida SPKI contra pins (2-3 activos)
+    ↳ Pin match: continúa
+    ↳ Pin mismatch: bloquea, emite evento SOC, registra fingerprint del cert
+Config firmada (remota): rota pins cada 90 días; backup pin siempre presente
+```
 
 ### 3.3 Operación y resiliencia
 | Tema | Política | Nota |
@@ -96,23 +96,7 @@ Config firmada (remota): rota pins cada 90 días; backup pin siempre presente
 | Fallback | `fail-closed` por defecto; `fail-open` solo en ventana aprobada y monitoreada | Controla indisponibilidad sin abrir MITM |
 | Debug | Pinning desactivado solo en `debug`; `release` siempre activo | Facilita pruebas sin comprometer producción |
 
-### 3.4 Observabilidad y seguridad
-| Elemento | Detalle | Umbral/Alerta |
-|:---------|:--------|:--------------|
-| Eventos | `pinning.blocked`, `pinning.matched`, `pinning.failopen_enabled` | Alertar al SOC en bloqueos |
-| Métricas | p95 handshake TLS < 500 ms; pin-match > 99.9% | Warning si se acerca a límites |
-| Alertas SOC | `pinning.blocked` > 3 eventos/hora/dispositivo | Indica MITM/debug indebido |
-
-### 3.5 Política de pins (rotación y custodia)
-| Aspecto | Política |
-|:--------|:---------|
-| Cantidad de pins activos | 2–3 SPKI simultáneos |
-| Formato | SPKI en Base64 (RSA/ECDSA) |
-| Rotación | Cada 90 días o al rotar key pair; agregar pin nuevo antes de retirar el viejo |
-| Fallback | `fail-closed` salvo ventana de rotación aprobada; revertir si `pinning.blocked` se dispara |
-| Publicación | Config remota firmada (JWKS/firmware) con `kid`, algoritmo y expiración |
-
-### 3.6 Mini-ADR (Decisión de Arquitectura)
+### 3.4 Mini-ADR (Decisión de Arquitectura)
 | Aspecto | Detalle |
 |:--------|:--------|
 | Problema | MITM posible con CA instalada; caída de app al rotar cert único. |
@@ -120,6 +104,22 @@ Config firmada (remota): rota pins cada 90 días; backup pin siempre presente
 | Decisión | Pinning por SPKI con 2–3 pins, backup, config remota firmada, detección de proxy/root/JB. |
 | Consecuencias | Necesita gestión de pins en backend/config; posible bloqueo en proxies corporativos (política fail-closed). |
 | Riesgos aceptados | Debug restringido; usuarios en proxies SSL legítimos pueden verse bloqueados (política de seguridad). |
+
+### 3.5 Observabilidad y seguridad
+| Elemento | Detalle | Umbral/Alerta |
+|:---------|:--------|:--------------|
+| Eventos | `pinning.blocked`, `pinning.matched`, `pinning.failopen_enabled` | Alertar al SOC en bloqueos |
+| Métricas | p95 handshake TLS < 500 ms; pin-match > 99.9% | Warning si se acerca a límites |
+| Alertas SOC | `pinning.blocked` > 3 eventos/hora/dispositivo | Indica MITM/debug indebido |
+
+### 3.6 Política de pins (rotación y custodia)
+| Aspecto | Política |
+|:--------|:---------|
+| Cantidad de pins activos | 2–3 SPKI simultáneos |
+| Formato | SPKI en Base64 (RSA/ECDSA) |
+| Rotación | Cada 90 días o al rotar key pair; agregar pin nuevo antes de retirar el viejo |
+| Fallback | `fail-closed` salvo ventana de rotación aprobada; revertir si `pinning.blocked` se dispara |
+| Publicación | Config remota firmada (JWKS/firmware) con `kid`, algoritmo y expiración |
 
 ---
 

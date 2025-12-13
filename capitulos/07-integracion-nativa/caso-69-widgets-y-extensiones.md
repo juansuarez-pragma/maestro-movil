@@ -1,5 +1,5 @@
 # Caso 69: Widgets y Extensiones Seguras
-## Compartir Datos entre App y Widget sin Filtrar Información
+## Compartir Datos entre App y [Widget](#term-widget "Superficie UI del OS fuera de la app principal.") sin Filtrar Información
 
 ---
 
@@ -35,7 +35,7 @@
 |:-------|:-----------------|:---------------------|
 | Apple WidgetKit | Global | Widgets deben ser ligeros y respetar privacidad. |
 | Android App Widgets | Global | Updates deben ser controlados; datos sensibles con cuidado. |
-| OWASP MAS | Global | Minimización y storage seguro para datos compartidos. |
+| OWASP MAS | Global | [Minimización](#term-minimizacion "Guardar/mostrar solo lo estrictamente necesario.") y storage seguro para datos compartidos. |
 
 **Resumen global**
 - Widgets deben ser “read-only” y mínimos: datos no sensibles o derivados, storage compartido cifrado, refresh controlado.
@@ -80,7 +80,7 @@
 |:-----|:---------|:-----|
 | Contenido | Mostrar estados y resúmenes, no detalles | Privacidad |
 | Bloqueado | “Ocultar contenido sensible” por defecto | Confianza |
-| Control remoto | Kill switch del widget | Contención |
+| Control remoto | [Kill switch](#term-kill-switch "Apagado remoto ante incidentes.") del widget | Contención |
 
 ### 3.3 Operación y riesgo
 | Tema | Política | Nota |
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Widget | Superficie UI del OS fuera de la app principal. |
-| Contenedor compartido | Espacio compartido app↔widget (App Group / shared prefs). |
-| Minimización | Guardar/mostrar solo lo estrictamente necesario. |
-| Lockscreen | Pantalla bloqueada; requiere políticas de visibilidad. |
-| Kill switch | Apagado remoto ante incidentes. |
+| <a id="term-widget"></a>Widget | Superficie UI del OS fuera de la app principal. |
+| <a id="term-contenedor-compartido"></a>Contenedor compartido | Espacio compartido app↔widget (App Group / shared prefs). |
+| <a id="term-minimizacion"></a>Minimización | Guardar/mostrar solo lo estrictamente necesario. |
+| <a id="term-lockscreen"></a>Lockscreen | Pantalla bloqueada; requiere políticas de visibilidad. |
+| <a id="term-kill-switch"></a>Kill switch | Apagado remoto ante incidentes. |
 
 ---
 

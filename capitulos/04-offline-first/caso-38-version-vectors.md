@@ -70,8 +70,8 @@
 ### 3.1 Plan de verificación (V&V)
 | Tipo de verificación | Qué valida | Responsable/Entorno |
 |:---------------------|:-----------|:--------------------|
-| Unit (CI) | Dominancia/concurrencia detectada correctamente | Equipo móvil, CI |
-| Integration (CI) | Merge guiado por vector evita sobrescrituras erróneas | Móvil/Backend, CI |
+| Unit (CI) | [Dominancia](#term-dominancia "Cuando un vector es >= en todos los contadores a otro.")/concurrencia detectada correctamente | Equipo móvil, CI |
+| Integration (CI) | [Merge guiado](#term-merge-guiado "Estrategia de resolución basada en detectar conflicto.") por vector evita sobrescrituras erróneas | Móvil/Backend, CI |
 | Observabilidad | Logging de vectores y conflictos detectados | Móvil/SRE |
 | Bounding | GC/limit de tamaño de vectores funciona | Móvil/QA |
 
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Version Vector | Mapa de contador por replica/actor para detectar orden parcial. |
-| Dominancia | Cuando un vector es >= en todos los contadores a otro. |
-| Concurrencia | Cambios que no dominan entre sí; requieren merge. |
-| Actor/Replica | Nodo que genera cambios. |
-| Merge guiado | Estrategia de resolución basada en detectar conflicto. |
+| <a id="term-version-vector"></a>Version Vector | Mapa de contador por replica/actor para detectar orden parcial. |
+| <a id="term-dominancia"></a>Dominancia | Cuando un vector es >= en todos los contadores a otro. |
+| <a id="term-concurrencia"></a>Concurrencia | Cambios que no dominan entre sí; requieren merge. |
+| <a id="term-actor-replica"></a>Actor/Replica | Nodo que genera cambios. |
+| <a id="term-merge-guiado"></a>Merge guiado | Estrategia de resolución basada en detectar conflicto. |
 
 ---
 

@@ -64,7 +64,7 @@
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Desplegar a 1-5% con flags/segmentos. Medir crash rate, ANR, latencia, métricas UX. Definir umbrales de stop automático. Rollback inmediato vía flag. Telemetría por versión/cohorte. |
+| **Capacidades (SÍ permite)** | Desplegar a 1-5% con flags/segmentos. Medir crash rate, ANR, latencia, métricas UX. Definir umbrales de stop automático. [Rollback](#term-rollback "Desactivar rápidamente la versión/feature problemática.") inmediato vía flag. Telemetría por versión/cohorte. |
 | **Restricciones Duras (NO permite)** | **Sin telemetría en tiempo real:** Decisiones tardías. **Segmentación limitada:** Necesita SDK que soporte targeting. **Falsos positivos:** Umbrales deben calibrarse. |
 | **Criterio de Selección** | Flags/segmentación, monitoreo en tiempo casi real, umbrales de stop, plan de rollback. |
 
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Canary Release | Rollout a pequeña cohorte para validar antes de 100%. |
-| Cohorte | Subconjunto de usuarios para un experimento/rollout. |
-| Gate de stop | Condición que detiene rollout si se supera un umbral. |
-| Crash rate | Porcentaje de sesiones con crash. |
-| Rollback | Desactivar rápidamente la versión/feature problemática. |
+| <a id="term-canary-release"></a>Canary Release | Rollout a pequeña cohorte para validar antes de 100%. |
+| <a id="term-cohorte"></a>Cohorte | Subconjunto de usuarios para un experimento/rollout. |
+| <a id="term-gate-de-stop"></a>Gate de stop | Condición que detiene rollout si se supera un umbral. |
+| <a id="term-crash-rate"></a>Crash rate | Porcentaje de sesiones con crash. |
+| <a id="term-rollback"></a>Rollback | Desactivar rápidamente la versión/feature problemática. |
 
 ---
 

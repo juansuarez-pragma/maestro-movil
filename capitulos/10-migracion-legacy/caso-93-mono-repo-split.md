@@ -1,5 +1,5 @@
 # Caso 93: Dividir un Mono-Repo Legacy
-## Separar en Múltiples Repos sin Perder Trazabilidad
+## Separar en Múltiples Repos sin Perder [Trazabilidad](#term-trazabilidad "Capacidad de seguir cambios a través de repos.")
 
 ---
 
@@ -9,7 +9,7 @@
 |:------|:------|
 | **Palabras Clave de Negocio** | monorepo split, migración, dependencias, trazabilidad |
 | **Patrón Técnico** | Repository Split, Dependency Mapping, History Preservation |
-| **Stack Seleccionado** | Git filter-repo/subtree + mapping de dependencias + CI por repo |
+| **Stack Seleccionado** | Git [filter-repo](#term-filter-repo "Herramienta para reescribir historial Git preservando paths.")/subtree + mapping de dependencias + [CI por repo](#term-ci-por-repo "Pipelines separados adaptados a cada nuevo repositorio.") |
 | **Nivel de Criticidad** | Alto |
 
 ---
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| filter-repo | Herramienta para reescribir historial Git preservando paths. |
-| Subtree split | Extraer un directorio con su historia a otro repo. |
-| Dependencia cruzada | Uso de código entre módulos que se separarán. |
-| Trazabilidad | Capacidad de seguir cambios a través de repos. |
-| CI por repo | Pipelines separados adaptados a cada nuevo repositorio. |
+| <a id="term-filter-repo"></a>filter-repo | Herramienta para reescribir historial Git preservando paths. |
+| <a id="term-subtree-split"></a>Subtree split | Extraer un directorio con su historia a otro repo. |
+| <a id="term-dependencia-cruzada"></a>Dependencia cruzada | Uso de código entre módulos que se separarán. |
+| <a id="term-trazabilidad"></a>Trazabilidad | Capacidad de seguir cambios a través de repos. |
+| <a id="term-ci-por-repo"></a>CI por repo | Pipelines separados adaptados a cada nuevo repositorio. |
 
 ---
 

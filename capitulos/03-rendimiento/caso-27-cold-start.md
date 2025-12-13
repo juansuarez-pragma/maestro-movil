@@ -1,4 +1,4 @@
-# Caso 27: Cold Start de 8 Segundos
+# Caso 27: [Cold Start](#term-cold-start "Inicio desde cero, sin procesos en memoria.") de 8 Segundos
 ## Optimizar Tiempo de Arranque en Apps Bancarias
 
 ---
@@ -9,7 +9,7 @@
 |:------|:------|
 | **Palabras Clave de Negocio** | cold start, tiempo de arranque, rendimiento, splash |
 | **Patrón Técnico** | Startup Profiling, Lazy Initialization, Deferred Loading |
-| **Stack Seleccionado** | Flutter + Dart Deferred Imports + AOT optimizations + Splash ligero |
+| **Stack Seleccionado** | Flutter + Dart Deferred Imports + [AOT](#term-aot "Ahead-of-Time compilation para startups más rápidos.") optimizations + Splash ligero |
 | **Nivel de Criticidad** | Alto |
 
 ---
@@ -18,7 +18,7 @@
 
 ### Problema detectado (técnico)
 - Inicializar todo en `main()` y cargar assets pesados retrasa el primer frame y eleva el cold start a 8s.
-- Sin diferir módulos no críticos ni optimizar assets, TTI/TTFF exceden la meta (<2s).
+- Sin diferir módulos no críticos ni optimizar assets, [TTI/TTFF](#term-tti-ttff "Time To Interactive / Time To First Frame.") exceden la meta (<2s).
 - Falta de medición (trace-startup, DevTools) oculta los puntos calientes de arranque.
 
 ### Escenario de Negocio
@@ -64,7 +64,7 @@
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Mover init pesado a futuros post-frame. Usar deferred imports para features no críticas. Reducir tamaño de assets (webp, LQIP). Precache selectivo. Medir con `flutter run --trace-startup` y DevTools. |
+| **Capacidades (SÍ permite)** | Mover init pesado a futuros post-frame. Usar deferred imports para features no críticas. Reducir tamaño de assets (webp, [LQIP](#term-lqip "Low Quality Image Placeholder para reducir tiempo de carga de assets.")). Precache selectivo. Medir con `flutter run --trace-startup` y DevTools. |
 | **Restricciones Duras (NO permite)** | **Dependencias críticas:** Auth/config mínimas deben cargarse para home. **Dispositivos low-end:** AOT y compresión ayudan pero hardware limita. **Assets enormes:** Requieren optimización externa. |
 | **Criterio de Selección** | Inicio "just enough": config + routing + base providers; todo lo demás diferido. Medición continua del tiempo a primer frame útil. |
 
@@ -118,11 +118,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Cold Start | Inicio desde cero, sin procesos en memoria. |
-| Deferred Import | Carga diferida de librerías Dart bajo demanda. |
-| LQIP | Low Quality Image Placeholder para reducir tiempo de carga de assets. |
-| AOT | Ahead-of-Time compilation para startups más rápidos. |
-| TTI/TTFF | Time To Interactive / Time To First Frame. |
+| <a id="term-cold-start"></a>Cold Start | Inicio desde cero, sin procesos en memoria. |
+| <a id="term-deferred-import"></a>Deferred Import | Carga diferida de librerías Dart bajo demanda. |
+| <a id="term-lqip"></a>LQIP | Low Quality Image Placeholder para reducir tiempo de carga de assets. |
+| <a id="term-aot"></a>AOT | Ahead-of-Time compilation para startups más rápidos. |
+| <a id="term-tti-ttff"></a>TTI/TTFF | Time To Interactive / Time To First Frame. |
 
 ---
 

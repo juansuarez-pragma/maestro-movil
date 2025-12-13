@@ -1,4 +1,4 @@
-# Caso 60: A/B Testing Arquitectónico
+# Caso 60: [A/B Testing](#term-a-b-testing "[Experimento](#term-experimento "Configuración que asigna variantes y mide métricas.") controlado con variantes A y B.") Arquitectónico
 ## Servir Diferentes UIs desde el Mismo Código
 
 ---
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| A/B Testing | Experimento controlado con variantes A y B. |
-| Experimento | Configuración que asigna variantes y mide métricas. |
-| Variante | Diferente UI/feature bajo prueba. |
-| Cleanup | Remover código de experimentos concluidos. |
-| Assignment | Lógica que decide qué variante recibe un usuario. |
+| <a id="term-a-b-testing"></a>A/B Testing | Experimento controlado con variantes A y B. |
+| <a id="term-experimento"></a>Experimento | Configuración que asigna variantes y mide métricas. |
+| <a id="term-variante"></a>Variante | Diferente UI/feature bajo prueba. |
+| <a id="term-cleanup"></a>Cleanup | Remover código de experimentos concluidos. |
+| <a id="term-assignment"></a>Assignment | Lógica que decide qué variante recibe un usuario. |
 
 ---
 

@@ -9,7 +9,7 @@
 |:------|:------|
 | **Palabras Clave de Negocio** | firma, certificados, keystore, provisioning profile, fastlane |
 | **Patrón Técnico** | Secure Key Management, Automated Signing, Certificates Rotation |
-| **Stack Seleccionado** | Fastlane match/cert/pilot + Secret Manager/Vault + CI |
+| **Stack Seleccionado** | [Fastlane match/cert](#term-fastlane-match-cert "Herramientas para gestionar credenciales de firma iOS/Android.")/pilot + [Secret Manager/Vault](#term-secret-manager-vault "Servicio seguro para guardar secretos.") + CI |
 | **Nivel de Criticidad** | Crítico |
 
 ---
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Keystore | Archivo que contiene claves para firmar apps Android. |
-| Provisioning Profile | Perfil que autoriza apps iOS a correr en dispositivos. |
-| Secret Manager/Vault | Servicio seguro para guardar secretos. |
-| Rotación de certificados | Renovar certificados antes de expiración. |
-| Fastlane match/cert | Herramientas para gestionar credenciales de firma iOS/Android. |
+| <a id="term-keystore"></a>Keystore | Archivo que contiene claves para firmar apps Android. |
+| <a id="term-provisioning-profile"></a>Provisioning Profile | Perfil que autoriza apps iOS a correr en dispositivos. |
+| <a id="term-secret-manager-vault"></a>Secret Manager/Vault | Servicio seguro para guardar secretos. |
+| <a id="term-rotacion-de-certificados"></a>Rotación de certificados | Renovar certificados antes de expiración. |
+| <a id="term-fastlane-match-cert"></a>Fastlane match/cert | Herramientas para gestionar credenciales de firma iOS/Android. |
 
 ---
 

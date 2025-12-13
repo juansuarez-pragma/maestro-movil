@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | feature flags, rollout, kill switch, control de cambios |
-| **Patrón Técnico** | Feature Flag Governance, Kill Switch, Targeting |
+| **Patrón Técnico** | Feature Flag Governance, [Kill Switch](#term-kill-switch "Flag para apagar una función inmediatamente."), [Targeting](#term-targeting "Selección de audiencia para un flag.") |
 | **Stack Seleccionado** | Flutter + Flags SDK (LaunchDarkly/ConfigCat/Custom) + Riverpod gating + analytics |
 | **Nivel de Criticidad** | Alto |
 
@@ -26,7 +26,7 @@
 > *"Como equipo, quiero liberar código a producción y controlar el impacto con flags sin retrasar deploys."*
 
 ### Incidentes reportados
-- **Progressive delivery:** Falta de kill switch prolongó incidentes en producción.
+- **[Progressive delivery](#term-progressive-delivery "Deploy rápido, activación gradual con flags."):** Falta de kill switch prolongó incidentes en producción.
 - **Equipos sin gobernanza:** Flags zombies generaron comportamiento impredecible meses después.
 
 ### Analítica y prevalencia (industria)
@@ -34,7 +34,7 @@
 | Fuente | Muestra / Región | Hallazgos relevantes |
 |:-------|:-----------------|:---------------------|
 | Progressive delivery reports | Global | Flags con kill switch reducen MTTR en incidentes. |
-| Postmortems de flags | Varios | Expiración ausente causa deuda y bugs tardíos. |
+| Postmortems de flags | Varios | [Expiración](#term-expiracion "Fecha/lógica para retirar flags antiguos.") ausente causa deuda y bugs tardíos. |
 | NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; gobernanza de configuración/flags es débil. |
 
 **Resumen global**
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Kill Switch | Flag para apagar una función inmediatamente. |
-| Targeting | Selección de audiencia para un flag. |
-| Expiración | Fecha/lógica para retirar flags antiguos. |
-| Zombie flag | Flag que ya no controla nada y queda en el código. |
-| Progressive delivery | Deploy rápido, activación gradual con flags. |
+| <a id="term-kill-switch"></a>Kill Switch | Flag para apagar una función inmediatamente. |
+| <a id="term-targeting"></a>Targeting | Selección de audiencia para un flag. |
+| <a id="term-expiracion"></a>Expiración | Fecha/lógica para retirar flags antiguos. |
+| <a id="term-zombie-flag"></a>Zombie flag | Flag que ya no controla nada y queda en el código. |
+| <a id="term-progressive-delivery"></a>Progressive delivery | Deploy rápido, activación gradual con flags. |
 
 ---
 

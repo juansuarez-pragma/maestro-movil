@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | migración, monolito, modularización, refactor |
-| **Patrón Técnico** | Strangler Fig, Modularization, Feature Extraction |
+| **Patrón Técnico** | [Strangler Fig](#term-strangler-fig "Patrón para reemplazar sistemas gradualmente."), Modularization, Feature Extraction |
 | **Stack Seleccionado** | Flutter + packages internos + Melos + feature flags para cutover |
 | **Nivel de Criticidad** | Alto |
 
@@ -73,7 +73,7 @@
 |:---------------------|:-----------|:--------------------|
 | Tests por paquete | Integridad tras extracción | QA/Móvil |
 | Afectados | CI ejecuta solo lo impactado | DevOps |
-| Flags | Cutover seguro y rollback | Móvil/QA |
+| Flags | [Cutover](#term-cutover "Paso de sistema viejo a nuevo.") seguro y rollback | Móvil/QA |
 
 ### 3.2 UX y operación
 | Tema | Política | Nota |
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Strangler Fig | Patrón para reemplazar sistemas gradualmente. |
-| Cutover | Paso de sistema viejo a nuevo. |
-| Package interno | Módulo independiente en el monorepo. |
-| Dependencia cíclica | Referencia circular entre módulos; debe evitarse. |
-| Afectación por paquete | Detectar qué paquetes cambian para limitar pruebas/build. |
+| <a id="term-strangler-fig"></a>Strangler Fig | Patrón para reemplazar sistemas gradualmente. |
+| <a id="term-cutover"></a>Cutover | Paso de sistema viejo a nuevo. |
+| <a id="term-package-interno"></a>Package interno | Módulo independiente en el monorepo. |
+| <a id="term-dependencia-ciclica"></a>Dependencia cíclica | Referencia circular entre módulos; debe evitarse. |
+| <a id="term-afectacion-por-paquete"></a>Afectación por paquete | Detectar qué paquetes cambian para limitar pruebas/build. |
 
 ---
 

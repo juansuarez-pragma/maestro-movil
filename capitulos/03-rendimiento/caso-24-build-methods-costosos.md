@@ -8,8 +8,8 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | rendimiento UI, rebuild, memoización, selectors |
-| **Patrón Técnico** | Widget Decomposition, Memoization, Selector Pattern |
-| **Stack Seleccionado** | Flutter + Riverpod Selectors + `const` widgets + RepaintBoundary |
+| **Patrón Técnico** | Widget Decomposition, Memoization, [Selector](#term-selector "Deriva parte del estado para limitar rebuild.") Pattern |
+| **Stack Seleccionado** | Flutter + Riverpod Selectors + [`const` widget](#term-const-widget "Widget inmutable que no se vuelve a construir si no cambian props.")s + [RepaintBoundary](#term-repaintboundary "Aísla repaints a una subparte del árbol.") |
 | **Nivel de Criticidad** | Alto |
 
 ---
@@ -81,7 +81,7 @@
 |:-----|:---------|:-----|
 | Composición | Descomponer por responsabilidad; `const` cuando aplique | Menos diff |
 | Aislamiento | `RepaintBoundary` para widgets caros | Aísla repaints |
-| Memoización | Cache de cálculos recurrentes | Reduce CPU |
+| [Memoización](#term-memoizacion "Cache de resultados de computo para reutilizar.") | Cache de cálculos recurrentes | Reduce CPU |
 
 ### 3.3 Operación y riesgo
 | Tema | Política | Nota |
@@ -119,12 +119,12 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Selector | Deriva parte del estado para limitar rebuild. |
-| `const` widget | Widget inmutable que no se vuelve a construir si no cambian props. |
-| RepaintBoundary | Aísla repaints a una subparte del árbol. |
-| Memoización | Cache de resultados de computo para reutilizar. |
-| Build tree | Árbol de widgets que describe la UI. |
-| Flame chart | Visualización de tiempos de build/layout/paint en profiling. |
+| <a id="term-selector"></a>Selector | Deriva parte del estado para limitar rebuild. |
+| <a id="term-const-widget"></a>`const` widget | Widget inmutable que no se vuelve a construir si no cambian props. |
+| <a id="term-repaintboundary"></a>RepaintBoundary | Aísla repaints a una subparte del árbol. |
+| <a id="term-memoizacion"></a>Memoización | Cache de resultados de computo para reutilizar. |
+| <a id="term-build-tree"></a>Build tree | Árbol de widgets que describe la UI. |
+| <a id="term-flame-chart"></a>Flame chart | Visualización de tiempos de build/layout/paint en profiling. |
 
 ---
 

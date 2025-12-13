@@ -1,4 +1,4 @@
-# Caso 90: GPS Spoofing y Mock Locations
+# Caso 90: GPS [Spoofing](#term-spoofing "Suplantación de una señal (ej. GPS).") y Mock Locations
 ## Evitar Fraude por Ubicación Falsa en Geofencing
 
 ---
@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | GPS spoofing, mock location, antifraude, ubicación, geofencing |
-| **Patrón Técnico** | Location Integrity, Signal Fusion, Risk-Based Step-up |
+| **Patrón Técnico** | Location Integrity, Signal Fusion, Risk-Based [Step-up](#term-step-up "Solicitar un factor adicional ante riesgo.") |
 | **Stack Seleccionado** | Flutter + plugins de ubicación + backend de scoring + Play Integrity/App Attest (cuando aplique) |
 | **Nivel de Criticidad** | Alto |
 
@@ -34,7 +34,7 @@
 | Fuente | Muestra / Región | Hallazgos relevantes |
 |:-------|:-----------------|:---------------------|
 | Android Location | Global | Existen flags y señales para detectar ubicaciones simuladas (según API/OS). |
-| Prácticas antifraude | Global | “Signal fusion” (GPS + red + device integrity) reduce spoofing. |
+| Prácticas antifraude | Global | “[Signal fusion](#term-signal-fusion "Combinar señales para aumentar confiabilidad.")” (GPS + red + device integrity) reduce spoofing. |
 | OWASP MAS | Global | Recomienda validar integridad del dispositivo y no confiar en una sola señal. |
 
 **Resumen global**
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Mock location | Ubicación simulada por el OS/app para pruebas o spoofing. |
-| Spoofing | Suplantación de una señal (ej. GPS). |
-| Signal fusion | Combinar señales para aumentar confiabilidad. |
-| Scoring | Puntaje de riesgo basado en señales. |
-| Step-up | Solicitar un factor adicional ante riesgo. |
+| <a id="term-mock-location"></a>Mock location | Ubicación simulada por el OS/app para pruebas o spoofing. |
+| <a id="term-spoofing"></a>Spoofing | Suplantación de una señal (ej. GPS). |
+| <a id="term-signal-fusion"></a>Signal fusion | Combinar señales para aumentar confiabilidad. |
+| <a id="term-scoring"></a>Scoring | Puntaje de riesgo basado en señales. |
+| <a id="term-step-up"></a>Step-up | Solicitar un factor adicional ante riesgo. |
 
 ---
 

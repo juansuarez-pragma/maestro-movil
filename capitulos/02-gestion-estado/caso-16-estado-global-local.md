@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | estado global, estado local, saldo en tiempo real, rendimiento |
-| **Patrón Técnico** | State Partitioning, Selector Optimization, Background Refresh |
+| **Patrón Técnico** | State Partitioning, [Selector](#term-selector "Función que deriva una porción del estado minimizando rebuilds.") Optimization, Background Refresh |
 | **Stack Seleccionado** | Flutter + Riverpod Selectors + Stream caching + InheritedModel para widgets pesados |
 | **Nivel de Criticidad** | Alto |
 
@@ -17,8 +17,8 @@
 ## 1. Planteamiento del Problema (El "Trigger")
 
 ### Problema detectado (técnico)
-- Estado global monolítico dispara rebuilds masivos y jank; estado excesivamente local provoca saldos inconsistentes entre pantallas.
-- Sin stream cache/TTL, cada pantalla refresca saldo → tormenta de requests y lag.
+- [Estado global](#term-estado-global "Datos compartidos entre pantallas (saldo, usuario).") monolítico dispara rebuilds masivos y jank; estado excesivamente local provoca saldos inconsistentes entre pantallas.
+- Sin stream cache/[TTL](#term-ttl "Tiempo máximo que un dato permanece válido antes de refrescar."), cada pantalla refresca saldo → tormenta de requests y lag.
 - Sin deduplicar refresh y sin selectors, se desperdicia CPU/red y se generan glitches visuales.
 
 ### Escenario de Negocio
@@ -65,7 +65,7 @@
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Mantener saldo en store global con stream cache y TTL. Usar selectors para derivar vistas mínimas sin rebuild masivo. Estado local para inputs/UI. Refresh en background con política de TTL corta y backoff. |
+| **Capacidades (SÍ permite)** | Mantener saldo en store global con stream cache y TTL. Usar selectors para derivar vistas mínimas sin rebuild masivo. [Estado local](#term-estado-local "Estado efímero de UI (inputs, toggles).") para inputs/UI. Refresh en background con política de TTL corta y backoff. |
 | **Restricciones Duras (NO permite)** | **Sin cache compartida:** Cada pantalla refrescando saldo saturará red. **Race de refresh:** Necesita deduplicación para evitar múltiples fetch simultáneos. **Consistencia fuerte:** En presencia de múltiples dispositivos, puede haber lag hasta converger. |
 | **Criterio de Selección** | Riverpod por selectores y scopes; stream caching para evitar N requests; separar Domain state (saldo) de View state (filtros, toggles). |
 
@@ -87,7 +87,7 @@
 ### 3.3 Operación y riesgo
 | Tema | Política | Nota |
 |:-----|:--------|:-----|
-| Deduplicación | Evitar múltiples fetch simultáneos; compartir stream cache | Reduce carga |
+| [Deduplicación](#term-deduplicacion "Evitar múltiples fetch simultáneos para la misma fuente de datos.") | Evitar múltiples fetch simultáneos; compartir stream cache | Reduce carga |
 | Consistencia multi-dispositivo | Validar saldo contra backend en acciones críticas | Minimiza discrepancias |
 | Observabilidad | Métricas de jank, latencia de refresh y divergencia | Control continuo |
 
@@ -120,12 +120,12 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Estado global | Datos compartidos entre pantallas (saldo, usuario). |
-| Estado local | Estado efímero de UI (inputs, toggles). |
-| Selector | Función que deriva una porción del estado minimizando rebuilds. |
-| TTL | Tiempo máximo que un dato permanece válido antes de refrescar. |
-| Stream cache | Almacenar última emisión de un stream para nuevos suscriptores. |
-| Deduplicación | Evitar múltiples fetch simultáneos para la misma fuente de datos. |
+| <a id="term-estado-global"></a>Estado global | Datos compartidos entre pantallas (saldo, usuario). |
+| <a id="term-estado-local"></a>Estado local | Estado efímero de UI (inputs, toggles). |
+| <a id="term-selector"></a>Selector | Función que deriva una porción del estado minimizando rebuilds. |
+| <a id="term-ttl"></a>TTL | Tiempo máximo que un dato permanece válido antes de refrescar. |
+| <a id="term-stream-cache"></a>Stream cache | Almacenar última emisión de un stream para nuevos suscriptores. |
+| <a id="term-deduplicacion"></a>Deduplicación | Evitar múltiples fetch simultáneos para la misma fuente de datos. |
 
 ---
 

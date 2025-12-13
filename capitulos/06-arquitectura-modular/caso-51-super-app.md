@@ -8,8 +8,8 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | super app, mini-apps, extensibilidad, sandbox |
-| **Patrón Técnico** | Micro-frontends, Plugin Architecture, Sandbox Execution |
-| **Stack Seleccionado** | Flutter + módulos desacoplados + Dynamic Feature (Android) + App Clips/widgets (iOS) |
+| **Patrón Técnico** | Micro-frontends, Plugin Architecture, [Sandbox](#term-sandbox "Aislamiento de ejecución y permisos limitados.") Execution |
+| **Stack Seleccionado** | Flutter + módulos desacoplados + [Dynamic Feature](#term-dynamic-feature "Módulo Android descargable bajo demanda.") (Android) + App Clips/widgets (iOS) |
 | **Nivel de Criticidad** | Alto |
 
 ---
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Micro-frontend | Módulo de UI autónomo integrado en una app mayor. |
-| Sandbox | Aislamiento de ejecución y permisos limitados. |
-| Dynamic Feature | Módulo Android descargable bajo demanda. |
-| App Clip | Módulo ligero de iOS para tareas acotadas. |
-| API contractual | Interfaz controlada que limita capacidades de un módulo. |
+| <a id="term-micro-frontend"></a>Micro-frontend | Módulo de UI autónomo integrado en una app mayor. |
+| <a id="term-sandbox"></a>Sandbox | Aislamiento de ejecución y permisos limitados. |
+| <a id="term-dynamic-feature"></a>Dynamic Feature | Módulo Android descargable bajo demanda. |
+| <a id="term-app-clip"></a>App Clip | Módulo ligero de iOS para tareas acotadas. |
+| <a id="term-api-contractual"></a>API contractual | Interfaz controlada que limita capacidades de un módulo. |
 
 ---
 

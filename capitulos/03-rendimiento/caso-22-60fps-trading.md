@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | 60fps, trading, animaciones, rendimiento, jank |
-| **Patrón Técnico** | Frame Budgeting, Layering, Precomposición |
+| **Patrón Técnico** | Frame Budgeting, Layering, [Precomposición](#term-precomposicion "Preparar animaciones/recursos para reducir trabajo en runtime.") |
 | **Stack Seleccionado** | Flutter + `AnimatedBuilder`/`ImplicitlyAnimatedWidgets` + `TickerProvider` + `rive` (opcional) |
 | **Nivel de Criticidad** | Crítico |
 
@@ -34,7 +34,7 @@
 | Fuente | Muestra / Región | Hallazgos relevantes |
 |:-------|:-----------------|:---------------------|
 | Apps de trading | Global | Jank por animaciones + datos; requieren throttle/diff. |
-| Flutter perf estudios | Global | RepaintBoundary y isolates reducen jank. |
+| Flutter perf estudios | Global | [RepaintBoundary](#term-repaintboundary "Widget que aísla repaints a una subparte del árbol.") y isolates reducen jank. |
 | NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; perf/animación es foco de hallazgos. |
 
 **Resumen global**
@@ -57,7 +57,7 @@
 |:-----------------|:-----------------------|:----------------------------------|
 | **BAJA** | setState masivo en cada tick de datos | **INADECUADO:** Rebuild global, jank severo. |
 | **ACEPTABLE** | `AnimatedBuilder` focalizado + throttling de actualizaciones | **MEJORA:** Menos rebuild, pero sin separar capas ni precomponer. |
-| **ENTERPRISE** | **Presupuesto de frame:** separar capa estática vs dinámica, usar widgets animados eficientes, throttle/diff de datos, trabajo pesado en Isolate, precompose vectores (Rive/Lottie) | **ÓPTIMO:** Mantiene 60fps, reduce jank y consumo. |
+| **ENTERPRISE** | **[Presupuesto de frame](#term-presupuesto-de-frame "Tiempo máximo por frame (16ms a 60fps)."):** separar capa estática vs dinámica, usar widgets animados eficientes, throttle/diff de datos, trabajo pesado en Isolate, precompose vectores (Rive/Lottie) | **ÓPTIMO:** Mantiene 60fps, reduce jank y consumo. |
 
 ---
 
@@ -120,12 +120,12 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Presupuesto de frame | Tiempo máximo por frame (16ms a 60fps). |
-| RepaintBoundary | Widget que aísla repaints a una subparte del árbol. |
-| Throttle/Diff | Limitar frecuencia y enviar solo cambios respecto al estado previo. |
-| ImplicitlyAnimatedWidget | Widget que anima propiedades sin manejar `AnimationController`. |
-| Precomposición | Preparar animaciones/recursos para reducir trabajo en runtime. |
-| RepaintBoundary | Aislar repaints a subárboles específicos. |
+| <a id="term-presupuesto-de-frame"></a>Presupuesto de frame | Tiempo máximo por frame (16ms a 60fps). |
+| <a id="term-repaintboundary"></a>RepaintBoundary | Widget que aísla repaints a una subparte del árbol. |
+| <a id="term-throttle-diff"></a>Throttle/Diff | Limitar frecuencia y enviar solo cambios respecto al estado previo. |
+| <a id="term-implicitlyanimatedwidget"></a>ImplicitlyAnimatedWidget | Widget que anima propiedades sin manejar `AnimationController`. |
+| <a id="term-precomposicion"></a>Precomposición | Preparar animaciones/recursos para reducir trabajo en runtime. |
+| <a id="term-repaintboundary"></a>RepaintBoundary | Aislar repaints a subárboles específicos. |
 
 ---
 

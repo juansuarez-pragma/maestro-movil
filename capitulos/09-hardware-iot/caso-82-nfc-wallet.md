@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | nfc, wallet, pagos, tokenización, seguridad |
-| **Patrón Técnico** | Secure NFC, Tokenization, HCE (Host Card Emulation) |
+| **Patrón Técnico** | Secure NFC, Tokenization, [HCE](#term-hce "Host Card Emulation; emula tarjeta en software.") (Host Card Emulation) |
 | **Stack Seleccionado** | Flutter + Platform Channels NFC + tokenización + cifrado en app |
 | **Nivel de Criticidad** | Crítico |
 
@@ -18,7 +18,7 @@
 
 ### Problema detectado (técnico)
 - Leer/escribir NFC sin autenticación/cifrado permite clonado y replay.
-- Sin tokenización ni HCE/SE, el PAN o datos sensibles quedan expuestos.
+- Sin tokenización ni HCE/SE, el [PAN](#term-pan "Primary Account Number; dato sensible de tarjeta.") o datos sensibles quedan expuestos.
 - Variabilidad de hardware/OS complica la compatibilidad si no se prueba.
 
 ### Escenario de Negocio
@@ -33,7 +33,7 @@
 
 | Fuente | Muestra / Región | Hallazgos relevantes |
 |:-------|:-----------------|:---------------------|
-| PCI-DSS casos | Global | Tokenización recomendada para minimizar exposición de PAN. |
+| PCI-DSS casos | Global | [Tokenización](#term-tokenizacion "Sustituir PAN/dato sensible por token opaco.") recomendada para minimizar exposición de PAN. |
 | Incident reports | Global | Clonado/replay de tags sin autenticación. |
 | NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; comunicaciones/almacenamiento inseguro frecuentes. |
 
@@ -64,8 +64,8 @@
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Usar tokens opacos en vez de PAN. Autenticación mutua para escritura/lectura. Cifrar payloads NFC. Validar integridad (MAC). HCE para emulación segura. |
-| **Restricciones Duras (NO permite)** | **Hardware/SE:** No todos los dispositivos soportan Secure Element; HCE depende del SO. **Latencia:** Operaciones seguras pueden ser más lentas. **Compatibilidad:** Varias APIs de NFC varían por fabricante. |
+| **Capacidades (SÍ permite)** | Usar tokens opacos en vez de PAN. Autenticación mutua para escritura/lectura. Cifrar payloads NFC. Validar integridad ([MAC](#term-mac "Message Authentication Code para integridad.")). HCE para emulación segura. |
+| **Restricciones Duras (NO permite)** | **Hardware/SE:** No todos los dispositivos soportan [Secure Element](#term-secure-element "Hardware seguro para claves/operaciones."); HCE depende del SO. **Latencia:** Operaciones seguras pueden ser más lentas. **Compatibilidad:** Varias APIs de NFC varían por fabricante. |
 | **Criterio de Selección** | Tokenización y HCE donde posible; cifrado y MAC; policies de lectura/escritura; almacenamiento seguro de claves. |
 
 ### 3.1 Plan de verificación (V&V)
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| HCE | Host Card Emulation; emula tarjeta en software. |
-| Tokenización | Sustituir PAN/dato sensible por token opaco. |
-| Secure Element | Hardware seguro para claves/operaciones. |
-| MAC | Message Authentication Code para integridad. |
-| PAN | Primary Account Number; dato sensible de tarjeta. |
+| <a id="term-hce"></a>HCE | Host Card Emulation; emula tarjeta en software. |
+| <a id="term-tokenizacion"></a>Tokenización | Sustituir PAN/dato sensible por token opaco. |
+| <a id="term-secure-element"></a>Secure Element | Hardware seguro para claves/operaciones. |
+| <a id="term-mac"></a>MAC | Message Authentication Code para integridad. |
+| <a id="term-pan"></a>PAN | Primary Account Number; dato sensible de tarjeta. |
 
 ---
 

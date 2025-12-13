@@ -1,5 +1,5 @@
 # Caso 64: FIDO2/Passkeys en Flutter
-## Autenticación Sin Contraseña con WebAuthn
+## Autenticación Sin Contraseña con [WebAuthn](#term-webauthn "Estándar de autenticación basada en claves públicas.")
 
 ---
 
@@ -105,7 +105,7 @@
 | KPI | Objetivo | Umbral/Alerta | Impacto esperado |
 |:----|:---------|:--------------|:-----------------|
 | Incidentes de phishing | ↓ vs baseline | Crítico si no baja | Seguridad |
-| Éxito de login con Passkey | > 99% en dispositivos soportados | Warning si baja | UX |
+| Éxito de login con [Passkey](#term-passkey "Credencial FIDO2 ligada a dispositivo/biometría.") | > 99% en dispositivos soportados | Warning si baja | UX |
 | Uso de fallback (OTP) | ↓ progresivo | Alerta si alto | Adopción |
 | Abandono en login | Tendencia a la baja | Warning si sube | Conversión |
 
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Passkey | Credencial FIDO2 ligada a dispositivo/biometría. |
-| WebAuthn | Estándar de autenticación basada en claves públicas. |
-| Challenge | Valor único enviado por el servidor para validar autenticación. |
-| Credential ID | Identificador de la credencial almacenada. |
-| Relying Party | Servicio que solicita autenticación WebAuthn. |
+| <a id="term-passkey"></a>Passkey | Credencial FIDO2 ligada a dispositivo/biometría. |
+| <a id="term-webauthn"></a>WebAuthn | Estándar de autenticación basada en claves públicas. |
+| <a id="term-challenge"></a>Challenge | Valor único enviado por el servidor para validar autenticación. |
+| <a id="term-credential-id"></a>Credential ID | Identificador de la credencial almacenada. |
+| <a id="term-relying-party"></a>Relying Party | Servicio que solicita autenticación WebAuthn. |
 
 ---
 

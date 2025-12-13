@@ -1,5 +1,5 @@
 # Caso 9: PCI-DSS en el Bolsillo
-## Tokenización de Tarjetas sin Tocar Datos Sensibles
+## [Tokenización](#term-tokenizacion "Reemplazar datos sensibles ([PAN](#term-pan "Primary Account Number de la tarjeta; dato regulado por PCI-DSS.")) por tokens no sensibles.") de Tarjetas sin Tocar Datos Sensibles
 
 ---
 
@@ -19,7 +19,7 @@
 ### Problema detectado (técnico)
 - Si la app procesa PAN/CVV directamente, todo el stack entra en scope PCI (infra, app, logs), con costos altos y riesgo legal.
 - Filtrados en logs/crashes o analytics pueden exponer PAN/CVV aunque uses SDK si no se sanitiza.
-- Sin 3DS2/SCA y tokenización correcta, se incrementa el riesgo de fraude y el rechazo por cumplimiento.
+- Sin [3DS2](#term-3ds2 "Strong Customer Authentication basado en EMV 3-D Secure 2.")/SCA y tokenización correcta, se incrementa el riesgo de fraude y el rechazo por cumplimiento.
 
 ### Escenario de Negocio
 
@@ -39,7 +39,7 @@ Problema regulatorio: PCI-DSS tiene 12 requisitos y >300 controles; manejar PAN/
 |:-------|:-----------------|:---------------------|
 | Verizon PCI Report (2023) | Global | 43.4% mantienen cumplimiento PCI-DSS todo el año. |
 | IBM Cost of Data Breach (2023) | Global | Promedio de costo por brecha con datos de pago: ~$4.45M. |
-| Stripe/Adyen adoption (2024) | Integraciones móviles | Tokenización reduce scope a SAQ A-EP; menor coste de auditoría vs manejo directo de PAN. |
+| Stripe/Adyen adoption (2024) | Integraciones móviles | Tokenización reduce scope a [SAQ A-EP](#term-saq-a-ep "Cuestionario de autoevaluación para merchants con tokenización/hosted fields."); menor coste de auditoría vs manejo directo de PAN. |
 
 **Resumen global**
 - Menos de la mitad de las organizaciones mantienen cumplimiento PCI constante.
@@ -94,7 +94,7 @@ Problema regulatorio: PCI-DSS tiene 12 requisitos y >300 controles; manejar PAN/
 | Tema | Política | Nota |
 |:-----|:--------|:-----|
 | Logs/analytics | Sanitizar; bloquear eventos con PAN/CVV | Previene fugas |
-| Scope PCI | Mantener SAQ A-EP; no almacenar ni transmitir PAN | Reduce costo de auditoría |
+| [Scope PCI](#term-scope-pci "Alcance de cumplimiento PCI; reducirlo disminuye superficie de auditoría.") | Mantener SAQ A-EP; no almacenar ni transmitir PAN | Reduce costo de auditoría |
 | Tokens | Solo backend maneja tokens para cargo; app almacena metadata no sensible | Seguridad y compliance |
 
 ### 3.4 Mini-ADR (Decisión de Arquitectura)
@@ -126,14 +126,14 @@ Problema regulatorio: PCI-DSS tiene 12 requisitos y >300 controles; manejar PAN/
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Tokenización | Reemplazar datos sensibles (PAN) por tokens no sensibles. |
-| PAN | Primary Account Number de la tarjeta; dato regulado por PCI-DSS. |
-| Vault | Servicio seguro que almacena PAN y realiza detokenización bajo políticas estrictas. |
-| Detokenización | Proceso de recuperar el PAN original desde un token bajo controles de autorización. |
-| Scope PCI | Alcance de cumplimiento PCI; reducirlo disminuye superficie de auditoría. |
-| PCI-DSS SAQ | Self-Assessment Questionnaire para evaluar cumplimiento según tipo de integración. |
-| 3DS2 | Strong Customer Authentication basado en EMV 3-D Secure 2. |
-| SAQ A-EP | Cuestionario de autoevaluación para merchants con tokenización/hosted fields. |
+| <a id="term-tokenizacion"></a>Tokenización | Reemplazar datos sensibles (PAN) por tokens no sensibles. |
+| <a id="term-pan"></a>PAN | Primary Account Number de la tarjeta; dato regulado por PCI-DSS. |
+| <a id="term-vault"></a>Vault | Servicio seguro que almacena PAN y realiza detokenización bajo políticas estrictas. |
+| <a id="term-detokenizacion"></a>Detokenización | Proceso de recuperar el PAN original desde un token bajo controles de autorización. |
+| <a id="term-scope-pci"></a>Scope PCI | Alcance de cumplimiento PCI; reducirlo disminuye superficie de auditoría. |
+| <a id="term-pci-dss-saq"></a>PCI-DSS SAQ | Self-Assessment Questionnaire para evaluar cumplimiento según tipo de integración. |
+| <a id="term-3ds2"></a>3DS2 | Strong Customer Authentication basado en EMV 3-D Secure 2. |
+| <a id="term-saq-a-ep"></a>SAQ A-EP | Cuestionario de autoevaluación para merchants con tokenización/hosted fields. |
 
 ---
 

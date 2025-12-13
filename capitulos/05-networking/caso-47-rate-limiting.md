@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | rate limit, degradación, resiliencia, throttling |
-| **Patrón Técnico** | Client-side Rate Limiting, Graceful Degradation, Quota Awareness |
+| **Patrón Técnico** | Client-side Rate Limiting, Graceful Degradation, [Quota](#term-quota "Cupo de solicitudes asignado.") Awareness |
 | **Stack Seleccionado** | Flutter + Dio interceptors + Riverpod para estado de cuota + backoff |
 | **Nivel de Criticidad** | Alto |
 
@@ -18,7 +18,7 @@
 
 ### Problema detectado (técnico)
 - Ignorar 429 y reintentar genera thundering herd, prolonga el bloqueo y empeora UX.
-- Sin leer `Retry-After` ni pausar colas, se consumen cuotas rápidamente.
+- Sin leer `[Retry-After](#term-retry-after "Header que indica cuándo reintentar.")` ni pausar colas, se consumen cuotas rápidamente.
 - Falta de degradación clara confunde al usuario y dispara tickets.
 
 ### Escenario de Negocio
@@ -34,7 +34,7 @@
 | Fuente | Muestra / Región | Hallazgos relevantes |
 |:-------|:-----------------|:---------------------|
 | APIs públicas/fintech | Global | 429 comunes; manejo deficiente prolonga bloqueo. |
-| SRE practices | Global | Backoff y respeto a `Retry-After` reducen thundering herd. |
+| SRE practices | Global | [Backoff](#term-backoff "Espera creciente antes de reintentar.") y respeto a `Retry-After` reducen thundering herd. |
 | NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; manejo de límites/errores es hallazgo común. |
 
 **Resumen global**
@@ -56,7 +56,7 @@
 |:-----------------|:-----------------------|:----------------------------------|
 | **BAJA** | Ignorar 429 y reintentar normal | **INADECUADO:** Extiende bloqueo, mala UX. |
 | **ACEPTABLE** | Mostrar error genérico | **MEJORA:** Evita algunos reintentos, pero no guía al usuario ni respeta Retry-After. |
-| **ENTERPRISE** | **Rate limit aware:** leer Retry-After, pausar solicitudes, degradar UI, mostrar tiempos de espera, backoff | **ÓPTIMO:** Reduce bloqueo y mantiene UX controlada. |
+| **ENTERPRISE** | **[Rate limit](#term-rate-limit "Límite de solicitudes permitido en un intervalo.") aware:** leer Retry-After, pausar solicitudes, degradar UI, mostrar tiempos de espera, backoff | **ÓPTIMO:** Reduce bloqueo y mantiene UX controlada. |
 
 ---
 
@@ -72,7 +72,7 @@
 | Tipo de verificación | Qué valida | Responsable/Entorno |
 |:---------------------|:-----------|:--------------------|
 | Unit (CI) | Respeto de `Retry-After` y pausa de colas | Equipo móvil, CI |
-| Integration (CI) | Degradación/pausa se aplican en 429 simulados | Móvil/QA |
+| Integration (CI) | [Degradación](#term-degradacion "Funcionar con capacidad reducida en lugar de fallar.")/pausa se aplican en 429 simulados | Móvil/QA |
 | Observabilidad | Eventos `ratelimit.*` con tiempos de espera y funciones degradadas | Móvil/SRE |
 
 ### 3.2 UX y operación
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Rate limit | Límite de solicitudes permitido en un intervalo. |
-| Retry-After | Header que indica cuándo reintentar. |
-| Degradación | Funcionar con capacidad reducida en lugar de fallar. |
-| Quota | Cupo de solicitudes asignado. |
-| Backoff | Espera creciente antes de reintentar. |
+| <a id="term-rate-limit"></a>Rate limit | Límite de solicitudes permitido en un intervalo. |
+| <a id="term-retry-after"></a>Retry-After | Header que indica cuándo reintentar. |
+| <a id="term-degradacion"></a>Degradación | Funcionar con capacidad reducida en lugar de fallar. |
+| <a id="term-quota"></a>Quota | Cupo de solicitudes asignado. |
+| <a id="term-backoff"></a>Backoff | Espera creciente antes de reintentar. |
 
 ---
 

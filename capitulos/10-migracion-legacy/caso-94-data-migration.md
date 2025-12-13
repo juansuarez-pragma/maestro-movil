@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | migración de datos, downtime, batch, backfill |
-| **Patrón Técnico** | Dual Write/Read, Backfill, Phased Cutover |
+| **Patrón Técnico** | Dual Write/Read, [Backfill](#term-backfill "Poblar datos históricos en el nuevo sistema."), Phased [Cutover](#term-cutover "Cambio definitivo al nuevo sistema.") |
 | **Stack Seleccionado** | Flutter (feature flags para nueva API) + backend dual-read/write + jobs batch |
 | **Nivel de Criticidad** | Crítico |
 
@@ -64,7 +64,7 @@
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Dual write a sistemas viejo/nuevo. Dual read con preferencia al nuevo tras backfill validado. Cutover por cohortes con flags. Rollback a viejo si falla. Monitoreo de errores y métricas. |
+| **Capacidades (SÍ permite)** | Dual write a sistemas viejo/nuevo. Dual read con preferencia al nuevo tras backfill validado. Cutover por cohortes con flags. [Rollback](#term-rollback "Volver al sistema anterior rápidamente.") a viejo si falla. Monitoreo de errores y métricas. |
 | **Restricciones Duras (NO permite)** | **Costo:** Dual write aumenta complejidad. **Consistencia eventual:** Requiere reconciliación. **Timeframes:** Backfill grande necesita ventanas y control de carga. |
 | **Criterio de Selección** | Dual read/write, backfill con verificación, cutover por cohortes, flags en cliente, rollback plan. |
 
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Backfill | Poblar datos históricos en el nuevo sistema. |
-| Dual write/read | Escribir/leer en ambos sistemas durante transición. |
-| Cutover | Cambio definitivo al nuevo sistema. |
-| Cohorte | Grupo de usuarios migrados en un lote. |
-| Rollback | Volver al sistema anterior rápidamente. |
+| <a id="term-backfill"></a>Backfill | Poblar datos históricos en el nuevo sistema. |
+| <a id="term-dual-write-read"></a>Dual write/read | Escribir/leer en ambos sistemas durante transición. |
+| <a id="term-cutover"></a>Cutover | Cambio definitivo al nuevo sistema. |
+| <a id="term-cohorte"></a>Cohorte | Grupo de usuarios migrados en un lote. |
+| <a id="term-rollback"></a>Rollback | Volver al sistema anterior rápidamente. |
 
 ---
 

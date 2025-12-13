@@ -1,5 +1,5 @@
 # Caso 55: Comunicación entre Features
-## Event Bus vs BLoC-to-BLoC
+## [Event Bus](#term-event-bus "Canal para publicar/suscribirse a eventos.") vs BLoC-to-BLoC
 
 ---
 
@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | comunicación interna, módulos, eventos, acoplamiento |
-| **Patrón Técnico** | Event Bus, Mediator, Shared State Contracts |
+| **Patrón Técnico** | Event Bus, [Mediator](#term-mediator "Componente que coordina comunicaciones entre módulos."), Shared State Contracts |
 | **Stack Seleccionado** | Flutter + Riverpod scoped providers + Event channels tipados |
 | **Nivel de Criticidad** | Alto |
 
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Event Bus | Canal para publicar/suscribirse a eventos. |
-| Mediator | Componente que coordina comunicaciones entre módulos. |
-| Evento tipado | Evento con estructura y tipos definidos. |
-| Scope de módulo | Ámbito de dependencias/eventos dentro de un feature. |
-| Tracing | Seguimiento de eventos para depuración. |
+| <a id="term-event-bus"></a>Event Bus | Canal para publicar/suscribirse a eventos. |
+| <a id="term-mediator"></a>Mediator | Componente que coordina comunicaciones entre módulos. |
+| <a id="term-evento-tipado"></a>Evento tipado | Evento con estructura y tipos definidos. |
+| <a id="term-scope-de-modulo"></a>Scope de módulo | Ámbito de dependencias/eventos dentro de un feature. |
+| <a id="term-tracing"></a>Tracing | Seguimiento de eventos para depuración. |
 
 ---
 

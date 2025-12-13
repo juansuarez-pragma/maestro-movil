@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | api versioning, compatibilidad, breaking changes, migración |
-| **Patrón Técnico** | Backward Compatibility, Adapter Pattern, Feature Flags |
+| **Patrón Técnico** | Backward Compatibility, [Adapter](#term-adapter "Capa que traduce entre contrato viejo y nuevo.") Pattern, Feature Flags |
 | **Stack Seleccionado** | Flutter + Dio interceptors/version header + adapters por versión + flags |
 | **Nivel de Criticidad** | Alto |
 
@@ -79,7 +79,7 @@
 | Tema | Política | Nota |
 |:-----|:---------|:-----|
 | Rollout | Flags para habilitar v2/v3 por cohorte | Control de riesgo |
-| Sunset | Plan de retiro de versiones viejas | Reduce deuda |
+| [Sunset](#term-sunset "Proceso de retirar una versión antigua.") | Plan de retiro de versiones viejas | Reduce deuda |
 | Errores | Manejar fallback si versión no soportada | Resiliencia |
 
 ### 3.3 Operación y riesgo
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Compatibilidad hacia atrás | Mantener clientes antiguos funcionando en versiones nuevas. |
-| Adapter | Capa que traduce entre contrato viejo y nuevo. |
-| Sunset | Proceso de retirar una versión antigua. |
-| Contrato | Estructura y reglas de un endpoint. |
-| Feature Flag | Control remoto para habilitar versión/feature. |
+| <a id="term-compatibilidad-hacia-atras"></a>Compatibilidad hacia atrás | Mantener clientes antiguos funcionando en versiones nuevas. |
+| <a id="term-adapter"></a>Adapter | Capa que traduce entre contrato viejo y nuevo. |
+| <a id="term-sunset"></a>Sunset | Proceso de retirar una versión antigua. |
+| <a id="term-contrato"></a>Contrato | Estructura y reglas de un endpoint. |
+| <a id="term-feature-flag"></a>Feature Flag | Control remoto para habilitar versión/feature. |
 
 ---
 

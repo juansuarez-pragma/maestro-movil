@@ -64,7 +64,7 @@
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Mapear cada feature legacy a su reemplazo. Estado (pendiente/en progreso/done). Flags y cohortes. Métricas de adopción y defectos. Dueños claros. |
+| **Capacidades (SÍ permite)** | Mapear cada feature legacy a su reemplazo. Estado (pendiente/en progreso/done). Flags y cohortes. [Métricas de adopción](#term-metricas-de-adopcion "Uso de la nueva funcionalidad vs legacy.") y defectos. Dueños claros. |
 | **Restricciones Duras (NO permite)** | **Exactitud:** Requiere mantenerlo actualizado. **Scope creep:** Definir claramente qué es "parity". **Automatización limitada:** Algunas métricas deben ingresarse manualmente. |
 | **Criterio de Selección** | Dashboard vivo con responsables; flags y métricas de adopción; definición clara de done por feature. |
 
@@ -80,7 +80,7 @@
 |:-----|:---------|:-----|
 | Flags | Activar por cohorte y limpiar al completar | Deuda controlada |
 | Comunicación | Visibilidad de estado a negocio/soporte | Alineación |
-| Definición de done | Checklist con UX/perf/bugs | Claridad |
+| [Definición de done](#term-definicion-de-done "Criterios para considerar un feature completo.") | Checklist con UX/perf/bugs | Claridad |
 
 ### 3.3 Operación y riesgo
 | Tema | Política | Nota |
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Feature parity | Equivalencia funcional entre legacy y nuevo sistema. |
-| Cohorte | Grupo de usuarios migrados a la nueva versión. |
-| Definición de done | Criterios para considerar un feature completo. |
-| Métricas de adopción | Uso de la nueva funcionalidad vs legacy. |
-| Traceabilidad | Capacidad de rastrear estado y propietarios. |
+| <a id="term-feature-parity"></a>Feature parity | Equivalencia funcional entre legacy y nuevo sistema. |
+| <a id="term-cohorte"></a>Cohorte | Grupo de usuarios migrados a la nueva versión. |
+| <a id="term-definicion-de-done"></a>Definición de done | Criterios para considerar un feature completo. |
+| <a id="term-metricas-de-adopcion"></a>Métricas de adopción | Uso de la nueva funcionalidad vs legacy. |
+| <a id="term-traceabilidad"></a>Traceabilidad | Capacidad de rastrear estado y propietarios. |
 
 ---
 

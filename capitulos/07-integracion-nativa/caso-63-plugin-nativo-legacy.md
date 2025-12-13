@@ -1,4 +1,4 @@
-# Caso 63: Plugin Nativo Legacy
+# Caso 63: Plugin Nativo [Legacy](#term-legacy "Código obsoleto o sin mantenimiento.")
 ## Migrar un Plugin Obsoleto sin Romper Producción
 
 ---
@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | plugin legacy, migración, compatibilidad, nativo |
-| **Patrón Técnico** | Strangler Pattern, Compatibility Layer, Dual-stack |
+| **Patrón Técnico** | [Strangler Pattern](#term-strangler-pattern "Reemplazar componentes gradualmente ejecutando dual-stack."), Compatibility Layer, Dual-stack |
 | **Stack Seleccionado** | Flutter + plugin legacy + nuevo plugin paralelo + feature flags |
 | **Nivel de Criticidad** | Alto |
 
@@ -64,7 +64,7 @@
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Ejecutar ambos plugins bajo un wrapper unificado. Seleccionar plugin por flag/versión de SO. Medir errores/latencia por plugin. Rollback instantáneo si el nuevo falla. |
+| **Capacidades (SÍ permite)** | Ejecutar ambos plugins bajo un wrapper unificado. Seleccionar plugin por flag/versión de SO. Medir errores/latencia por plugin. [Rollback](#term-rollback "Volver rápidamente a la implementación previa.") instantáneo si el nuevo falla. |
 | **Restricciones Duras (NO permite)** | **Doble mantenimiento:** Requiere esfuerzos en dos stacks temporalmente. **Tamaño:** Puede aumentar el bundle. **Compatibilidad:** Algunos SO/arquitecturas pueden no soportar ambos. |
 | **Criterio de Selección** | Strangler con flags y telemetría; wrapper común; plan de sunset para legacy tras estabilizar el nuevo. |
 
@@ -93,7 +93,7 @@
 | Aspecto | Detalle |
 |:--------|:--------|
 | Problema | Reemplazar plugin obsoleto sin interrumpir producción. |
-| Opciones evaluadas | Cutover directo; branch única; dual-stack con flags y telemetría. |
+| Opciones evaluadas | [Cutover](#term-cutover "Momento de cambio definitivo a la nueva implementación.") directo; branch única; dual-stack con flags y telemetría. |
 | Decisión | Dual-stack con wrapper común, flags y rollback rápido. |
 | Consecuencias | Mantener dos plugins temporalmente; monitoreo adicional. |
 | Riesgos aceptados | Mayor tamaño del app; doble mantenimiento transitorio. |
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Strangler Pattern | Reemplazar componentes gradualmente ejecutando dual-stack. |
-| Cutover | Momento de cambio definitivo a la nueva implementación. |
-| Telemetría comparativa | Medir comportamiento de ambas implementaciones. |
-| Legacy | Código obsoleto o sin mantenimiento. |
-| Rollback | Volver rápidamente a la implementación previa. |
+| <a id="term-strangler-pattern"></a>Strangler Pattern | Reemplazar componentes gradualmente ejecutando dual-stack. |
+| <a id="term-cutover"></a>Cutover | Momento de cambio definitivo a la nueva implementación. |
+| <a id="term-telemetria-comparativa"></a>Telemetría comparativa | Medir comportamiento de ambas implementaciones. |
+| <a id="term-legacy"></a>Legacy | Código obsoleto o sin mantenimiento. |
+| <a id="term-rollback"></a>Rollback | Volver rápidamente a la implementación previa. |
 
 ---
 

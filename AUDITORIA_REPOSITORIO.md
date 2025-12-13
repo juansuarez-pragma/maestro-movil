@@ -4,7 +4,7 @@
 
 Este repositorio es una base documental sólida para apoyar decisiones de arquitectura móvil en Flutter y alimentar un RAG, gracias a su **estructura repetible**, enfoque **agnóstico (sin código)**, uso de **tablas/heurísticas**, y referencias externas. Aun así, presenta brechas cuantificables (consistencia de anclas de glosario y variación de algunos encabezados) que reducen la “precisión operacional” para agentes de IA.
 
-**Veredicto:** Apto para RAG en escenarios de arquitectura y operación móvil, con mejoras puntuales recomendadas (unificación de anclas y normalización de headings).
+**Veredicto:** Apto para RAG en escenarios de arquitectura y operación móvil, con mejoras puntuales recomendadas (normalización de headings y controles editoriales).
 
 ---
 
@@ -31,8 +31,11 @@ Este repositorio es una base documental sólida para apoyar decisiones de arquit
 - Casos con `## 4. Impacto esperado`: **100/100**
 - Casos con `## Glosario de Términos Clave`: **100/100**
 - Casos con `## Referencias`: **100/100**
+- Casos con `### 3.1 Plan de verificación`: **100/100**
+- Casos con `### 3.4 Mini-ADR`: **100/100**
 - Casos con tabla de analítica (encabezado `| Fuente |`): **100/100**
 - Casos con tabla de KPIs (encabezado `| KPI |`): **100/100**
+- Casos con anclas de glosario `id="term-*"`: **100/100**
 
 ### Señales de “RAG readiness”
 - Total de links externos (HTTP/HTTPS) en casos: **367**
@@ -41,11 +44,8 @@ Este repositorio es una base documental sólida para apoyar decisiones de arquit
 - Tamaño documental: **~13,587 líneas** en casos; **~136 líneas promedio** por caso (típicamente “consumible” por chunking)
 
 ### Brechas detectadas (impacto directo en RAG)
-- **Anclas del glosario tipo `#term-*`:** siguen siendo no uniformes en la mayoría de casos. Esto reduce:
-  - navegación interna (clic/tooltip),
-  - consistencia semántica para extracción de términos.
-- Variación de headings en algunos casos (ej. los primeros del capítulo 1 no siguen exactamente los mismos subtítulos: `Resumen global` / `3.1 Plan de verificación` / `3.4 Mini-ADR`), lo que reduce la extracción determinista por reglas simples.
 - Referencias mínimas: estandarizadas a **≥3 links** por caso (mejora de grounding).
+- Tooltips por “hover” dependen del renderer Markdown; se implementan con atributo `title` en enlaces (sin JS).
 
 ---
 
@@ -88,7 +88,6 @@ El template (0–4 + glosario + referencias) se aproxima a prácticas industrial
 - **Referencias externas** → grounding y trazabilidad (reduce alucinación del agente).
 
 ### Limitantes actuales (que bajan eficacia)
-- **Anclas `#term-*` no uniformes**: limita navegación interna y consistencia de entidades.
 - **Variación de subtítulos en algunos casos**: complica extracción por reglas (cuando se desea RAG híbrido: semántico + reglas).
 
 ---
@@ -99,8 +98,8 @@ El template (0–4 + glosario + referencias) se aproxima a prácticas industrial
 - **Estructura y chunking:** Alto
 - **Cobertura temática:** Alto
 - **Trazabilidad (referencias):** Alto (mínimo ≥3 referencias por caso)
-- **Navegación/entidades (glosario):** Medio-Bajo (por falta de `#term-*`)
+- **Navegación/entidades (glosario):** Alto (anclas `id="term-*"` y links internos estandarizados)
 
 ### Recomendaciones (alto impacto / bajo costo)
-1. Estandarizar `#term-*` en glosarios y enlazado desde el cuerpo para mejorar navegación y consistencia de entidades.
-2. Normalizar subtítulos (ej. “Resumen global”, “3.1 Plan de verificación”, “3.4 Mini-ADR”) para extracción determinista.
+1. Normalizar subtítulos (ej. “3.1 Plan de verificación”, “3.4 Mini-ADR”) para extracción determinista.
+2. Mantener checklist editorial (pre-merge) para evitar regresiones de headings, enlaces y referencias.

@@ -1,4 +1,4 @@
-# Caso 34: CRDT para Carritos
+# Caso 34: [CRDT](#term-crdt "Estructura de datos replicada sin conflictos, merge conmutativo.") para Carritos
 ## Resolución Automática de Conflictos sin Servidor
 
 ---
@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | carritos offline, conflictos, crdt, sincronización |
-| **Patrón Técnico** | CRDT (OR-Set/G-Counter), Conflict-free Merge, Event Sourcing |
+| **Patrón Técnico** | CRDT ([OR-Set](#term-or-set "Observed-Remove Set; soporta add/remove sin resurrección.")/[G-Counter](#term-g-counter "Contador solo crecimiento; útil para cantidades sumables.")), Conflict-free Merge, Event Sourcing |
 | **Stack Seleccionado** | Flutter + Riverpod + SQLite/Isar para log de eventos + CRDT libs/implementación propia |
 | **Nivel de Criticidad** | Alto |
 
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| CRDT | Estructura de datos replicada sin conflictos, merge conmutativo. |
-| OR-Set | Observed-Remove Set; soporta add/remove sin resurrección. |
-| G-Counter | Contador solo crecimiento; útil para cantidades sumables. |
-| Log de eventos | Registro secuencial de operaciones para replay. |
-| Snapshot | Estado comprimido para acelerar reconstrucción. |
+| <a id="term-crdt"></a>CRDT | Estructura de datos replicada sin conflictos, merge conmutativo. |
+| <a id="term-or-set"></a>OR-Set | Observed-Remove Set; soporta add/remove sin resurrección. |
+| <a id="term-g-counter"></a>G-Counter | Contador solo crecimiento; útil para cantidades sumables. |
+| <a id="term-log-de-eventos"></a>Log de eventos | Registro secuencial de operaciones para replay. |
+| <a id="term-snapshot"></a>Snapshot | Estado comprimido para acelerar reconstrucción. |
 
 ---
 

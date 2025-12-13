@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | biometría de voz, autenticación, liveness, fraude |
-| **Patrón Técnico** | Voiceprint Enrollment/Verification, Anti-Spoofing, Challenge Phrases |
+| **Patrón Técnico** | [Voiceprint](#term-voiceprint "Plantilla biométrica de voz.") Enrollment/Verification, Anti-Spoofing, Challenge Phrases |
 | **Stack Seleccionado** | Flutter + Platform Channels a SDK de voz + mic permissions + cifrado de templates |
 | **Nivel de Criticidad** | Alto |
 
@@ -65,7 +65,7 @@
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
 | **Capacidades (SÍ permite)** | Enrollment con consentimiento. Verificación con challenge aleatorio. Detección de spoof (replay/deepfake). Templates cifrados. Ajuste de umbrales y re-entrenamiento. |
-| **Restricciones Duras (NO permite)** | **Ruido:** Afecta precisión. **Privacidad:** Datos biométricos regulados. **Hardware:** Calidad de micrófono impacta FAR/FRR. |
+| **Restricciones Duras (NO permite)** | **Ruido:** Afecta precisión. **Privacidad:** Datos biométricos regulados. **Hardware:** Calidad de micrófono impacta [FAR/FRR](#term-far-frr "False Accept/Reject Rate."). |
 | **Criterio de Selección** | SDK con anti-spoof, challenge dinámico, templates cifrados; políticas de consentimiento/borrado; métricas FAR/FRR. |
 
 ### 3.1 Plan de verificación (V&V)
@@ -78,7 +78,7 @@
 ### 3.2 UX y operación
 | Tema | Política | Nota |
 |:-----|:---------|:-----|
-| Frases | Challenge aleatorio; evitar frases fijas | Seguridad |
+| Frases | [Challenge aleatorio](#term-challenge-aleatorio "Frase/código distinto en cada verificación."); evitar frases fijas | Seguridad |
 | Feedback | Mensajes claros en rechazo y reintentos limitados | UX |
 | Consentimiento | Opt-in y borrado a solicitud | Cumplimiento |
 
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Voiceprint | Plantilla biométrica de voz. |
-| FAR/FRR | False Accept/Reject Rate. |
-| Challenge aleatorio | Frase/código distinto en cada verificación. |
-| Anti-spoofing | Técnicas para detectar audio falso/reproducido. |
-| Template cifrado | Voiceprint almacenada con cifrado fuerte. |
+| <a id="term-voiceprint"></a>Voiceprint | Plantilla biométrica de voz. |
+| <a id="term-far-frr"></a>FAR/FRR | False Accept/Reject Rate. |
+| <a id="term-challenge-aleatorio"></a>Challenge aleatorio | Frase/código distinto en cada verificación. |
+| <a id="term-anti-spoofing"></a>Anti-spoofing | Técnicas para detectar audio falso/reproducido. |
+| <a id="term-template-cifrado"></a>Template cifrado | Voiceprint almacenada con cifrado fuerte. |
 
 ---
 

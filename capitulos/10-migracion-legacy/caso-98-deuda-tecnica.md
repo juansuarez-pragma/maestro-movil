@@ -7,7 +7,7 @@
 
 | Campo | Valor |
 |:------|:------|
-| **Palabras Clave de Negocio** | deuda técnica, métricas, priorización, ROI |
+| **Palabras Clave de Negocio** | deuda técnica, métricas, priorización, [ROI](#term-roi "Retorno de inversión de pagar la deuda.") |
 | **Patrón Técnico** | Tech Debt Register, Impact/Risk Scoring, ROI Calculation |
 | **Stack Seleccionado** | Flutter repo + métricas (lint, coverage, cycle time) + tablero de deuda |
 | **Nivel de Criticidad** | Alto |
@@ -34,7 +34,7 @@
 | Fuente | Muestra / Región | Hallazgos relevantes |
 |:-------|:-----------------|:---------------------|
 | Tech debt practices | Global | Registros con puntajes mejoran priorización. |
-| Accelerate metrics | Global | Cycle time/defectos correlacionan con deuda. |
+| Accelerate metrics | Global | [Cycle time](#term-cycle-time "Tiempo desde commit a producción.")/defectos correlacionan con deuda. |
 | NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; deuda de configuración/seguridad es común. |
 
 **Resumen global**
@@ -106,7 +106,7 @@
 |:----|:---------|:--------------|:-----------------|
 | Cycle time | ↓ tras abordar deuda prioritaria | Warning si no baja | Velocidad |
 | Bugs/hotfixes recurrentes | ↓ | Crítico si sube | Calidad |
-| Cobertura | ↑ en módulos críticos | Warning si estanca | Confianza |
+| [Cobertura](#term-cobertura "% de código cubierto por tests.") | ↑ en módulos críticos | Warning si estanca | Confianza |
 | ROI de deuda | Casos con ROI>1 priorizados | Alerta si no | Alineación negocio |
 
 ---
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Deuda técnica | Compromisos que incrementan costo futuro de cambios. |
-| ROI | Retorno de inversión de pagar la deuda. |
-| Cycle time | Tiempo desde commit a producción. |
-| Cobertura | % de código cubierto por tests. |
-| Severidad | Gravedad/impacto de un ítem de deuda. |
+| <a id="term-deuda-tecnica"></a>Deuda técnica | Compromisos que incrementan costo futuro de cambios. |
+| <a id="term-roi"></a>ROI | Retorno de inversión de pagar la deuda. |
+| <a id="term-cycle-time"></a>Cycle time | Tiempo desde commit a producción. |
+| <a id="term-cobertura"></a>Cobertura | % de código cubierto por tests. |
+| <a id="term-severidad"></a>Severidad | Gravedad/impacto de un ítem de deuda. |
 
 ---
 

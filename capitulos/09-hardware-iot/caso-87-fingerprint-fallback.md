@@ -1,4 +1,4 @@
-# Caso 87: Fingerprint Fallback
+# Caso 87: Fingerprint [Fallback](#term-fallback "Alternativa cuando el método principal falla.")
 ## Qué Hacer Cuando el Sensor Falla
 
 ---
@@ -8,8 +8,8 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | fingerprint, fallback, biometría, accesibilidad |
-| **Patrón Técnico** | Biometric Fallback, Risk-Based Step-up, Graceful Degradation |
-| **Stack Seleccionado** | Flutter + local_auth + policies de fallback (PIN/OTP) + Riverpod estado |
+| **Patrón Técnico** | Biometric Fallback, Risk-Based [Step-up](#term-step-up "Aumentar seguridad según riesgo."), Graceful Degradation |
+| **Stack Seleccionado** | Flutter + local_auth + policies de fallback ([PIN](#term-pin "Código personal; debe tener políticas de seguridad.")/OTP) + Riverpod estado |
 | **Nivel de Criticidad** | Alto |
 
 ---
@@ -65,7 +65,7 @@
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
 | **Capacidades (SÍ permite)** | Detectar fallos de biometría y ofrecer PIN/OTP. Limitar intentos y aplicar step-up. Registrar fallos para fraude/UX. Permitir desactivar biometría en dispositivos problemáticos. |
-| **Restricciones Duras (NO permite)** | **Biometría obligatoria:** Si regulación exige, fallback puede ser limitado. **PIN débil:** Requiere políticas de longitud/complexidad. **A11y:** Prompts deben ser accesibles. |
+| **Restricciones Duras (NO permite)** | **Biometría obligatoria:** Si regulación exige, fallback puede ser limitado. **PIN débil:** Requiere políticas de longitud/complexidad. **[A11y](#term-a11y "Accesibilidad; cumplimiento para lectores de pantalla."):** Prompts deben ser accesibles. |
 | **Criterio de Selección** | Fallback seguro (PIN/OTP) con límites, logging, y step-up; biometría opcional pero recomendada; mensajes claros. |
 
 ### 3.1 Plan de verificación (V&V)
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Fallback | Alternativa cuando el método principal falla. |
-| Step-up | Aumentar seguridad según riesgo. |
-| Intentos limitados | Número máximo antes de bloqueo. |
-| A11y | Accesibilidad; cumplimiento para lectores de pantalla. |
-| PIN | Código personal; debe tener políticas de seguridad. |
+| <a id="term-fallback"></a>Fallback | Alternativa cuando el método principal falla. |
+| <a id="term-step-up"></a>Step-up | Aumentar seguridad según riesgo. |
+| <a id="term-intentos-limitados"></a>Intentos limitados | Número máximo antes de bloqueo. |
+| <a id="term-a11y"></a>A11y | Accesibilidad; cumplimiento para lectores de pantalla. |
+| <a id="term-pin"></a>PIN | Código personal; debe tener políticas de seguridad. |
 
 ---
 

@@ -8,8 +8,8 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | deduplicación, doble tap, requests duplicados, idempotencia |
-| **Patrón Técnico** | In-flight Request Deduplication, Idempotent Client, Mutex per Endpoint |
-| **Stack Seleccionado** | Flutter + Dio interceptors + in-flight map + Idempotency-Key |
+| **Patrón Técnico** | In-flight Request Deduplication, Idempotent Client, [Mutex](#term-mutex "Exclusión mutua para serializar requests iguales.") per Endpoint |
+| **Stack Seleccionado** | Flutter + Dio interceptors + in-flight map + [Idempotency-Key](#term-idempotency-key "Token único que evita doble procesamiento en backend.") |
 | **Nivel de Criticidad** | Crítico |
 
 ---
@@ -55,7 +55,7 @@
 | Nivel de Madurez | Solución y Herramienta | Análisis de Decisión (Trade-offs) |
 |:-----------------|:-----------------------|:----------------------------------|
 | **BAJA** | Deshabilitar botón en UI solamente | **INADECUADO:** No cubre multi-requests programáticos ni reintentos. |
-| **ACEPTABLE** | Throttle/Debounce de acciones | **MEJORA:** Reduce taps, pero no elimina duplicados in-flight. |
+| **ACEPTABLE** | [Throttle/Debounce](#term-throttle-debounce "Limitar frecuencia de acciones/requests.") de acciones | **MEJORA:** Reduce taps, pero no elimina duplicados in-flight. |
 | **ENTERPRISE** | **Dedup + idempotencia:** mantener mapa de requests en vuelo, rechazar duplicados, usar Idempotency-Key en pagos | **ÓPTIMO:** Previene cobros duplicados y reduce carga. |
 
 ---
@@ -116,11 +116,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| In-flight dedup | Reutilizar la misma respuesta para requests concurrentes iguales. |
-| Idempotency-Key | Token único que evita doble procesamiento en backend. |
-| Throttle/Debounce | Limitar frecuencia de acciones/requests. |
-| Payload hash | Hash del cuerpo/payload para identificar duplicados. |
-| Mutex | Exclusión mutua para serializar requests iguales. |
+| <a id="term-in-flight-dedup"></a>In-flight dedup | Reutilizar la misma respuesta para requests concurrentes iguales. |
+| <a id="term-idempotency-key"></a>Idempotency-Key | Token único que evita doble procesamiento en backend. |
+| <a id="term-throttle-debounce"></a>Throttle/Debounce | Limitar frecuencia de acciones/requests. |
+| <a id="term-payload-hash"></a>Payload hash | Hash del cuerpo/payload para identificar duplicados. |
+| <a id="term-mutex"></a>Mutex | Exclusión mutua para serializar requests iguales. |
 
 ---
 

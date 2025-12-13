@@ -57,7 +57,7 @@
 |:-----------------|:-----------------------|:----------------------------------|
 | **BAJA** | Cargar toda la lista en memoria, `ListView` sin builder | **INADECUADO:** OOM, jank severo. |
 | **ACEPTABLE** | `ListView.builder` + paginación manual | **MEJORA:** Menor memoria, pero requiere manejo manual de loading/error y puede duplicar requests. |
-| **ENTERPRISE** | **Paginación estructurada:** `infinite_scroll_pagination` o controller propio con estados (loading/error/empty), cache local, placeholders, parsing en Isolate | **ÓPTIMO:** Smooth scroll, uso de memoria controlado, UX consistente ante errores. |
+| **ENTERPRISE** | **Paginación estructurada:** `infinite_scroll_pagination` o controller propio con estados (loading/error/empty), cache local, placeholders, parsing en [Isolate](#term-isolate "Hilo ligero de Dart para trabajo pesado sin bloquear UI.") | **ÓPTIMO:** Smooth scroll, uso de memoria controlado, UX consistente ante errores. |
 
 ---
 
@@ -65,9 +65,9 @@
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Paginación con clave (cursor/offset) y cache parcial en SQLite. Placeholders skeleton mientras carga. Parsing de JSON pesado en Isolate. Reintentos con backoff por página. Prefetch de la siguiente página al 80% del scroll. |
+| **Capacidades (SÍ permite)** | Paginación con clave (cursor/offset) y cache parcial en SQLite. Placeholders skeleton mientras carga. Parsing de JSON pesado en Isolate. Reintentos con backoff por página. [Prefetch](#term-prefetch "Solicitar anticipadamente la siguiente página cerca del final del scroll.") de la siguiente página al 80% del scroll. |
 | **Restricciones Duras (NO permite)** | **Sin API paginada:** Si backend no expone cursor/offset, se degrada a fetch completo. **Layouts complejos con shrinkWrap:** Aumentan costo de layout. **Orden garantizado:** Cambios en backend pueden invalidar posición; requiere stable IDs. |
-| **Criterio de Selección** | Virtualización de celdas con builders; paginador estructurado para estados claros; cache local para offline breve; Isolate para parsing de lotes grandes. |
+| **Criterio de Selección** | [Virtualización](#term-virtualizacion "Renderizar solo los ítems visibles + buffer cercano.") de celdas con builders; paginador estructurado para estados claros; cache local para offline breve; Isolate para parsing de lotes grandes. |
 
 ### 3.1 Plan de verificación (V&V)
 | Tipo de verificación | Qué valida | Responsable/Entorno |
@@ -121,12 +121,12 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Virtualización | Renderizar solo los ítems visibles + buffer cercano. |
-| Cursor/Offset | Mecanismo de paginación; cursor es más estable ante inserciones. |
-| Placeholder/Skeleton | Celda de carga que mantiene estabilidad del layout. |
-| Prefetch | Solicitar anticipadamente la siguiente página cerca del final del scroll. |
-| Isolate | Hilo ligero de Dart para trabajo pesado sin bloquear UI. |
-| Stable ID | Identificador consistente para cada ítem, usado para claves de lista. |
+| <a id="term-virtualizacion"></a>Virtualización | Renderizar solo los ítems visibles + buffer cercano. |
+| <a id="term-cursor-offset"></a>Cursor/Offset | Mecanismo de paginación; cursor es más estable ante inserciones. |
+| <a id="term-placeholder-skeleton"></a>Placeholder/Skeleton | Celda de carga que mantiene estabilidad del layout. |
+| <a id="term-prefetch"></a>Prefetch | Solicitar anticipadamente la siguiente página cerca del final del scroll. |
+| <a id="term-isolate"></a>Isolate | Hilo ligero de Dart para trabajo pesado sin bloquear UI. |
+| <a id="term-stable-id"></a>Stable ID | Identificador consistente para cada ítem, usado para claves de lista. |
 
 ---
 

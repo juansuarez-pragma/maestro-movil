@@ -18,7 +18,7 @@
 
 ### Problema detectado (técnico)
 - Deltas offline sin reservas ni merge determinista generan sobreventa y datos inconsistentes.
-- LWW basado solo en timestamp descarta ediciones válidas y depende de reloj (skew).
+- [LWW](#term-lww "Last Writer Wins; estrategia basada en timestamp.") basado solo en timestamp descarta ediciones válidas y depende de reloj (skew).
 - Sin log de conflictos/resolución, soporte y auditoría son difíciles.
 
 ### Escenario de Negocio
@@ -118,11 +118,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Reserva temporal | Bloqueo de stock por tiempo limitado hasta confirmar venta. |
-| Delta de stock | Cambio incremental (+/-) aplicado al inventario. |
-| LWW | Last Writer Wins; estrategia basada en timestamp. |
-| Reconciliación | Ajustar diferencias entre cliente y backend. |
-| Conflicto semántico | Regla de negocio que no se resuelve solo con timestamp. |
+| <a id="term-reserva-temporal"></a>Reserva temporal | Bloqueo de stock por tiempo limitado hasta confirmar venta. |
+| <a id="term-delta-de-stock"></a>Delta de stock | Cambio incremental (+/-) aplicado al inventario. |
+| <a id="term-lww"></a>LWW | Last Writer Wins; estrategia basada en timestamp. |
+| <a id="term-reconciliacion"></a>Reconciliación | Ajustar diferencias entre cliente y backend. |
+| <a id="term-conflicto-semantico"></a>Conflicto semántico | Regla de negocio que no se resuelve solo con timestamp. |
 
 ---
 

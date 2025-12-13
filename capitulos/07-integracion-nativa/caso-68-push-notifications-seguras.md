@@ -55,7 +55,7 @@
 | Nivel de Madurez | Solución y Herramienta | Análisis de Decisión (Trade-offs) |
 |:-----------------|:-----------------------|:----------------------------------|
 | **BAJA** | Payload con PII + acción local sin verificación | **INADECUADO:** Exposición y spoofing. |
-| **ACEPTABLE** | Payload mínimo pero sin expiración/telemetría | **MEJORA:** Menos PII, pero aún sin control operacional. |
+| **ACEPTABLE** | [Payload mínimo](#term-payload-minimo "Notificación con identificador, sin datos sensibles.") pero sin expiración/telemetría | **MEJORA:** Menos PII, pero aún sin control operacional. |
 | **ENTERPRISE** | **Push seguro:** payload mínimo (id), fetch de detalle autenticado, acciones firmadas/one-time, expiración, controles de lockscreen, telemetría end-to-end | **ÓPTIMO:** Seguridad y operabilidad. |
 
 ---
@@ -64,7 +64,7 @@
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Acciones rápidas con confirmación server-side. Minimizar PII en notificaciones. Controlar visibilidad (public/private). Correlación `push_id` ↔ `trace_id`. Expiración de acciones. |
+| **Capacidades (SÍ permite)** | Acciones rápidas con confirmación server-side. Minimizar PII en notificaciones. Controlar visibilidad (public/private). [Correlación](#term-correlacion "Enlazar push_id con trace_id para diagnóstico.") `push_id` ↔ `trace_id`. Expiración de acciones. |
 | **Restricciones Duras (NO permite)** | **Entrega no garantizada:** push puede retrasarse o perderse. **Offline:** acciones requieren conectividad. **Políticas de OS:** iOS/Android limitan background. |
 | **Criterio de Selección** | Payload mínimo + fetch autenticado; acciones siempre validadas por backend; políticas de visibilidad y telemetría. |
 
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Payload mínimo | Notificación con identificador, sin datos sensibles. |
-| Lockscreen privacy | Política para ocultar contenido sensible en pantalla bloqueada. |
-| Acción one-time | Acción válida una vez, con expiración. |
-| Correlación | Enlazar `push_id` con `trace_id` para diagnóstico. |
-| Fetch autenticado | Obtener detalle desde backend con auth. |
+| <a id="term-payload-minimo"></a>Payload mínimo | Notificación con identificador, sin datos sensibles. |
+| <a id="term-lockscreen-privacy"></a>Lockscreen privacy | Política para ocultar contenido sensible en pantalla bloqueada. |
+| <a id="term-accion-one-time"></a>Acción one-time | Acción válida una vez, con expiración. |
+| <a id="term-correlacion"></a>Correlación | Enlazar `push_id` con `trace_id` para diagnóstico. |
+| <a id="term-fetch-autenticado"></a>Fetch autenticado | Obtener detalle desde backend con auth. |
 
 ---
 

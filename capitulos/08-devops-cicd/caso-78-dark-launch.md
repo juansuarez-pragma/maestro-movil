@@ -1,4 +1,4 @@
-# Caso 78: Dark Launch
+# Caso 78: [Dark Launch](#term-dark-launch "Desplegar funcionalidad oculta en producción.")
 ## Desplegar en Producción sin Activar la Funcionalidad
 
 ---
@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | dark launch, progressive delivery, feature flags, riesgo |
-| **Patrón Técnico** | Dark Launch, Shadow Traffic, Dual Execution |
+| **Patrón Técnico** | Dark Launch, [Shadow Traffic](#term-shadow-traffic "Duplicar tráfico a nueva funcionalidad sin afectar respuesta al usuario."), Dual Execution |
 | **Stack Seleccionado** | Flutter + flags/experiments SDK + duplicación de requests (shadow) + observabilidad |
 | **Nivel de Criticidad** | Alto |
 
@@ -64,7 +64,7 @@
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Deploy con flag apagado. Enviar shadow traffic sin impactar respuesta al usuario. Monitorear métricas y errores. Activar gradualmente a segmentos. Rollback inmediato via flag. |
+| **Capacidades (SÍ permite)** | Deploy con flag apagado. Enviar shadow traffic sin impactar respuesta al usuario. Monitorear métricas y errores. Activar gradualmente a segmentos. [Rollback](#term-rollback "Apagar o revertir rápidamente ante fallas.") inmediato via flag. |
 | **Restricciones Duras (NO permite)** | **Shadow incompleto:** No replica 100% de casos. **Costo:** Duplicar requests aumenta carga. **Privacidad:** Debe cumplir tratamiento de datos aun en shadow. |
 | **Criterio de Selección** | Flags con killswitch; shadow para rutas críticas; monitoreo antes de habilitar; activación gradual. |
 
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Dark Launch | Desplegar funcionalidad oculta en producción. |
-| Shadow Traffic | Duplicar tráfico a nueva funcionalidad sin afectar respuesta al usuario. |
-| Flag/Kill Switch | Control remoto para activar/desactivar features. |
-| Progressive Delivery | Activar features gradualmente con control. |
-| Rollback | Apagar o revertir rápidamente ante fallas. |
+| <a id="term-dark-launch"></a>Dark Launch | Desplegar funcionalidad oculta en producción. |
+| <a id="term-shadow-traffic"></a>Shadow Traffic | Duplicar tráfico a nueva funcionalidad sin afectar respuesta al usuario. |
+| <a id="term-flag-kill-switch"></a>Flag/Kill Switch | Control remoto para activar/desactivar features. |
+| <a id="term-progressive-delivery"></a>Progressive Delivery | Activar features gradualmente con control. |
+| <a id="term-rollback"></a>Rollback | Apagar o revertir rápidamente ante fallas. |
 
 ---
 

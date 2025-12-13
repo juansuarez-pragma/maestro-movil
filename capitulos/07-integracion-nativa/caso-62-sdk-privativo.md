@@ -1,4 +1,4 @@
-# Caso 62: SDK Privativo con Licenciamiento
+# Caso 62: SDK Privativo con [Licenciamiento](#term-licenciamiento "Validación de uso autorizado del SDK.")
 ## Integrar SDKs con Keys, Obfuscation y Auditoría
 
 ---
@@ -87,7 +87,7 @@
 |:-----|:--------|:-----|
 | Rotación | Rotar keys/licencias periódicamente | Reduce exposición |
 | Build/CI | Inyectar credenciales vía vault/secrets | Cumplimiento |
-| Attestation | Bloquear root/emulador según política | Defensa |
+| [Attestation](#term-attestation "Verificación de integridad del dispositivo/app.") | Bloquear root/emulador según política | Defensa |
 
 ### 3.4 Mini-ADR (Decisión de Arquitectura)
 | Aspecto | Detalle |
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Licenciamiento | Validación de uso autorizado del SDK. |
-| Ofuscación | Transformar código para dificultar ingeniería inversa. |
-| Secure Storage | Almacenamiento cifrado en dispositivo. |
-| Attestation | Verificación de integridad del dispositivo/app. |
-| Key rotation | Rotación periódica de claves/licencias. |
+| <a id="term-licenciamiento"></a>Licenciamiento | Validación de uso autorizado del SDK. |
+| <a id="term-ofuscacion"></a>Ofuscación | Transformar código para dificultar ingeniería inversa. |
+| <a id="term-secure-storage"></a>Secure Storage | Almacenamiento cifrado en dispositivo. |
+| <a id="term-attestation"></a>Attestation | Verificación de integridad del dispositivo/app. |
+| <a id="term-key-rotation"></a>Key rotation | Rotación periódica de claves/licencias. |
 
 ---
 

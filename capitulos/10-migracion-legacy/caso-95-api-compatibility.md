@@ -1,4 +1,4 @@
-# Caso 95: API Compatibility Layer
+# Caso 95: API [Compatibility Layer](#term-compatibility-layer "Capa que adapta múltiples versiones de contrato.")
 ## Soportar Clientes v1, v2 y v3 Simultáneamente
 
 ---
@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | compatibilidad api, versiones múltiples, adapter, gateway |
-| **Patrón Técnico** | Compatibility Layer, Adapter, Feature Flags |
+| **Patrón Técnico** | Compatibility Layer, [Adapter](#term-adapter "Traduce contratos entre cliente y backend."), Feature Flags |
 | **Stack Seleccionado** | Flutter + adapters por versión + headers/version en interceptor + API gateway |
 | **Nivel de Criticidad** | Alto |
 
@@ -65,7 +65,7 @@
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
 | **Capacidades (SÍ permite)** | Encapsular diferencias por versión. Activar nuevas versiones por flag. Incluir header/version único en cada request. Probar contratos por versión. Plan de sunset y métricas de uso. |
-| **Restricciones Duras (NO permite)** | **Deuda acumulada:** Debe retirarse soporte a versiones viejas. **Matriz de pruebas grande:** Necesita automatización. **Adapters complejos:** Si cambios son profundos, pueden inflarse. |
+| **Restricciones Duras (NO permite)** | **Deuda acumulada:** Debe retirarse soporte a versiones viejas. **[Matriz de pruebas](#term-matriz-de-pruebas "Combinaciones de versiones y features a validar.") grande:** Necesita automatización. **Adapters complejos:** Si cambios son profundos, pueden inflarse. |
 | **Criterio de Selección** | Adapter/gateway, flags para rollout, tests contractuales, métricas y plan de deprecación. |
 
 ### 3.1 Plan de verificación (V&V)
@@ -79,7 +79,7 @@
 | Tema | Política | Nota |
 |:-----|:---------|:-----|
 | Rollout | Flags por cohorte/versión | Migración controlada |
-| Sunset | Comunicar y retirar versiones | Deuda bajo control |
+| [Sunset](#term-sunset "Retiro planificado de una versión.") | Comunicar y retirar versiones | Deuda bajo control |
 | Errores | Mensajes claros en versión no soportada | UX |
 
 ### 3.3 Operación y riesgo
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Compatibility Layer | Capa que adapta múltiples versiones de contrato. |
-| Sunset | Retiro planificado de una versión. |
-| Header de versión | Header HTTP que indica versión esperada. |
-| Adapter | Traduce contratos entre cliente y backend. |
-| Matriz de pruebas | Combinaciones de versiones y features a validar. |
+| <a id="term-compatibility-layer"></a>Compatibility Layer | Capa que adapta múltiples versiones de contrato. |
+| <a id="term-sunset"></a>Sunset | Retiro planificado de una versión. |
+| <a id="term-header-de-version"></a>Header de versión | Header HTTP que indica versión esperada. |
+| <a id="term-adapter"></a>Adapter | Traduce contratos entre cliente y backend. |
+| <a id="term-matriz-de-pruebas"></a>Matriz de pruebas | Combinaciones de versiones y features a validar. |
 
 ---
 

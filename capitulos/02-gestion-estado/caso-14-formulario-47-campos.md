@@ -8,8 +8,8 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | onboarding bancario, validación reactiva, formularios complejos, errores en tiempo real |
-| **Patrón Técnico** | Form State Management, Reactive Validation, Debounced Async Validation |
-| **Stack Seleccionado** | Flutter + Riverpod/Formz + Debounce + InputMask + Async validators |
+| **Patrón Técnico** | [Form State Management](#term-form-state-management "Gestión centralizada del estado y validaciones de un formulario."), Reactive Validation, Debounced Async Validation |
+| **Stack Seleccionado** | Flutter + Riverpod/Formz + [Debounce](#term-debounce "Retrasar ejecución hasta que cese la entrada, evitando llamadas excesivas.") + InputMask + Async validators |
 | **Nivel de Criticidad** | Alto |
 
 ---
@@ -121,13 +121,13 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Validación reactiva | Mostrar errores conforme se digita, no solo al enviar. |
-| Cross-field validation | Reglas que involucran múltiples campos (ej. país + documento). |
-| Debounce | Retrasar ejecución hasta que cese la entrada, evitando llamadas excesivas. |
-| Input Mask | Formato guiado para capturar datos (IBAN, teléfono). |
-| Form State Management | Gestión centralizada del estado y validaciones de un formulario. |
-| Cross-field validation | Reglas que involucran múltiples campos (ej. país + documento). |
-| Async validation | Validación contra servicios externos (listas de sanciones, KYC). |
+| <a id="term-validacion-reactiva"></a>Validación reactiva | Mostrar errores conforme se digita, no solo al enviar. |
+| <a id="term-cross-field-validation"></a>Cross-field validation | Reglas que involucran múltiples campos (ej. país + documento). |
+| <a id="term-debounce"></a>Debounce | Retrasar ejecución hasta que cese la entrada, evitando llamadas excesivas. |
+| <a id="term-input-mask"></a>Input Mask | Formato guiado para capturar datos (IBAN, teléfono). |
+| <a id="term-form-state-management"></a>Form State Management | Gestión centralizada del estado y validaciones de un formulario. |
+| <a id="term-cross-field-validation"></a>Cross-field validation | Reglas que involucran múltiples campos (ej. país + documento). |
+| <a id="term-async-validation"></a>Async validation | Validación contra servicios externos (listas de sanciones, KYC). |
 
 ---
 

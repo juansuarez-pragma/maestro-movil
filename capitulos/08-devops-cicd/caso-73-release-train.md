@@ -1,4 +1,4 @@
-# Caso 73: Release Train
+# Caso 73: [Release Train](#term-release-train "Cadencia fija de releases, listo o no el feature.")
 ## Calendario de Releases Predecible en Banca
 
 ---
@@ -34,7 +34,7 @@
 | Fuente | Muestra / Región | Hallazgos relevantes |
 |:-------|:-----------------|:---------------------|
 | Release trains en producto | Global | Cadencia fija reduce retrabajo y alinea QA/negocio. |
-| Trunk-based adoption | Global | Menos conflictos y ciclos más cortos. |
+| [Trunk-based](#term-trunk-based "Estrategia con main como rama fuente y ciclos cortos.") adoption | Global | Menos conflictos y ciclos más cortos. |
 | NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; gobernanza de releases es punto débil. |
 
 **Resumen global**
@@ -64,7 +64,7 @@
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Programar corte de release fijo. Usar feature flags para aislar features no listas. Gates de tests, seguridad, firmas. Hotfix branch para incidentes. |
+| **Capacidades (SÍ permite)** | Programar corte de release fijo. Usar feature flags para aislar features no listas. Gates de tests, seguridad, firmas. [Hotfix](#term-hotfix "Corrección urgente fuera del ciclo normal.") branch para incidentes. |
 | **Restricciones Duras (NO permite)** | **Ramas largas:** Evitar divergence; trunk-based recomendado. **Flags olvidados:** Necesitan cleanup. **Capacidad de QA:** Cadencia alta requiere automatización. |
 | **Criterio de Selección** | Trunk-based + flags; calendario fijo; gates de calidad y cumplimiento; freeze corto. |
 
@@ -86,7 +86,7 @@
 | Tema | Política | Nota |
 |:-----|:--------|:-----|
 | Branching | Trunk-based + ramas de hotfix/release candidates | Menos conflicto |
-| Freeze | Ventanas cortas y definidas | Estabilidad |
+| [Freeze](#term-freeze "Ventana donde se limitan cambios para estabilizar.") | Ventanas cortas y definidas | Estabilidad |
 | Métricas | Fallas por release, tiempo de aprobación | Mejora continua |
 
 ### 3.4 Mini-ADR (Decisión de Arquitectura)
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Release Train | Cadencia fija de releases, listo o no el feature. |
-| Freeze | Ventana donde se limitan cambios para estabilizar. |
-| Gate | Criterio obligatorio (tests, seguridad) antes de liberar. |
-| Hotfix | Corrección urgente fuera del ciclo normal. |
-| Trunk-based | Estrategia con main como rama fuente y ciclos cortos. |
+| <a id="term-release-train"></a>Release Train | Cadencia fija de releases, listo o no el feature. |
+| <a id="term-freeze"></a>Freeze | Ventana donde se limitan cambios para estabilizar. |
+| <a id="term-gate"></a>Gate | Criterio obligatorio (tests, seguridad) antes de liberar. |
+| <a id="term-hotfix"></a>Hotfix | Corrección urgente fuera del ciclo normal. |
+| <a id="term-trunk-based"></a>Trunk-based | Estrategia con main como rama fuente y ciclos cortos. |
 
 ---
 

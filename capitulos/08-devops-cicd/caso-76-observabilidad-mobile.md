@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | observabilidad, logs, métricas, trazas, mobile |
-| **Patrón Técnico** | Structured Logging, Distributed Tracing, Mobile APM |
+| **Patrón Técnico** | Structured Logging, Distributed Tracing, Mobile [APM](#term-apm "Application Performance Monitoring.") |
 | **Stack Seleccionado** | Flutter + SDK APM (Datadog/Firebase/Sentry) + OpenTelemetry donde aplique + Riverpod context for tracing |
 | **Nivel de Criticidad** | Crítico |
 
@@ -19,7 +19,7 @@
 ### Problema detectado (técnico)
 - Logs locales y crash reports básicos no permiten correlacionar con backend.
 - Sin métricas UX/perf y umbrales, el equipo detecta incidentes tarde.
-- Falta de políticas de PII genera riesgo de cumplimiento.
+- Falta de políticas de [PII](#term-pii "Información personal identificable; no se debe loggear.") genera riesgo de cumplimiento.
 
 ### Escenario de Negocio
 
@@ -64,7 +64,7 @@
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Agregar trace/span IDs a requests y logs. Métricas de negocio (conversión, error rate) y UX (TTI, ANR). Logs estructurados sin PII. Sampling para performance. Alertas con umbrales. |
+| **Capacidades (SÍ permite)** | Agregar trace/span IDs a requests y logs. Métricas de negocio (conversión, error rate) y UX (TTI, [ANR](#term-anr "App Not Responding; bloqueo prolongado del hilo UI.")). Logs estructurados sin PII. [Sampling](#term-sampling "Tomar una fracción de eventos/trazas para reducir costo.") para performance. Alertas con umbrales. |
 | **Restricciones Duras (NO permite)** | **PII:** No loggear datos sensibles. **Costo:** APM/trazas generan costos; usar sampling. **Privacidad:** Cumplir GDPR/leyes locales. |
 | **Criterio de Selección** | SDK APM confiable; correlación de IDs; políticas de PII; sampling; tableros y alertas claros. |
 
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| APM | Application Performance Monitoring. |
-| Trace/Span ID | Identificadores para correlacionar trazas. |
-| Sampling | Tomar una fracción de eventos/trazas para reducir costo. |
-| ANR | App Not Responding; bloqueo prolongado del hilo UI. |
-| PII | Información personal identificable; no se debe loggear. |
+| <a id="term-apm"></a>APM | Application Performance Monitoring. |
+| <a id="term-trace-span-id"></a>Trace/Span ID | Identificadores para correlacionar trazas. |
+| <a id="term-sampling"></a>Sampling | Tomar una fracción de eventos/trazas para reducir costo. |
+| <a id="term-anr"></a>ANR | App Not Responding; bloqueo prolongado del hilo UI. |
+| <a id="term-pii"></a>PII | Información personal identificable; no se debe loggear. |
 
 ---
 

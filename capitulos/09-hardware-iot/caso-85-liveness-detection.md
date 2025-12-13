@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | liveness, spoofing, biometría facial, anti-fraude |
-| **Patrón Técnico** | Presentation Attack Detection (PAD), Challenge-Response, Anti-Spoofing |
+| **Patrón Técnico** | Presentation Attack Detection ([PAD](#term-pad "Presentation Attack Detection.")), [Challenge-Response](#term-challenge-response "Solicitar acciones para probar liveness."), Anti-Spoofing |
 | **Stack Seleccionado** | Flutter + SDK nativo de liveness (iBeta/NIST) via Platform Channels + Riverpod estado |
 | **Nivel de Criticidad** | Crítico |
 
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| PAD | Presentation Attack Detection. |
-| Deepfake | Video/imagen generada para suplantación. |
-| Challenge-Response | Solicitar acciones para probar liveness. |
-| Evidencia firmada | Resultado con firma para auditoría. |
-| Falsos positivos/negativos | Errores de detección. |
+| <a id="term-pad"></a>PAD | Presentation Attack Detection. |
+| <a id="term-deepfake"></a>Deepfake | Video/imagen generada para suplantación. |
+| <a id="term-challenge-response"></a>Challenge-Response | Solicitar acciones para probar liveness. |
+| <a id="term-evidencia-firmada"></a>Evidencia firmada | Resultado con firma para auditoría. |
+| <a id="term-falsos-positivos-negativos"></a>Falsos positivos/negativos | Errores de detección. |
 
 ---
 

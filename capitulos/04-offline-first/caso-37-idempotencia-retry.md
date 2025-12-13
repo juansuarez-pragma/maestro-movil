@@ -1,5 +1,5 @@
 # Caso 37: El Pedido Duplicado
-## Idempotencia en Retry de Operaciones Críticas
+## [Idempotencia](#term-idempotencia "Repetir una operación produce el mismo resultado sin duplicarla.") en Retry de Operaciones Críticas
 
 ---
 
@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | idempotencia, retries, pedidos duplicados, operaciones críticas |
-| **Patrón Técnico** | Idempotent Operations, Retry with Backoff, Idempotency-Key |
+| **Patrón Técnico** | Idempotent Operations, Retry with [Backoff](#term-backoff "Espera creciente entre reintentos."), [Idempotency-Key](#term-idempotency-key "Identificador único por operación para deduplicar en backend.") |
 | **Stack Seleccionado** | Flutter + Dio interceptors + Idempotency-Key + Riverpod estado de pedidos |
 | **Nivel de Criticidad** | Crítico |
 
@@ -118,11 +118,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Idempotencia | Repetir una operación produce el mismo resultado sin duplicarla. |
-| Idempotency-Key | Identificador único por operación para deduplicar en backend. |
-| Backoff | Espera creciente entre reintentos. |
-| Pedido crítico | Operación que no debe duplicarse (pagos, órdenes). |
-| Retry seguro | Reintento que preserva idempotencia y consistencia. |
+| <a id="term-idempotencia"></a>Idempotencia | Repetir una operación produce el mismo resultado sin duplicarla. |
+| <a id="term-idempotency-key"></a>Idempotency-Key | Identificador único por operación para deduplicar en backend. |
+| <a id="term-backoff"></a>Backoff | Espera creciente entre reintentos. |
+| <a id="term-pedido-critico"></a>Pedido crítico | Operación que no debe duplicarse (pagos, órdenes). |
+| <a id="term-retry-seguro"></a>Retry seguro | Reintento que preserva idempotencia y consistencia. |
 
 ---
 

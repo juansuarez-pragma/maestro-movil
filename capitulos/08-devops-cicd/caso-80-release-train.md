@@ -1,4 +1,4 @@
-# Caso 80: Release Train Quincenal
+# Caso 80: [Release Train](#term-release-train "Cadencia fija de releases compartida por squads.") Quincenal
 ## Coordinar 4 Squads sin Conflictos
 
 ---
@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | release train, coordinación, squads, mobile release |
-| **Patrón Técnico** | Trunk-Based Development, Branch Policies, Feature Flags |
+| **Patrón Técnico** | [Trunk-Based](#term-trunk-based "Estrategia de branching centrada en main.") Development, Branch Policies, Feature Flags |
 | **Stack Seleccionado** | Flutter + main trunk + ramas hotfix + flags + CI con ventanas de freeze |
 | **Nivel de Criticidad** | Alto |
 
@@ -56,7 +56,7 @@
 |:-----------------|:-----------------------|:----------------------------------|
 | **BAJA** | Cada squad libera cuando quiere | **INADECUADO:** Caos y conflictos. |
 | **ACEPTABLE** | Calendario sin flags ni gates estrictos | **MEJORA:** Más orden, pero riesgo de bloqueos. |
-| **ENTERPRISE** | **Train + flags + gates:** trunk-based, merges tempranos, freeze corto, flags para features incompletas, QA por corte | **ÓPTIMO:** Flujo predecible y riesgo controlado. |
+| **ENTERPRISE** | **Train + flags + gates:** trunk-based, merges tempranos, freeze corto, flags para features incompletas, [QA por corte](#term-qa-por-corte "Pruebas alineadas al corte del release.") | **ÓPTIMO:** Flujo predecible y riesgo controlado. |
 
 ---
 
@@ -64,7 +64,7 @@
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Cadencia fija (quincenal). Merges a main con flags para aislar features. Freeze breve para estabilizar. QA/regresión por corte. Hotfix branch para emergencias. |
+| **Capacidades (SÍ permite)** | Cadencia fija (quincenal). Merges a main con flags para aislar features. [Freeze](#term-freeze "Ventana para estabilizar antes de liberar.") breve para estabilizar. QA/regresión por corte. [Hotfix](#term-hotfix "Corrección urgente fuera del ciclo.") branch para emergencias. |
 | **Restricciones Duras (NO permite)** | **Feature sin flag:** No debe mergearse. **Squads sin coordinación:** Requiere acuerdos y gobernanza. **Automatización insuficiente:** Sin CI sólido, freeze se alarga. |
 | **Criterio de Selección** | Trunk-based con flags; freeze mínimo; QA coordinado; métricas de estabilidad por release. |
 
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Release Train | Cadencia fija de releases compartida por squads. |
-| Freeze | Ventana para estabilizar antes de liberar. |
-| Trunk-Based | Estrategia de branching centrada en main. |
-| Hotfix | Corrección urgente fuera del ciclo. |
-| QA por corte | Pruebas alineadas al corte del release. |
+| <a id="term-release-train"></a>Release Train | Cadencia fija de releases compartida por squads. |
+| <a id="term-freeze"></a>Freeze | Ventana para estabilizar antes de liberar. |
+| <a id="term-trunk-based"></a>Trunk-Based | Estrategia de branching centrada en main. |
+| <a id="term-hotfix"></a>Hotfix | Corrección urgente fuera del ciclo. |
+| <a id="term-qa-por-corte"></a>QA por corte | Pruebas alineadas al corte del release. |
 
 ---
 

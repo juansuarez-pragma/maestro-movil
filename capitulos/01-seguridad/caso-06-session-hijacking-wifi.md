@@ -1,4 +1,4 @@
-# Caso 6: Session Hijacking en WiFi Público
+# Caso 6: [Session Hijacking](#term-session-hijacking "Toma de sesión mediante robo de tokens/cookies en tránsito.") en WiFi Público
 ## El Caso del Café que Vació Cuentas
 
 ---
@@ -86,7 +86,7 @@
 ### 3.2 UX y operación
 | Tema | Política | Nota |
 |:-----|:---------|:-----|
-| Mensajes | En WiFi abierto: “Red no confiable, solo consulta; usa datos móviles/VPN para operar” | Alinea expectativas y reduce soporte |
+| Mensajes | En WiFi abierto: “[Red no confiable](#term-untrusted "Clasificación de WiFi abierto/cautivo que dispara controles adicionales (OTP, bloqueo de operaciones)."), solo consulta; usa datos móviles/VPN para operar” | Alinea expectativas y reduce soporte |
 | CTA | Botón para habilitar VPN o cambiar de red | Guía acción mitigadora |
 | Cambio de red | Revalidar riesgo y limpiar tokens si cambia fingerprint de red | Evita reuse fuera del contexto original |
 

@@ -1,4 +1,4 @@
-# Caso 29: Tree Shaking Agresivo
+# Caso 29: [Tree Shaking](#term-tree-shaking "Eliminación de código no utilizado en compilación.") Agresivo
 ## Reducir 40% del Bundle Size en Apps Enterprise
 
 ---
@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | bundle size, tree shaking, rendimiento, tamaño de app |
-| **Patrón Técnico** | Code Splitting, Dead Code Elimination, Asset Optimization |
+| **Patrón Técnico** | Code Splitting, Dead Code Elimination, [Asset Optimization](#term-asset-optimization "Reducir tamaño y formatos de recursos (imágenes, fuentes).") |
 | **Stack Seleccionado** | Flutter AOT + Dart tree shaking + Deferred imports + ProGuard/R8 para nativo |
 | **Nivel de Criticidad** | Alto |
 
@@ -56,7 +56,7 @@
 |:-----------------|:-----------------------|:----------------------------------|
 | **BAJA** | Incluir todas las libs y assets en el main bundle | **INADECUADO:** Tamaño excesivo, assets no usados. |
 | **ACEPTABLE** | Remover assets no usados, minificar nativo | **MEJORA:** Reduce algo, pero no separa módulos. |
-| **ENTERPRISE** | **Tree shaking + carga diferida:** deferred imports para features pesadas, eliminación de código muerto, assets optimizados/condicionales, R8/ProGuard configurados | **ÓPTIMO:** Bundle pequeño, arranque más rápido, menos uso de almacenamiento. |
+| **ENTERPRISE** | **Tree shaking + carga diferida:** deferred imports para features pesadas, eliminación de código muerto, assets optimizados/condicionales, [R8/ProGuard](#term-r8-proguard "Herramientas de minificación/obfuscación para código nativo.") configurados | **ÓPTIMO:** Bundle pequeño, arranque más rápido, menos uso de almacenamiento. |
 
 ---
 
@@ -81,7 +81,7 @@
 |:-----|:---------|:-----|
 | Carga diferida | Módulos pesados cargados on-demand con feedback | UX consistente |
 | Assets | WebP/AVIF, fonts subset, sprites | Menos peso |
-| Split per ABI | Distribuir por arquitectura | Descarga menor |
+| [Split per ABI](#term-split-per-abi "Generar APKs/artefactos por arquitectura para reducir tamaño.") | Distribuir por arquitectura | Descarga menor |
 
 ### 3.3 Operación y riesgo
 | Tema | Política | Nota |
@@ -118,12 +118,12 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Tree Shaking | Eliminación de código no utilizado en compilación. |
-| Deferred Import | Cargar un módulo Dart bajo demanda. |
-| Split per ABI | Generar APKs/artefactos por arquitectura para reducir tamaño. |
-| R8/ProGuard | Herramientas de minificación/obfuscación para código nativo. |
-| Asset Optimization | Reducir tamaño y formatos de recursos (imágenes, fuentes). |
-| Keep Rules | Configuración para preservar clases/métodos usados por reflexión. |
+| <a id="term-tree-shaking"></a>Tree Shaking | Eliminación de código no utilizado en compilación. |
+| <a id="term-deferred-import"></a>Deferred Import | Cargar un módulo Dart bajo demanda. |
+| <a id="term-split-per-abi"></a>Split per ABI | Generar APKs/artefactos por arquitectura para reducir tamaño. |
+| <a id="term-r8-proguard"></a>R8/ProGuard | Herramientas de minificación/obfuscación para código nativo. |
+| <a id="term-asset-optimization"></a>Asset Optimization | Reducir tamaño y formatos de recursos (imágenes, fuentes). |
+| <a id="term-keep-rules"></a>Keep Rules | Configuración para preservar clases/métodos usados por reflexión. |
 
 ---
 

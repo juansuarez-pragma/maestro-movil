@@ -33,7 +33,7 @@
 
 | Fuente | Muestra / Región | Hallazgos relevantes |
 |:-------|:-----------------|:---------------------|
-| Behavioral biometrics | Global | Acelerómetro/giroscopio se usan para señales anti-bot. |
+| [Behavioral biometrics](#term-behavioral-biometrics "Identificación por patrones de uso/movimiento.") | Global | Acelerómetro/giroscopio se usan para señales anti-bot. |
 | Investigación anti-fraude | Global | Modelos requieren datos limpios y minimizados para reducir falsos positivos. |
 | NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; manejo de datos/sensores es brecha común. |
 
@@ -65,7 +65,7 @@
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
 | **Capacidades (SÍ permite)** | Capturar movimientos durante interacciones críticas. Extraer features (varianza, frecuencia). Enviar features anonimizadas para scoring. Aplicar step-up/bloqueo ante riesgo. |
-| **Restricciones Duras (NO permite)** | **Privacidad:** Requiere consentimiento y minimización. **Costo battery:** Sampling debe ser limitado. **Modelos:** Necesita entrenamiento y actualización; riesgo de falsos positivos. |
+| **Restricciones Duras (NO permite)** | **Privacidad:** Requiere consentimiento y minimización. **Costo battery:** [Sampling](#term-sampling "Captura de datos a intervalos controlados.") debe ser limitado. **Modelos:** Necesita entrenamiento y actualización; riesgo de falsos positivos. |
 | **Criterio de Selección** | Recolección mínima necesaria, features calculadas localmente, consentimientos claros, sampling y límites de battery, backend de scoring. |
 
 ### 3.1 Plan de verificación (V&V)
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Behavioral biometrics | Identificación por patrones de uso/movimiento. |
-| Feature | Métrica derivada de datos brutos de sensores. |
-| Scoring | Puntaje de riesgo basado en features. |
-| Sampling | Captura de datos a intervalos controlados. |
-| Anonimización | Remover PII de datos antes de enviarlos. |
+| <a id="term-behavioral-biometrics"></a>Behavioral biometrics | Identificación por patrones de uso/movimiento. |
+| <a id="term-feature"></a>Feature | Métrica derivada de datos brutos de sensores. |
+| <a id="term-scoring"></a>Scoring | Puntaje de riesgo basado en features. |
+| <a id="term-sampling"></a>Sampling | Captura de datos a intervalos controlados. |
+| <a id="term-anonimizacion"></a>Anonimización | Remover PII de datos antes de enviarlos. |
 
 ---
 

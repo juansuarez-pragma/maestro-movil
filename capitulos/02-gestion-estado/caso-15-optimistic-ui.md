@@ -1,4 +1,4 @@
-# Caso 15: Optimistic UI que Mintió
+# Caso 15: [Optimistic UI](#term-optimistic-ui "Mostrar cambios localmente antes de confirmación del servidor.") que Mintió
 ## Revertir Estados Cuando el Backend Rechaza
 
 ---
@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | optimistic UI, rollback, consistencia, error handling |
-| **Patrón Técnico** | Optimistic Updates, Saga Pattern, Retry with Compensating Action |
+| **Patrón Técnico** | Optimistic Updates, [Saga Pattern](#term-saga-pattern "Coordinación de transacciones con pasos y compensaciones."), Retry with Compensating Action |
 | **Stack Seleccionado** | Flutter + Riverpod/StateNotifier + Queue de acciones + SQLite para cola offline |
 | **Nivel de Criticidad** | Alto |
 
@@ -74,14 +74,14 @@
 |:---------------------|:-----------|:--------------------|
 | Unit (CI) | Acciones optimistas aplican y revertir sin mutar estado previo | Equipo móvil, CI |
 | Integration (CI) | Rechazo backend ejecuta acción compensatoria y sincroniza estado | Móvil/Backend, CI + staging |
-| Seguridad/consistencia | Idempotency-Key evita duplicar en reintentos; cola persiste offline breve | QA/Seguridad |
+| Seguridad/consistencia | [Idempotency-Key](#term-idempotency-key "Identificador único para evitar duplicados en reintentos.") evita duplicar en reintentos; cola persiste offline breve | QA/Seguridad |
 | Observabilidad | Eventos `optimistic.*` con motivo y resultado | Móvil/SRE |
 
 ### 3.2 UX y operación
 | Tema | Política | Nota |
 |:-----|:---------|:-----|
 | Feedback | Mostrar estado optimista y, si falla, revertir con explicación | Transparencia al usuario |
-| Reintentos | Backoff y límite; permitir “reintentar” con misma acción | Control de carga y UX |
+| Reintentos | [Backoff](#term-backoff "Incrementar espera entre reintentos para reducir carga.") y límite; permitir “reintentar” con misma acción | Control de carga y UX |
 | Cola | Persistir acciones en SQLite; limpiar al confirmar/rollback | Robustez offline breve |
 
 ### 3.3 Operación y riesgo
@@ -120,12 +120,12 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Optimistic UI | Mostrar cambios localmente antes de confirmación del servidor. |
-| Acción compensatoria | Operación que revierte o ajusta el estado tras un fallo. |
-| Saga Pattern | Coordinación de transacciones con pasos y compensaciones. |
-| Backoff | Incrementar espera entre reintentos para reducir carga. |
-| Cola de acciones | Lista persistente de operaciones pendientes de confirmación. |
-| Idempotency-Key | Identificador único para evitar duplicados en reintentos. |
+| <a id="term-optimistic-ui"></a>Optimistic UI | Mostrar cambios localmente antes de confirmación del servidor. |
+| <a id="term-accion-compensatoria"></a>Acción compensatoria | Operación que revierte o ajusta el estado tras un fallo. |
+| <a id="term-saga-pattern"></a>Saga Pattern | Coordinación de transacciones con pasos y compensaciones. |
+| <a id="term-backoff"></a>Backoff | Incrementar espera entre reintentos para reducir carga. |
+| <a id="term-cola-de-acciones"></a>Cola de acciones | Lista persistente de operaciones pendientes de confirmación. |
+| <a id="term-idempotency-key"></a>Idempotency-Key | Identificador único para evitar duplicados en reintentos. |
 
 ---
 

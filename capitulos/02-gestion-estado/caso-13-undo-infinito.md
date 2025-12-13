@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | undo/redo, historial, editor financiero, trazabilidad |
-| **Patrón Técnico** | Command Pattern, Event Log, Snapshotting |
+| **Patrón Técnico** | [Command Pattern](#term-command-pattern "Encapsular acciones como objetos inmutables ejecutables y reversibles."), [Event Log](#term-event-log "Registro secuencial de eventos/acciones aplicados al modelo."), Snapshotting |
 | **Stack Seleccionado** | Flutter + Riverpod + Immutable State (Freezed) + SQLite para snapshots |
 | **Nivel de Criticidad** | Alto |
 
@@ -82,7 +82,7 @@
 |:-----|:---------|:-----|
 | Undo/redo | Disponibles entre sesiones; límites según retención/log | UX confiable |
 | Snapshots | Guardar cada N eventos/tiempo para arranque rápido | Balance rendimiento |
-| Auditoría | Mostrar versión/timestamp en vistas de historial | Transparencia |
+| [Auditoría](#term-auditoria "Registro fiable para investigación y cumplimiento.") | Mostrar versión/timestamp en vistas de historial | Transparencia |
 
 ### 3.3 Operación y riesgo
 | Tema | Política | Nota |
@@ -120,12 +120,12 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Command Pattern | Encapsular acciones como objetos inmutables ejecutables y reversibles. |
-| Event Log | Registro secuencial de eventos/acciones aplicados al modelo. |
-| Snapshot | Estado compacto guardado periódicamente para acelerar el replay del log. |
-| Undo/Redo | Revertir/aplicar nuevamente acciones en orden inverso/normal. |
-| Inmutabilidad | Estado no se modifica; se crea una nueva copia por cambio. |
-| Auditoría | Registro fiable para investigación y cumplimiento. |
+| <a id="term-command-pattern"></a>Command Pattern | Encapsular acciones como objetos inmutables ejecutables y reversibles. |
+| <a id="term-event-log"></a>Event Log | Registro secuencial de eventos/acciones aplicados al modelo. |
+| <a id="term-snapshot"></a>Snapshot | Estado compacto guardado periódicamente para acelerar el replay del log. |
+| <a id="term-undo-redo"></a>Undo/Redo | Revertir/aplicar nuevamente acciones en orden inverso/normal. |
+| <a id="term-inmutabilidad"></a>Inmutabilidad | Estado no se modifica; se crea una nueva copia por cambio. |
+| <a id="term-auditoria"></a>Auditoría | Registro fiable para investigación y cumplimiento. |
 
 ---
 

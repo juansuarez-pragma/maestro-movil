@@ -1,4 +1,4 @@
-# Caso 56: Shared Kernel
+# Caso 56: [Shared Kernel](#term-shared-kernel "Subconjunto de modelo/contratos compartidos y estables.")
 ## Extraer Código Común sin Crear un Monolito
 
 ---
@@ -9,7 +9,7 @@
 |:------|:------|
 | **Palabras Clave de Negocio** | shared kernel, código común, módulos, dependencia cruzada |
 | **Patrón Técnico** | Shared Kernel, Domain Library, Semantic Versioning |
-| **Stack Seleccionado** | Flutter + packages internos (monorepo) + Melos + semver |
+| **Stack Seleccionado** | Flutter + packages internos (monorepo) + [Melos](#term-melos "Herramienta para gestionar monorepos de Dart/Flutter.") + semver |
 | **Nivel de Criticidad** | Alto |
 
 ---
@@ -34,7 +34,7 @@
 | Fuente | Muestra / Región | Hallazgos relevantes |
 |:-------|:-----------------|:---------------------|
 | Proyectos DDD | Global | Shared kernels grandes generan ripple effects y deuda. |
-| Monorepos móviles | LATAM/EU | Semver y contratos reducen roturas de build. |
+| Monorepos móviles | LATAM/EU | [Semver](#term-semver "Versionado semántico para comunicar compatibilidad.") y contratos reducen roturas de build. |
 | NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; gobernanza de dependencias es crítica. |
 
 **Resumen global**
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Shared Kernel | Subconjunto de modelo/contratos compartidos y estables. |
-| Semver | Versionado semántico para comunicar compatibilidad. |
-| Contract Testing | Validar que consumidores y proveedor coinciden en contratos. |
-| Monorepo | Repositorio único que aloja múltiples paquetes. |
-| Melos | Herramienta para gestionar monorepos de Dart/Flutter. |
+| <a id="term-shared-kernel"></a>Shared Kernel | Subconjunto de modelo/contratos compartidos y estables. |
+| <a id="term-semver"></a>Semver | Versionado semántico para comunicar compatibilidad. |
+| <a id="term-contract-testing"></a>Contract Testing | Validar que consumidores y proveedor coinciden en contratos. |
+| <a id="term-monorepo"></a>Monorepo | Repositorio único que aloja múltiples paquetes. |
+| <a id="term-melos"></a>Melos | Herramienta para gestionar monorepos de Dart/Flutter. |
 
 ---
 

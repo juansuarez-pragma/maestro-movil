@@ -8,8 +8,8 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | platform channels, sdk nativo, integración, kotlin/swift |
-| **Patrón Técnico** | Platform Channels, Method/Event Channels, Bridge Pattern |
-| **Stack Seleccionado** | Flutter + Kotlin/Swift + MethodChannel/EventChannel + Riverpod para estado |
+| **Patrón Técnico** | Platform Channels, Method/Event Channels, [Bridge](#term-bridge "Capa de traducción entre APIs nativas y Dart.") Pattern |
+| **Stack Seleccionado** | Flutter + Kotlin/Swift + [MethodChannel](#term-methodchannel "Canal para invocar métodos nativos desde Dart.")/[EventChannel](#term-eventchannel "Canal para recibir streams de eventos desde nativo.") + Riverpod para estado |
 | **Nivel de Criticidad** | Alto |
 
 ---
@@ -79,7 +79,7 @@
 | Tema | Política | Nota |
 |:-----|:---------|:-----|
 | Errores | Mensajes claros y reintentos seguros | UX transparente |
-| Lifecycle | Init/dispose controlado para evitar leaks | Estabilidad |
+| [Lifecycle](#term-lifecycle "Ciclo de vida de inicialización/limpieza de un SDK.") | Init/dispose controlado para evitar leaks | Estabilidad |
 | Compatibilidad | Matriz de versiones SDK/OS soportadas | Riesgo acotado |
 
 ### 3.3 Operación y riesgo
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| MethodChannel | Canal para invocar métodos nativos desde Dart. |
-| EventChannel | Canal para recibir streams de eventos desde nativo. |
-| Bridge | Capa de traducción entre APIs nativas y Dart. |
-| Lifecycle | Ciclo de vida de inicialización/limpieza de un SDK. |
-| Mapping de errores | Traducción de códigos nativos a enum Dart. |
+| <a id="term-methodchannel"></a>MethodChannel | Canal para invocar métodos nativos desde Dart. |
+| <a id="term-eventchannel"></a>EventChannel | Canal para recibir streams de eventos desde nativo. |
+| <a id="term-bridge"></a>Bridge | Capa de traducción entre APIs nativas y Dart. |
+| <a id="term-lifecycle"></a>Lifecycle | Ciclo de vida de inicialización/limpieza de un SDK. |
+| <a id="term-mapping-de-errores"></a>Mapping de errores | Traducción de códigos nativos a enum Dart. |
 
 ---
 

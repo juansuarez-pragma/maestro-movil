@@ -7,9 +7,9 @@
 
 | Campo | Valor |
 |:------|:------|
-| **Palabras Clave de Negocio** | cache, invalidación, frescura de datos, TTL |
-| **Patrón Técnico** | Cache Invalidation Policies, Stale-While-Revalidate, E-Tag |
-| **Stack Seleccionado** | Flutter + SQLite/Isar cache + E-Tag/If-None-Match + Riverpod |
+| **Palabras Clave de Negocio** | cache, invalidación, frescura de datos, [TTL](#term-ttl "Tiempo que un recurso permanece válido en cache.") |
+| **Patrón Técnico** | Cache Invalidation Policies, [Stale-While-Revalidate](#term-stale-while-revalidate "Servir datos cacheados y refrescar en background."), [E-Tag](#term-e-tag "Hash/versión del recurso para validación condicional.") |
+| **Stack Seleccionado** | Flutter + SQLite/Isar cache + E-Tag/[If-None-Match](#term-if-none-match "Header para validar si un recurso cambió.") + Riverpod |
 | **Nivel de Criticidad** | Alto |
 
 ---
@@ -84,7 +84,7 @@
 ### 3.3 Operación y riesgo
 | Tema | Política | Nota |
 |:-----|:--------|:-----|
-| Invalidación dirigida | Borrar/actualizar recursos afectados por mutaciones | Consistencia |
+| [Invalidación dirigida](#term-invalidacion-dirigida "Borrar/actualizar solo recursos afectados por una mutación.") | Borrar/actualizar recursos afectados por mutaciones | Consistencia |
 | Fallback | Full fetch si E-Tag falla o backend no soporta | Robustez |
 | Auditoría | Log de invalidaciones y staleness para diagnóstico | Soporte |
 
@@ -104,7 +104,7 @@
 | KPI | Objetivo | Umbral/Alerta | Impacto esperado |
 |:----|:---------|:--------------|:-----------------|
 | Hit rate de cache | Alto con datos frescos | Alerta si baja | Menor latencia/costos |
-| Staleness | Controlada según TTL | Alerta si datos stale | UX confiable |
+| [Staleness](#term-staleness "Grado de antigüedad aceptable de los datos.") | Controlada según TTL | Alerta si datos stale | UX confiable |
 | Uso de red | Reducido vs baseline | Alerta si sube | Eficiencia |
 | Errores 304/invalidación | Bajo y manejado | Alerta si repetidos | Consistencia |
 
@@ -116,12 +116,12 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| E-Tag | Hash/versión del recurso para validación condicional. |
-| TTL | Tiempo que un recurso permanece válido en cache. |
-| Stale-While-Revalidate | Servir datos cacheados y refrescar en background. |
-| If-None-Match | Header para validar si un recurso cambió. |
-| Invalidación dirigida | Borrar/actualizar solo recursos afectados por una mutación. |
-| Staleness | Grado de antigüedad aceptable de los datos. |
+| <a id="term-e-tag"></a>E-Tag | Hash/versión del recurso para validación condicional. |
+| <a id="term-ttl"></a>TTL | Tiempo que un recurso permanece válido en cache. |
+| <a id="term-stale-while-revalidate"></a>Stale-While-Revalidate | Servir datos cacheados y refrescar en background. |
+| <a id="term-if-none-match"></a>If-None-Match | Header para validar si un recurso cambió. |
+| <a id="term-invalidacion-dirigida"></a>Invalidación dirigida | Borrar/actualizar solo recursos afectados por una mutación. |
+| <a id="term-staleness"></a>Staleness | Grado de antigüedad aceptable de los datos. |
 
 ---
 

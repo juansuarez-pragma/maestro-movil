@@ -38,7 +38,7 @@
 | NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; pipelines lentos afectan respuesta a parches. |
 
 **Resumen global**
-- Affected-only + cache + paralelismo reducen tiempo y costo; requiere buena invalidación para evitar builds corruptos.
+- [Affected-only](#term-affected-only "Ejecutar build/tests solo en módulos impactados.") + cache + paralelismo reducen tiempo y costo; requiere buena invalidación para evitar builds corruptos.
 
 ### Riesgos
 
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Build incremental | Compilar solo lo que cambió. |
-| Affected-only | Ejecutar build/tests solo en módulos impactados. |
-| Build cache | Reutilizar outputs para evitar recompilar. |
-| Paralelismo CI | Ejecutar jobs en paralelo para reducir tiempo total. |
-| Split per ABI | Artefactos separados por arquitectura para optimizar tamaño/tiempo. |
+| <a id="term-build-incremental"></a>Build incremental | Compilar solo lo que cambió. |
+| <a id="term-affected-only"></a>Affected-only | Ejecutar build/tests solo en módulos impactados. |
+| <a id="term-build-cache"></a>Build cache | Reutilizar outputs para evitar recompilar. |
+| <a id="term-paralelismo-ci"></a>Paralelismo CI | Ejecutar jobs en paralelo para reducir tiempo total. |
+| <a id="term-split-per-abi"></a>Split per ABI | Artefactos separados por arquitectura para optimizar tamaño/tiempo. |
 
 ---
 

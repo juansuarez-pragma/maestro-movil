@@ -1,4 +1,4 @@
-# Caso 44: Circuit Breaker Móvil
+# Caso 44: [Circuit Breaker](#term-circuit-breaker "Patrón que abre/cierra flujo de requests según salud.") Móvil
 ## Proteger la App cuando el Backend Agoniza
 
 ---
@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | circuit breaker, resiliencia, fallos backend, degradación |
-| **Patrón Técnico** | Circuit Breaker, Fallback/Degrade, Health Check |
+| **Patrón Técnico** | Circuit Breaker, [Fallback](#term-fallback "Comportamiento degradado cuando el servicio está caído.")/Degrade, Health Check |
 | **Stack Seleccionado** | Flutter + Dio interceptors + Riverpod estado de salud + backoff |
 | **Nivel de Criticidad** | Crítico |
 
@@ -64,7 +64,7 @@
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Abrir breaker tras N fallos/latencias altas. Half-open con probe controlado. Degradar UI (modo sólo lectura, cache) mientras está abierto. Telemetría de estado del breaker. |
+| **Capacidades (SÍ permite)** | Abrir breaker tras N fallos/latencias altas. [Half-open](#term-half-open "Estado de prueba para ver si el servicio se recuperó.") con probe controlado. Degradar UI (modo sólo lectura, cache) mientras está abierto. Telemetría de estado del breaker. |
 | **Restricciones Duras (NO permite)** | **Sin idempotencia:** Fallback debe respetar consistencia. **Mobile variability:** Errores locales de red no siempre implican fallo del backend; requiere heurísticas. **Coordinación:** Sin compartir estado entre clientes, cada uno decide localmente. |
 | **Criterio de Selección** | Breaker en interceptor para consistencia; umbrales ajustados; fallback claro; telemetría para observabilidad. |
 
@@ -79,7 +79,7 @@
 | Tema | Política | Nota |
 |:-----|:---------|:-----|
 | Mensajes claros | Mostrar degradación/solo lectura cuando breaker abierto | Confianza |
-| Probe controlado | Half-open con pocas requests | Evita carga |
+| [Probe](#term-probe "Request de prueba controlada para cerrar el breaker.") controlado | Half-open con pocas requests | Evita carga |
 | Cache | Servir cache cuando aplique | UX mejor |
 
 ### 3.3 Operación y riesgo
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Circuit Breaker | Patrón que abre/cierra flujo de requests según salud. |
-| Half-open | Estado de prueba para ver si el servicio se recuperó. |
-| Fallback | Comportamiento degradado cuando el servicio está caído. |
-| Probe | Request de prueba controlada para cerrar el breaker. |
-| Threshold | Umbral de fallos/latencia para abrir el breaker. |
+| <a id="term-circuit-breaker"></a>Circuit Breaker | Patrón que abre/cierra flujo de requests según salud. |
+| <a id="term-half-open"></a>Half-open | Estado de prueba para ver si el servicio se recuperó. |
+| <a id="term-fallback"></a>Fallback | Comportamiento degradado cuando el servicio está caído. |
+| <a id="term-probe"></a>Probe | Request de prueba controlada para cerrar el breaker. |
+| <a id="term-threshold"></a>Threshold | Umbral de fallos/latencia para abrir el breaker. |
 
 ---
 

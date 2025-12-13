@@ -1,5 +1,5 @@
 # Caso 96: Testing de Regresión Legacy
-## Crear Tests para Código sin Cobertura
+## Crear Tests para Código sin [Cobertura](#term-cobertura "Porcentaje de código ejercitado por tests.")
 
 ---
 
@@ -17,7 +17,7 @@
 ## 1. Planteamiento del Problema (El "Trigger")
 
 ### Problema detectado (técnico)
-- Refactor sin tests introduce regresiones invisibles.
+- [Refactor](#term-refactor "Cambiar estructura interna sin alterar comportamiento.") sin tests introduce regresiones invisibles.
 - Cobertura baja en módulos críticos impide detectar roturas de API/UI.
 - Golden/contract ausentes dejan cambios de UI/servicios sin control.
 
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Characterization Test | Test que documenta el comportamiento actual. |
-| Golden Test | Comparación de UI/render con un snapshot esperado. |
-| Contract Test | Validar acuerdos entre cliente y servicio. |
-| Cobertura | Porcentaje de código ejercitado por tests. |
-| Refactor | Cambiar estructura interna sin alterar comportamiento. |
+| <a id="term-characterization-test"></a>Characterization Test | Test que documenta el comportamiento actual. |
+| <a id="term-golden-test"></a>Golden Test | Comparación de UI/render con un snapshot esperado. |
+| <a id="term-contract-test"></a>Contract Test | Validar acuerdos entre cliente y servicio. |
+| <a id="term-cobertura"></a>Cobertura | Porcentaje de código ejercitado por tests. |
+| <a id="term-refactor"></a>Refactor | Cambiar estructura interna sin alterar comportamiento. |
 
 ---
 

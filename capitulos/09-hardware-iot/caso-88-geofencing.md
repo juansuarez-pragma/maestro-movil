@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | geofencing, ubicación, antifraude, transacciones |
-| **Patrón Técnico** | Geofence Rules, Risk Scoring, Location Verification |
+| **Patrón Técnico** | [Geofence](#term-geofence "Área geográfica definida para reglas de entrada/salida.") Rules, Risk Scoring, Location Verification |
 | **Stack Seleccionado** | Flutter + plugins de ubicación + backend de reglas + Riverpod estado de riesgo |
 | **Nivel de Criticidad** | Alto |
 
@@ -73,13 +73,13 @@
 |:---------------------|:-----------|:--------------------|
 | Reglas | Scoring y decisiones (step-up/bloqueo) correctas | Backend/QA |
 | Precisión | Manejo de señales múltiples y thresholds | Móvil/QA |
-| Privacidad | Consentimiento y minimización de datos | Seguridad/Legal |
+| Privacidad | [Consentimiento](#term-consentimiento "Aprobación del usuario para usar ubicación.") y minimización de datos | Seguridad/Legal |
 
 ### 3.2 UX y operación
 | Tema | Política | Nota |
 |:-----|:---------|:-----|
 | Consentimiento | Claro y revocable; mostrar uso de ubicación | Transparencia |
-| Step-up | Solicitar OTP/biometría según riesgo | UX/Seguridad |
+| [Step-up](#term-step-up "Solicitar factor adicional ante riesgo.") | Solicitar OTP/biometría según riesgo | UX/Seguridad |
 | Mensajes | Explicar bloqueos y cómo resolver | Soporte |
 
 ### 3.3 Operación y riesgo
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Geofence | Área geográfica definida para reglas de entrada/salida. |
-| Step-up | Solicitar factor adicional ante riesgo. |
-| Risk scoring | Puntaje de riesgo basado en señales (ubicación, device, patrón). |
-| Consentimiento | Aprobación del usuario para usar ubicación. |
-| Minimización de datos | Guardar solo lo necesario, posiblemente hash/zonas. |
+| <a id="term-geofence"></a>Geofence | Área geográfica definida para reglas de entrada/salida. |
+| <a id="term-step-up"></a>Step-up | Solicitar factor adicional ante riesgo. |
+| <a id="term-risk-scoring"></a>Risk scoring | Puntaje de riesgo basado en señales (ubicación, device, patrón). |
+| <a id="term-consentimiento"></a>Consentimiento | Aprobación del usuario para usar ubicación. |
+| <a id="term-minimizacion-de-datos"></a>Minimización de datos | Guardar solo lo necesario, posiblemente hash/zonas. |
 
 ---
 

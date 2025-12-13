@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | api legacy, versionado, compatibilidad, migración |
-| **Patrón Técnico** | API Gateway/Adapter, Backward Compatibility, Deprecation Plan |
+| **Patrón Técnico** | [API Gateway](#term-api-gateway "Capa que adapta y enruta versiones de API.")/[Adapter](#term-adapter "Traduce entre contratos viejos y nuevos."), Backward Compatibility, Deprecation Plan |
 | **Stack Seleccionado** | Flutter + adapters por versión + feature flags + API gateway |
 | **Nivel de Criticidad** | Alto |
 
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| API Gateway | Capa que adapta y enruta versiones de API. |
-| Deprecation/Sunset | Proceso de retirar una versión antigua. |
-| Adapter | Traduce entre contratos viejos y nuevos. |
-| Compatibilidad hacia atrás | Mantener clientes antiguos funcionando. |
-| Métricas de uso | Datos de qué clientes siguen en v1. |
+| <a id="term-api-gateway"></a>API Gateway | Capa que adapta y enruta versiones de API. |
+| <a id="term-deprecation-sunset"></a>Deprecation/Sunset | Proceso de retirar una versión antigua. |
+| <a id="term-adapter"></a>Adapter | Traduce entre contratos viejos y nuevos. |
+| <a id="term-compatibilidad-hacia-atras"></a>Compatibilidad hacia atrás | Mantener clientes antiguos funcionando. |
+| <a id="term-metricas-de-uso"></a>Métricas de uso | Datos de qué clientes siguen en v1. |
 
 ---
 

@@ -8,8 +8,8 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | IoT, telemetría, mqtt, calidad de servicio, seguridad |
-| **Patrón Técnico** | MQTT QoS, Offline Buffering, Secure Telemetry |
-| **Stack Seleccionado** | Flutter + MQTT/HTTPS + buffer local + TLS/mTLS |
+| **Patrón Técnico** | [MQTT](#term-mqtt "Protocolo ligero de mensajería para IoT.") [QoS](#term-qos "Calidad de servicio en entrega de mensajes."), Offline Buffering, Secure Telemetry |
+| **Stack Seleccionado** | Flutter + MQTT/HTTPS + buffer local + TLS/[mTLS](#term-mtls "Autenticación mutua TLS.") |
 | **Nivel de Criticidad** | Alto |
 
 ---
@@ -19,7 +19,7 @@
 ### Problema detectado (técnico)
 - HTTP sin QoS ni reintento pierde telemetría y deja monitoreo incompleto.
 - Sin buffer offline, los mensajes se pierden ante desconexión.
-- Sin TLS/mTLS y ACL, la telemetría puede ser interceptada o alterada.
+- Sin TLS/mTLS y [ACL](#term-acl "Lista de control de acceso por topic."), la telemetría puede ser interceptada o alterada.
 
 ### Escenario de Negocio
 
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| MQTT | Protocolo ligero de mensajería para IoT. |
-| QoS | Calidad de servicio en entrega de mensajes. |
-| mTLS | Autenticación mutua TLS. |
-| ACL | Lista de control de acceso por topic. |
-| Buffer offline | Almacenamiento temporal de mensajes sin red. |
+| <a id="term-mqtt"></a>MQTT | Protocolo ligero de mensajería para IoT. |
+| <a id="term-qos"></a>QoS | Calidad de servicio en entrega de mensajes. |
+| <a id="term-mtls"></a>mTLS | Autenticación mutua TLS. |
+| <a id="term-acl"></a>ACL | Lista de control de acceso por topic. |
+| <a id="term-buffer-offline"></a>Buffer offline | Almacenamiento temporal de mensajes sin red. |
 
 ---
 

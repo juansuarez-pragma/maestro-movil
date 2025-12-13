@@ -8,8 +8,8 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | computo pesado, hilo UI, isolates, parsing, jank |
-| **Patrón Técnico** | Background Processing, Isolate Pattern, Work Scheduling |
-| **Stack Seleccionado** | Flutter + Isolates/`compute` + Stream/IsolateChannel + Riverpod para orquestar |
+| **Patrón Técnico** | Background Processing, [Isolate](#term-isolate "Hilo ligero de Dart con memoria propia; se comunica por mensajes.") Pattern, Work Scheduling |
+| **Stack Seleccionado** | Flutter + Isolates/[`compute`](#term-compute "Helper para ejecutar una función en Isolate temporal.") + Stream/IsolateChannel + Riverpod para orquestar |
 | **Nivel de Criticidad** | Crítico |
 
 ---
@@ -17,7 +17,7 @@
 ## 1. Planteamiento del Problema (El "Trigger")
 
 ### Problema detectado (técnico)
-- Parsing/CPU-bound en el hilo UI (> 4–8ms) causa jank y ANR; freezes perceptibles.
+- Parsing/CPU-bound en el hilo UI (> 4–8ms) causa jank y [ANR](#term-anr "App Not Responding; el SO mata apps que bloquean el hilo principal."); freezes perceptibles.
 - Copiar grandes datasets sin chunking ni canales incrementa tiempo y memoria.
 - Sin cancelación/prioridad, tareas largas bloquean UX o consumen batería.
 
@@ -73,14 +73,14 @@
 |:---------------------|:-----------|:--------------------|
 | Performance | Frame time/jank no se degrada al procesar lotes | QA/Perf |
 | Unit (CI) | Tareas en Isolate retornan/cancelan según lo esperado | Equipo móvil, CI |
-| Integration (CI) | Chunking/canales devuelven progreso y respetan prioridad | Móvil/Backend, CI |
+| Integration (CI) | [Chunking](#term-chunking "Dividir trabajo grande en porciones pequeñas procesables.")/canales devuelven progreso y respetan prioridad | Móvil/Backend, CI |
 | Observabilidad | Métricas `isolate.task_time`, cancelaciones, tamaño de payload | Móvil/SRE |
 
 ### 3.2 UX y operación
 | Tema | Política | Nota |
 |:-----|:---------|:-----|
 | Progreso | Mostrar avance si tarea > X ms; opción de cancelar | Transparencia |
-| Prioridad | Tareas críticas primero; secundarias en background | UX estable |
+| [Prioridad](#term-prioridad "Orden de ejecución de tareas según criticidad.") | Tareas críticas primero; secundarias en background | UX estable |
 | Tamaño de payload | Evitar pasar blobs enormes; usar streaming/chunking | Menos copias |
 
 ### 3.3 Operación y riesgo
@@ -119,12 +119,12 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Isolate | Hilo ligero de Dart con memoria propia; se comunica por mensajes. |
-| `compute` | Helper para ejecutar una función en Isolate temporal. |
-| Chunking | Dividir trabajo grande en porciones pequeñas procesables. |
-| ANR | App Not Responding; el SO mata apps que bloquean el hilo principal. |
-| Canal de mensajes | Mecanismo para enviar/recibir datos entre Isolates. |
-| Prioridad | Orden de ejecución de tareas según criticidad. |
+| <a id="term-isolate"></a>Isolate | Hilo ligero de Dart con memoria propia; se comunica por mensajes. |
+| <a id="term-compute"></a>`compute` | Helper para ejecutar una función en Isolate temporal. |
+| <a id="term-chunking"></a>Chunking | Dividir trabajo grande en porciones pequeñas procesables. |
+| <a id="term-anr"></a>ANR | App Not Responding; el SO mata apps que bloquean el hilo principal. |
+| <a id="term-canal-de-mensajes"></a>Canal de mensajes | Mecanismo para enviar/recibir datos entre Isolates. |
+| <a id="term-prioridad"></a>Prioridad | Orden de ejecución de tareas según criticidad. |
 
 ---
 

@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | root detection, jailbreak detection, dispositivo comprometido, fraude, seguridad móvil, SafetyNet, Play Integrity |
-| **Patrón Técnico** | Device Attestation, Risk-Based Authentication, Layered Security |
+| **Patrón Técnico** | Device Attestation, [Risk-Based Authentication](#term-risk-auth "Ajustar controles (permitir/limitar/bloquear) según riesgo del dispositivo."), Layered Security |
 | **Stack Seleccionado** | flutter_jailbreak_detection + Platform Channels (Play Integrity/App Attest) + Riverpod (DeviceSecurityProvider) |
 | **Nivel de Criticidad** | Alto |
 

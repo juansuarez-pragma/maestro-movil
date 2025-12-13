@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | POS offline, cola de transacciones, pagos sin red, sincronización diferida |
-| **Patrón Técnico** | Offline Queue, Store-and-Forward, Idempotent Operations |
+| **Patrón Técnico** | Offline Queue, [Store-and-Forward](#term-store-and-forward "Guardar transacción local y enviarla cuando haya red."), Idempotent Operations |
 | **Stack Seleccionado** | Flutter + SQLite/Isar para cola + Riverpod para orquestar + retry/backoff |
 | **Nivel de Criticidad** | Crítico |
 
@@ -18,8 +18,8 @@
 
 ### Problema detectado (técnico)
 - Cobros offline sin cola persistente se pierden al cerrar app o al reconectar; reintentos manuales generan doble cobro.
-- Sin `Idempotency-Key` y confirmación backend, la reconciliación es inconsistente.
-- Falta de backoff/TTL → tormenta de reintentos y riesgo de caducar transacciones sin trazabilidad.
+- Sin `[Idempotency-Key](#term-idempotency-key "Identificador único para evitar doble procesamiento.")` y confirmación backend, la reconciliación es inconsistente.
+- Falta de backoff/[TTL](#term-ttl "Tiempo de vida de una transacción antes de caducar.") → tormenta de reintentos y riesgo de caducar transacciones sin trazabilidad.
 
 ### Escenario de Negocio
 
@@ -81,7 +81,7 @@
 |:-----|:---------|:-----|
 | Estado de cola | UI muestra pendientes/sincronizando/confirmadas | Transparencia |
 | Recibos | Generar recibo provisional y actualizar tras sync | Experiencia consistente |
-| Reintentos | Backoff y límite; CTA para reintentar manual si falla | Control de riesgo |
+| Reintentos | [Backoff](#term-backoff "Aumentar tiempo entre reintentos para reducir carga.") y límite; CTA para reintentar manual si falla | Control de riesgo |
 
 ### 3.3 Operación y riesgo
 | Tema | Política | Nota |
@@ -119,11 +119,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Store-and-Forward | Guardar transacción local y enviarla cuando haya red. |
-| Idempotency-Key | Identificador único para evitar doble procesamiento. |
-| Backoff | Aumentar tiempo entre reintentos para reducir carga. |
-| Reconciliación | Ajustar registros tras sincronizar con backend. |
-| TTL | Tiempo de vida de una transacción antes de caducar. |
+| <a id="term-store-and-forward"></a>Store-and-Forward | Guardar transacción local y enviarla cuando haya red. |
+| <a id="term-idempotency-key"></a>Idempotency-Key | Identificador único para evitar doble procesamiento. |
+| <a id="term-backoff"></a>Backoff | Aumentar tiempo entre reintentos para reducir carga. |
+| <a id="term-reconciliacion"></a>Reconciliación | Ajustar registros tras sincronizar con backend. |
+| <a id="term-ttl"></a>TTL | Tiempo de vida de una transacción antes de caducar. |
 
 ---
 

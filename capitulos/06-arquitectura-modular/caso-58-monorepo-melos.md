@@ -1,4 +1,4 @@
-# Caso 58: Mono-Repo con Melos
+# Caso 58: Mono-Repo con [Melos](#term-melos "Tooling para gestionar workspaces Dart/Flutter.")
 ## Gestionar 15 Packages sin Perder la Cordura
 
 ---
@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | monorepo, melos, packages, versionado |
-| **Patrón Técnico** | Monorepo Management, Workspace Tooling, Semantic Versioning |
+| **Patrón Técnico** | [Monorepo](#term-monorepo "Repositorio único con múltiples paquetes.") Management, Workspace Tooling, Semantic Versioning |
 | **Stack Seleccionado** | Flutter + Melos + Git hooks + CI para release/linters |
 | **Nivel de Criticidad** | Alto |
 
@@ -85,7 +85,7 @@
 ### 3.3 Operación y riesgo
 | Tema | Política | Nota |
 |:-----|:--------|:-----|
-| Semver | Cambios mayores requerirán plan de migración | Estabilidad |
+| [Semver](#term-semver "Versionado semántico para comunicar compatibilidad.") | Cambios mayores requerirán plan de migración | Estabilidad |
 | Cache | Habilitar caché de dependencias y build | Velocidad |
 | Seguridad | Revisión de dependencias y firmas en releases | Cumplimiento |
 
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Monorepo | Repositorio único con múltiples paquetes. |
-| Melos | Tooling para gestionar workspaces Dart/Flutter. |
-| Bootstrap | Instalar deps y preparar workspace. |
-| Semver | Versionado semántico para comunicar compatibilidad. |
-| Affected packages | Paquetes impactados por un cambio. |
+| <a id="term-monorepo"></a>Monorepo | Repositorio único con múltiples paquetes. |
+| <a id="term-melos"></a>Melos | Tooling para gestionar workspaces Dart/Flutter. |
+| <a id="term-bootstrap"></a>Bootstrap | Instalar deps y preparar workspace. |
+| <a id="term-semver"></a>Semver | Versionado semántico para comunicar compatibilidad. |
+| <a id="term-affected-packages"></a>Affected packages | Paquetes impactados por un cambio. |
 
 ---
 

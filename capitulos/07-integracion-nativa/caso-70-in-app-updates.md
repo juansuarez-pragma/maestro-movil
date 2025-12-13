@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | in-app updates, versiones mínimas, rollout, seguridad |
-| **Patrón Técnico** | Minimum Supported Version, Forced Update, Progressive Rollout |
+| **Patrón Técnico** | Minimum Supported Version, Forced Update, Progressive [Rollout](#term-rollout "Despliegue gradual por cohortes.") |
 | **Stack Seleccionado** | Flutter + verificación de versión (backend) + Play In-App Updates (Android) + feature flags |
 | **Nivel de Criticidad** | Alto |
 
@@ -85,7 +85,7 @@
 ### 3.3 Operación y riesgo
 | Tema | Política | Nota |
 |:-----|:--------|:-----|
-| Rollout | Canary y métricas antes de subir versión mínima | Control |
+| Rollout | [Canary](#term-canary "Cohorte pequeña para validar antes de escalar.") y métricas antes de subir versión mínima | Control |
 | Incidentes | Playbook para elevar min version | Respuesta |
 | Métricas | % base en versión mínima y tiempo de adopción | Gobernanza |
 
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Versión mínima | Versión mínima permitida por backend/política. |
-| Soft-block | Bloqueo suave que permite posponer temporalmente. |
-| Hard-block | Bloqueo obligatorio hasta actualizar (solo crítico). |
-| Rollout | Despliegue gradual por cohortes. |
-| Canary | Cohorte pequeña para validar antes de escalar. |
+| <a id="term-version-minima"></a>Versión mínima | Versión mínima permitida por backend/política. |
+| <a id="term-soft-block"></a>Soft-block | Bloqueo suave que permite posponer temporalmente. |
+| <a id="term-hard-block"></a>Hard-block | Bloqueo obligatorio hasta actualizar (solo crítico). |
+| <a id="term-rollout"></a>Rollout | Despliegue gradual por cohortes. |
+| <a id="term-canary"></a>Canary | Cohorte pequeña para validar antes de escalar. |
 
 ---
 

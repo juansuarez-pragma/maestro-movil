@@ -1,4 +1,4 @@
-# Caso 40: Merge Cliente-Servidor con Tombstones
+# Caso 40: [Merge](#term-merge "Proceso de combinar cambios cliente-servidor.") Cliente-Servidor con Tombstones
 ## Limpiar Datos Huérfanos en Sincronización Offline
 
 ---
@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | merge offline, tombstones, sincronización, borrados |
-| **Patrón Técnico** | Tombstone Deletion, Conflict Resolution, Garbage Collection |
+| **Patrón Técnico** | [Tombstone](#term-tombstone "Marcador de borrado que evita resurrección en merges.") Deletion, Conflict Resolution, Garbage Collection |
 | **Stack Seleccionado** | Flutter + SQLite/Isar con marcas de borrado + Riverpod + merge guiado |
 | **Nivel de Criticidad** | Alto |
 
@@ -38,7 +38,7 @@
 | NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; sync/merge/borrados son hallazgos frecuentes. |
 
 **Resumen global**
-- Tombstones con GC controlado evitan resurrección y controlan almacenamiento; requieren soporte backend y política de TTL.
+- Tombstones con GC controlado evitan resurrección y controlan almacenamiento; requieren soporte backend y política de [TTL](#term-ttl "Tiempo que se conserva un tombstone antes de limpiar.").
 
 ### Riesgos
 
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Tombstone | Marcador de borrado que evita resurrección en merges. |
-| GC (Garbage Collection) | Limpieza de tombstones/datos ya confirmados. |
-| TTL | Tiempo que se conserva un tombstone antes de limpiar. |
-| Dominancia de borrado | Política que prioriza tombstone sobre updates. |
-| Merge | Proceso de combinar cambios cliente-servidor. |
+| <a id="term-tombstone"></a>Tombstone | Marcador de borrado que evita resurrección en merges. |
+| <a id="term-gc-garbage-collection"></a>GC (Garbage Collection) | Limpieza de tombstones/datos ya confirmados. |
+| <a id="term-ttl"></a>TTL | Tiempo que se conserva un tombstone antes de limpiar. |
+| <a id="term-dominancia-de-borrado"></a>Dominancia de borrado | Política que prioriza tombstone sobre updates. |
+| <a id="term-merge"></a>Merge | Proceso de combinar cambios cliente-servidor. |
 
 ---
 

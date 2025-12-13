@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Taxonomía de eventos | Esquema estándar de nombres y propiedades. |
-| Deduplicación | Evitar contar varias veces el mismo evento. |
-| Sampling de eventos | Enviar solo un porcentaje de eventos para reducir carga. |
-| Contexto común | Datos compartidos (app_version, device, user_id anon) en todos los eventos. |
-| Pipeline único | Un solo flujo de envío y procesamiento para consistencia. |
+| <a id="term-taxonomia-de-eventos"></a>Taxonomía de eventos | Esquema estándar de nombres y propiedades. |
+| <a id="term-deduplicacion"></a>Deduplicación | Evitar contar varias veces el mismo evento. |
+| <a id="term-sampling-de-eventos"></a>Sampling de eventos | Enviar solo un porcentaje de eventos para reducir carga. |
+| <a id="term-contexto-comun"></a>Contexto común | Datos compartidos (app_version, device, user_id anon) en todos los eventos. |
+| <a id="term-pipeline-unico"></a>Pipeline único | Un solo flujo de envío y procesamiento para consistencia. |
 
 ---
 

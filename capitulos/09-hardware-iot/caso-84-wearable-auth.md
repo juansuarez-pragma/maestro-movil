@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | wearable, apple watch, segundo factor, mfa |
-| **Patrón Técnico** | Wearable MFA, Device Binding, Secure Notifications |
+| **Patrón Técnico** | [Wearable MFA](#term-wearable-mfa "Uso de reloj como factor de autenticación."), Device Binding, Secure Notifications |
 | **Stack Seleccionado** | Flutter + Platform Channels (WatchConnectivity/Companion) + push seguro + binding a dispositivo |
 | **Nivel de Criticidad** | Alto |
 
@@ -80,7 +80,7 @@
 |:-----|:---------|:-----|
 | Mensajes | Mostrar datos de la operación y expiración | Claridad |
 | Conectividad | Manejo offline/reenvío desde teléfono | Continuidad |
-| Revocación | Opción clara para desvincular reloj | Control usuario |
+| [Revocación](#term-revocacion "Quitar permisos/binding de un dispositivo.") | Opción clara para desvincular reloj | Control usuario |
 
 ### 3.3 Operación y riesgo
 | Tema | Política | Nota |
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Wearable MFA | Uso de reloj como factor de autenticación. |
-| Binding de dispositivo | Asociación de un dispositivo específico a la cuenta. |
-| Payload firmado | Mensaje con firma para integridad/autenticidad. |
-| Companion App | App móvil que comunica con el wearable. |
-| Revocación | Quitar permisos/binding de un dispositivo. |
+| <a id="term-wearable-mfa"></a>Wearable MFA | Uso de reloj como factor de autenticación. |
+| <a id="term-binding-de-dispositivo"></a>Binding de dispositivo | Asociación de un dispositivo específico a la cuenta. |
+| <a id="term-payload-firmado"></a>Payload firmado | Mensaje con firma para integridad/autenticidad. |
+| <a id="term-companion-app"></a>Companion App | App móvil que comunica con el wearable. |
+| <a id="term-revocacion"></a>Revocación | Quitar permisos/binding de un dispositivo. |
 
 ---
 

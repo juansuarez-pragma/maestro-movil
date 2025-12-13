@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | dependency injection, modularidad, escalabilidad, arquitectura |
-| **Patrón Técnico** | Inversion of Control, Service Locator, Provider-based DI |
+| **Patrón Técnico** | Inversion of Control, [Service Locator](#term-service-locator "Registro centralizado de dependencias accesibles globalmente."), Provider-based [DI](#term-di "Dependency Injection; proveer dependencias externamente.") |
 | **Stack Seleccionado** | Flutter + Riverpod/Injectable/GetIt (comparativo) |
 | **Nivel de Criticidad** | Alto |
 
@@ -72,7 +72,7 @@
 | Tipo de verificación | Qué valida | Responsable/Entorno |
 |:---------------------|:-----------|:--------------------|
 | Unit | Overrides funcionan y scopes liberan recursos | Móvil/CI |
-| Integration (CI) | Wiring generado y contratos de dependencias por módulo | QA/Móvil |
+| Integration (CI) | [Wiring](#term-wiring "Definición de cómo se construyen e inyectan las dependencias.") generado y contratos de dependencias por módulo | QA/Móvil |
 | Observabilidad | Logs/diagnóstico de dependencias resueltas | Móvil/SRE |
 
 ### 3.2 UX y operación
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| DI | Dependency Injection; proveer dependencias externamente. |
-| Service Locator | Registro centralizado de dependencias accesibles globalmente. |
-| Scope | Ámbito de vida de una dependencia. |
-| Override | Reemplazar una dependencia para testing/entornos. |
-| Wiring | Definición de cómo se construyen e inyectan las dependencias. |
+| <a id="term-di"></a>DI | Dependency Injection; proveer dependencias externamente. |
+| <a id="term-service-locator"></a>Service Locator | Registro centralizado de dependencias accesibles globalmente. |
+| <a id="term-scope"></a>Scope | Ámbito de vida de una dependencia. |
+| <a id="term-override"></a>Override | Reemplazar una dependencia para testing/entornos. |
+| <a id="term-wiring"></a>Wiring | Definición de cómo se construyen e inyectan las dependencias. |
 
 ---
 

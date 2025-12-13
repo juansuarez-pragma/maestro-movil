@@ -1,4 +1,4 @@
-# Caso 33: El Delta Sync Inteligente
+# Caso 33: El [Delta Sync](#term-delta-sync "Descarga solo cambios desde un punto conocido.") Inteligente
 ## Sincronizar Solo lo Necesario en Redes 2G
 
 ---
@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | delta sync, ancho de banda limitado, sincronización incremental, 2G |
-| **Patrón Técnico** | Delta Sync, Change Data Capture (CDC), Selective Sync |
+| **Patrón Técnico** | Delta Sync, Change Data Capture ([CDC](#term-cdc "Change Data Capture; captura de cambios de base de datos.")), Selective Sync |
 | **Stack Seleccionado** | Flutter + SQLite/Isar cache + Riverpod + API de cambios (offset/LSN) |
 | **Nivel de Criticidad** | Alto |
 
@@ -72,7 +72,7 @@
 | Tipo de verificación | Qué valida | Responsable/Entorno |
 |:---------------------|:-----------|:--------------------|
 | Unit (CI) | Aplicación de deltas y tombstones en cache local | Equipo móvil, CI |
-| Integration (CI) | Resume de descargas tras interrupción; prioridad por tabla | Móvil/Backend, CI |
+| Integration (CI) | [Resume](#term-resume "Reanudar descarga desde el último byte/offset recibido.") de descargas tras interrupción; prioridad por tabla | Móvil/Backend, CI |
 | Rendimiento | Uso de datos/tiempo de sync en redes simuladas 2G/3G | QA/Perf |
 | Observabilidad | Métricas `sync.delta` (latencia, bytes, errores) | Móvil/SRE |
 
@@ -118,11 +118,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Delta Sync | Descarga solo cambios desde un punto conocido. |
-| CDC | Change Data Capture; captura de cambios de base de datos. |
-| LSN/Offset | Marcador de posición en el log de cambios. |
-| Tombstone | Marcador de eliminación para que el cliente borre registros. |
-| Resume | Reanudar descarga desde el último byte/offset recibido. |
+| <a id="term-delta-sync"></a>Delta Sync | Descarga solo cambios desde un punto conocido. |
+| <a id="term-cdc"></a>CDC | Change Data Capture; captura de cambios de base de datos. |
+| <a id="term-lsn-offset"></a>LSN/Offset | Marcador de posición en el log de cambios. |
+| <a id="term-tombstone"></a>Tombstone | Marcador de eliminación para que el cliente borre registros. |
+| <a id="term-resume"></a>Resume | Reanudar descarga desde el último byte/offset recibido. |
 
 ---
 

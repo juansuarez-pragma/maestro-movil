@@ -8,8 +8,8 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | background sync, iOS restrictions, tasks, offline |
-| **Patrón Técnico** | Opportunistic Sync, Background Tasks, Push-to-Sync |
-| **Stack Seleccionado** | Flutter + BGTaskScheduler (iOS) via Platform Channels + Riverpod políticas + push triggers |
+| **Patrón Técnico** | [Opportunistic Sync](#term-opportunistic-sync "Sincronizar solo cuando hay condiciones favorables."), Background Tasks, Push-to-Sync |
+| **Stack Seleccionado** | Flutter + [BGTaskScheduler](#term-bgtaskscheduler "API iOS para tareas en background programadas.") (iOS) via Platform Channels + Riverpod políticas + push triggers |
 | **Nivel de Criticidad** | Alto |
 
 ---
@@ -64,7 +64,7 @@
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Registrar tareas BG con identificadores claros. Usar push silencioso para disparar sync breve. Batching de operaciones. Cancelar/posponer si batería baja o sin conectividad. |
+| **Capacidades (SÍ permite)** | Registrar tareas BG con identificadores claros. Usar push silencioso para disparar sync breve. [Batching](#term-batching "Agrupar operaciones para reducir wakeups.") de operaciones. Cancelar/posponer si batería baja o sin conectividad. |
 | **Restricciones Duras (NO permite)** | **Garantía absoluta:** iOS puede omitir tareas. **Ventanas cortas:** Trabajo debe ser rápido (<30s). **Permisos:** Necesita entitlement y justificación. |
 | **Criterio de Selección** | Push-to-sync para eventos críticos; BGTaskScheduler para sync periódico ligero; minimizar trabajo y medir consumo. |
 
@@ -94,7 +94,7 @@
 |:--------|:--------|
 | Problema | iOS limita BG; polling bloqueado, sync falla o consume batería. |
 | Opciones evaluadas | Polling; BGAppRefresh solo; push-to-sync + BGTask + batching. |
-| Decisión | Push silencioso + BGTaskScheduler con trabajo breve y batch; fallback en foreground. |
+| Decisión | [Push silencioso](#term-push-silencioso "Notificación sin UI para disparar lógica.") + BGTaskScheduler con trabajo breve y batch; fallback en foreground. |
 | Consecuencias | Configuración de entitlements y monitoreo energético. |
 | Riesgos aceptados | Ejecución no garantizada; variabilidad por políticas iOS. |
 
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| BGTaskScheduler | API iOS para tareas en background programadas. |
-| Push silencioso | Notificación sin UI para disparar lógica. |
-| Opportunistic Sync | Sincronizar solo cuando hay condiciones favorables. |
-| Batching | Agrupar operaciones para reducir wakeups. |
-| Entitlement | Permiso declarado para usar capacidades especiales. |
+| <a id="term-bgtaskscheduler"></a>BGTaskScheduler | API iOS para tareas en background programadas. |
+| <a id="term-push-silencioso"></a>Push silencioso | Notificación sin UI para disparar lógica. |
+| <a id="term-opportunistic-sync"></a>Opportunistic Sync | Sincronizar solo cuando hay condiciones favorables. |
+| <a id="term-batching"></a>Batching | Agrupar operaciones para reducir wakeups. |
+| <a id="term-entitlement"></a>Entitlement | Permiso declarado para usar capacidades especiales. |
 
 ---
 

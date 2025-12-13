@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | GraphQL, subscriptions, tiempo real, trading, precios |
-| **Patrón Técnico** | Real-time Streaming, Backpressure, Delta Updates |
+| **Patrón Técnico** | Real-time Streaming, [Backpressure](#term-backpressure "Controlar flujo para evitar sobrecarga."), Delta Updates |
 | **Stack Seleccionado** | Flutter + graphql_flutter + WebSocket transport + Riverpod para cache |
 | **Nivel de Criticidad** | Crítico |
 
@@ -79,7 +79,7 @@
 | Tema | Política | Nota |
 |:-----|:---------|:-----|
 | Throttle a UI | Limitar frames de precios a 15–20 fps | UX fluida |
-| Re-sync | Snap completo tras reconexión | Consistencia |
+| [Re-sync](#term-re-sync "Volver a consultar snapshot completo para corregir drift.") | Snap completo tras reconexión | Consistencia |
 | Tokens | Re-suscribir al renovar auth | Seguridad |
 
 ### 3.3 Operación y riesgo
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Subscription | Canal tiempo real en GraphQL sobre WebSocket. |
-| Diff | Solo los cambios respecto al estado previo. |
-| Backpressure | Controlar flujo para evitar sobrecarga. |
-| Heartbeat | Mensaje periódico para verificar conexión viva. |
-| Re-sync | Volver a consultar snapshot completo para corregir drift. |
+| <a id="term-subscription"></a>Subscription | Canal tiempo real en GraphQL sobre WebSocket. |
+| <a id="term-diff"></a>Diff | Solo los cambios respecto al estado previo. |
+| <a id="term-backpressure"></a>Backpressure | Controlar flujo para evitar sobrecarga. |
+| <a id="term-heartbeat"></a>Heartbeat | Mensaje periódico para verificar conexión viva. |
+| <a id="term-re-sync"></a>Re-sync | Volver a consultar snapshot completo para corregir drift. |
 
 ---
 

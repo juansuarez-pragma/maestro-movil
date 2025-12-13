@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | feature flags, rollout gradual, experimentación, toggles |
-| **Patrón Técnico** | Feature Toggles, Progressive Delivery, Remote Config |
+| **Patrón Técnico** | Feature Toggles, [Progressive Delivery](#term-progressive-delivery "Desplegar gradualmente a segmentos/porcentajes."), Remote Config |
 | **Stack Seleccionado** | Flutter + Remote Config/Flags SDK (LaunchDarkly/ConfigCat/Custom) + Riverpod |
 | **Nivel de Criticidad** | Alto |
 
@@ -64,7 +64,7 @@
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Rollout por porcentaje, segmento, dispositivo. Kill switch inmediato. Expiración de flags. Métricas de exposición y conversión. Evaluación local con cache y fallback offline. |
+| **Capacidades (SÍ permite)** | Rollout por porcentaje, segmento, dispositivo. Kill switch inmediato. [Expiración de flags](#term-expiracion-de-flags "Retirar flags antiguos para evitar deuda."). Métricas de exposición y conversión. Evaluación local con cache y fallback offline. |
 | **Restricciones Duras (NO permite)** | **Sin cleanup:** Flags viejos deben retirarse. **Latencia de fetch:** Requiere cache inicial y defaults seguros. **Seguridad:** Flags no deben exponer lógica sensible. |
 | **Criterio de Selección** | SDK con targeting y gobernanza; Riverpod para exponer flags tipados; política de expiración y limpieza en cada release. |
 
@@ -117,11 +117,11 @@
 
 | Término | Definición breve |
 |:--------|:-----------------|
-| Feature Flag | Condicional remoto que activa/desactiva funcionalidad. |
-| Progressive Delivery | Desplegar gradualmente a segmentos/porcentajes. |
-| Kill Switch | Mecanismo de apagado inmediato ante incidentes. |
-| Targeting | Seleccionar audiencias específicas para un flag. |
-| Expiración de flags | Retirar flags antiguos para evitar deuda. |
+| <a id="term-feature-flag"></a>Feature Flag | Condicional remoto que activa/desactiva funcionalidad. |
+| <a id="term-progressive-delivery"></a>Progressive Delivery | Desplegar gradualmente a segmentos/porcentajes. |
+| <a id="term-kill-switch"></a>Kill Switch | Mecanismo de apagado inmediato ante incidentes. |
+| <a id="term-targeting"></a>Targeting | Seleccionar audiencias específicas para un flag. |
+| <a id="term-expiracion-de-flags"></a>Expiración de flags | Retirar flags antiguos para evitar deuda. |
 
 ---
 
