@@ -9,8 +9,7 @@ Este archivo proporciona contexto a Claude Code cuando trabaja en este repositor
 **Maestría Empresarial Móvil** es un libro/guía de arquitectura Flutter para aplicaciones de Banca y E-commerce de nivel empresarial. El contenido consiste en casos prácticos que alimentan una base de conocimiento RAG para un agente de IA "Líder Técnico".
 
 **Estado actual (repo):**
-- Casos publicados: **95** (`capitulos/**/caso-*.md`).
-- Casos faltantes por incorporar: **67–70** y **90**.
+- Casos publicados: **100** (`capitulos/**/caso-*.md`).
 - Capítulo 1 renombrado a `capitulos/01-seguridad/` (antes `01-seguridad-bancaria/`).
 
 ---
@@ -29,9 +28,9 @@ maestro-movil/
     ├── 04-offline-first/        # Casos 31-40
     ├── 05-networking/           # Casos 41-50
     ├── 06-arquitectura-modular/ # Casos 51-60
-    ├── 07-integracion-nativa/   # Casos 61-66 (faltan 67-70)
+    ├── 07-integracion-nativa/   # Casos 61-70
     ├── 08-devops-cicd/          # Casos 71-80
-    ├── 09-hardware-iot/         # Casos 81-89 (falta 90)
+    ├── 09-hardware-iot/         # Casos 81-90
     └── 10-migracion-legacy/     # Casos 91-100
 ```
 

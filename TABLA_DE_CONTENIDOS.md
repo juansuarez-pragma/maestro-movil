@@ -118,8 +118,6 @@
 
 ## Capítulo 7: Integración Nativa y Platform Channels
 
-> Nota: en este repositorio aún no están publicados los casos **67–70**.
-
 | Caso | Título | Archivo |
 |:----:|:-------|:--------|
 | 61 | **Integrar SDKs Nativos (Stripe/Facetec) en Flutter** | [caso-61-platform-channels](capitulos/07-integracion-nativa/caso-61-platform-channels.md) |
@@ -128,6 +126,10 @@
 | 64 | **Autenticación Sin Contraseña con WebAuthn** | [caso-64-fido2-passkeys](capitulos/07-integracion-nativa/caso-64-fido2-passkeys.md) |
 | 65 | **Uso de Face/Touch/Voice con SDKs Nativos** | [caso-65-sensor-biometrics](capitulos/07-integracion-nativa/caso-65-sensor-biometrics.md) |
 | 66 | **Integrar WebViews/Views Nativos sin Romper la UX** | [caso-66-sdks-pagos-nativos](capitulos/07-integracion-nativa/caso-66-sdks-pagos-nativos.md) |
+| 67 | **Universal Links / App Links sin Phishing ni Hijacking** | [caso-67-deep-links-seguros](capitulos/07-integracion-nativa/caso-67-deep-links-seguros.md) |
+| 68 | **Acciones Sensibles desde Notificaciones sin Exponer PII** | [caso-68-push-notifications-seguras](capitulos/07-integracion-nativa/caso-68-push-notifications-seguras.md) |
+| 69 | **Compartir Datos entre App y Widget sin Filtrar Información** | [caso-69-widgets-y-extensiones](capitulos/07-integracion-nativa/caso-69-widgets-y-extensiones.md) |
+| 70 | **Forzar Actualizaciones Críticas sin Romper la Experiencia** | [caso-70-in-app-updates](capitulos/07-integracion-nativa/caso-70-in-app-updates.md) |
 
 ---
 
@@ -150,8 +152,6 @@
 
 ## Capítulo 9: Hardware, IoT y Biometría
 
-> Nota: en este repositorio aún no está publicado el caso **90**.
-
 | Caso | Título | Archivo |
 |:----:|:-------|:--------|
 | 81 | **Sincronizar Dispositivos sin Exponer Datos** | [caso-81-ble-seguro](capitulos/09-hardware-iot/caso-81-ble-seguro.md) |
@@ -163,6 +163,7 @@
 | 87 | **Qué Hacer Cuando el Sensor Falla** | [caso-87-fingerprint-fallback](capitulos/09-hardware-iot/caso-87-fingerprint-fallback.md) |
 | 88 | **Bloquear Transacciones Fuera de Zona** | [caso-88-geofencing](capitulos/09-hardware-iot/caso-88-geofencing.md) |
 | 89 | **Detectar Comportamiento de Bot con Sensores** | [caso-89-acelerometro-antifraud](capitulos/09-hardware-iot/caso-89-acelerometro-antifraud.md) |
+| 90 | **Evitar Fraude por Ubicación Falsa en Geofencing** | [caso-90-gps-spoofing](capitulos/09-hardware-iot/caso-90-gps-spoofing.md) |
 
 ---
 

@@ -14,7 +14,7 @@ Este repositorio contiene el contenido del libro **"Maestría Empresarial Móvil
 
 El contenido está estructurado como **casos prácticos** organizados en capítulos, cada uno abordando un escenario real con soluciones arquitectónicas completas.
 
-**Estado actual del repositorio:** 95 casos publicados. Faltan por incorporar los casos **67–70** y el **90** (ver `TABLA_DE_CONTENIDOS.md`).
+**Estado actual del repositorio:** 100 casos publicados (ver `TABLA_DE_CONTENIDOS.md`).
 
 ### Audiencia Objetivo
 - Desarrolladores Senior
@@ -45,9 +45,9 @@ maestro-movil/
 │   ├── 04-offline-first/              # Casos 31-40
 │   ├── 05-networking/                 # Casos 41-50
 │   ├── 06-arquitectura-modular/       # Casos 51-60
-│   ├── 07-integracion-nativa/         # Casos 61-66
+│   ├── 07-integracion-nativa/         # Casos 61-70
 │   ├── 08-devops-cicd/                # Casos 71-80
-│   ├── 09-hardware-iot/               # Casos 81-89
+│   ├── 09-hardware-iot/               # Casos 81-90
 │   └── 10-migracion-legacy/           # Casos 91-100
 └── .gitignore
 ```
