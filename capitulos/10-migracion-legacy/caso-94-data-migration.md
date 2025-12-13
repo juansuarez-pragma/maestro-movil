@@ -16,16 +16,29 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- Migración big-bang genera downtime y riesgo de pérdida de datos.
+- Sin dual read/write ni backfill validado, se pierden transacciones en transición.
+- Sin flags/cohortes, el cutover es todo-o-nada y difícil de revertir.
+
 ### Escenario de Negocio
 
 > *"Como banco, debo migrar 2M de usuarios a nueva plataforma sin cortar servicio."*
 
-Migraciones big-bang causan downtime; se requiere cutover gradual y seguro.
+### Incidentes reportados
+- **Migraciones sin dual-write:** Provocaron inconsistencias y reprocesos.
+- **Cortes nocturnos mal planificados:** Fallaron por falta de rollback y monitoreo.
 
-### Evidencia de Industria
+### Analítica y prevalencia (industria)
 
-- **Migraciones exitosas:** Dual write/read, backfill y cutover por cohortes.
-- **Incidentes:** Migraciones sin plan generan pérdidas y downtime prolongado.
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| Zero-downtime migrations | Global | Dual read/write con cutover por cohortes reduce riesgo. |
+| Postmortems de migración | Varios | Big bang sin backfill/validación generó pérdidas y downtime. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; cambios de backend sin plan causan fallas. |
+
+**Resumen global**
+- Dual read/write con backfill validado y cutover por cohortes minimiza downtime y riesgo; big bang es un antipatrón.
 
 ### Riesgos
 
@@ -55,6 +68,47 @@ Migraciones big-bang causan downtime; se requiere cutover gradual y seguro.
 | **Restricciones Duras (NO permite)** | **Costo:** Dual write aumenta complejidad. **Consistencia eventual:** Requiere reconciliación. **Timeframes:** Backfill grande necesita ventanas y control de carga. |
 | **Criterio de Selección** | Dual read/write, backfill con verificación, cutover por cohortes, flags en cliente, rollback plan. |
 
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Backfill | Datos consistentes (checksums/muestras) | Backend/Data |
+| Dual read/write | Sin pérdida de operaciones durante transición | QA/Backend |
+| Cutover | Flags/cohortes y rollback funcionan | Móvil/QA |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Ventanas | Ejecución en horarios de bajo tráfico | Menor impacto |
+| Comunicación | Avisos a soporte/negocio y monitoreo en vivo | Transparencia |
+| Soporte | Runbooks de rollback y puntos de control | Respuesta rápida |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Monitoreo | Errores/latencia/consistencia tras cutover | Observabilidad |
+| Carga | Throttling en backfill para no saturar | Estabilidad |
+| Logs | Auditoría de cohortes migradas | Trazabilidad |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Migrar 2M usuarios sin downtime ni pérdida. |
+| Opciones evaluadas | Big bang; ventana única; dual read/write con cohortes y rollback. |
+| Decisión | Dual read/write, backfill validado, cutover por cohortes con flags y rollback. |
+| Consecuencias | Mayor complejidad operativa; requiere monitoreo y scripts de reconciliación. |
+| Riesgos aceptados | Consistencia eventual durante transición; costo de operar dos rutas. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Downtime | 0 | Crítico si ocurre | Continuidad |
+| Pérdida de datos | 0 (checksums) | Crítico si >0 | Integridad |
+| Errores post-cutover | Tendencia a la baja | Warning si sube | Estabilidad |
+| Tiempo de migración | Dentro de ventana planificada | Alerta si se extiende | Operación |
+
 ---
 
 ## Glosario de Términos Clave
@@ -75,3 +129,4 @@ Migraciones big-bang causan downtime; se requiere cutover gradual y seguro.
 
 - [Zero-Downtime Migrations](https://martinfowler.com/articles/evodb.html)
 - [Blue-Green/Canary Database Migrations](https://aws.amazon.com/blogs/database/)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)

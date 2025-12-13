@@ -16,16 +16,29 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- Sin visibilidad de paridad, se duplican esfuerzos y se olvidan edge cases.
+- Listas manuales sin estados/propietarios son poco accionables.
+- Sin métricas de adopción/bugs, no se sabe cuándo retirar legacy.
+
 ### Escenario de Negocio
 
 > *"Como equipo, necesito saber qué funcionalidades del legacy ya existen en el nuevo stack y cuál es su estado."*
 
-Sin visibilidad, la migración se alarga, se duplican esfuerzos y se olvidan casos edge.
+### Incidentes reportados
+- **Migraciones grandes:** Features faltantes detectados tarde generaron regresiones.
+- **Sin trazabilidad:** Trabajo duplicado y retrasos al no saber qué está listo.
 
-### Evidencia de Industria
+### Analítica y prevalencia (industria)
 
-- **Migraciones grandes:** Parity matrices para controlar avance y evitar gaps.
-- **Errores comunes:** Funcionalidades faltantes detectadas tarde.
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| Prácticas de migración | Global | Parity matrices evitan gaps funcionales. |
+| Postmortems | Varios | Falta de dashboard causó retrabajo y bugs. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; governance/config limitada. |
+
+**Resumen global**
+- Dashboard de paridad con estados, flags y métricas reduce gaps y retrabajo; migrar sin trazabilidad genera regresiones.
 
 ### Riesgos
 
@@ -53,7 +66,48 @@ Sin visibilidad, la migración se alarga, se duplican esfuerzos y se olvidan cas
 |:----------|:----------------|
 | **Capacidades (SÍ permite)** | Mapear cada feature legacy a su reemplazo. Estado (pendiente/en progreso/done). Flags y cohortes. Métricas de adopción y defectos. Dueños claros. |
 | **Restricciones Duras (NO permite)** | **Exactitud:** Requiere mantenerlo actualizado. **Scope creep:** Definir claramente qué es "parity". **Automatización limitada:** Algunas métricas deben ingresarse manualmente. |
-| **Criterio de Selección** | Dashboard vivo con responsables; flags y métricas de adopción; definición clara de done para cada feature. |
+| **Criterio de Selección** | Dashboard vivo con responsables; flags y métricas de adopción; definición clara de done por feature. |
+
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Compleción | Features marcados como done cumplen criterios | QA/Producto |
+| Adopción | Uso vs legacy medido | Data |
+| Bugs | Defectos por feature rastreados | QA/Móvil |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Flags | Activar por cohorte y limpiar al completar | Deuda controlada |
+| Comunicación | Visibilidad de estado a negocio/soporte | Alineación |
+| Definición de done | Checklist con UX/perf/bugs | Claridad |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Gobernanza | Dueños por feature y revisión periódica | Responsabilidad |
+| Métricas | Adopción, defectos y tiempo por feature | Priorización |
+| Sunset | Retirar legacy al completar paridad | Salud del código |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Falta de visibilidad de paridad funcional durante migración. |
+| Opciones evaluadas | Migrar sin checklist; lista manual; dashboard con estados/flags/métricas. |
+| Decisión | Dashboard de paridad con estados, dueños, flags y métricas de adopción/defectos. |
+| Consecuencias | Requiere mantenimiento y gobernanza; parte de datos puede ser manual. |
+| Riesgos aceptados | Desactualización si no se mantiene; esfuerzo de operación. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Gaps funcionales | 0 al cerrar paridad | Crítico si >0 | Calidad |
+| Tiempo por feature | Predecible | Warning si crece | Planificación |
+| Bugs por feature migrada | Tendencia a la baja | Crítico si sube | Estabilidad |
+| Deuda de flags | Flags limpios al completar | Warning si quedan | Salud |
 
 ---
 
@@ -74,3 +128,4 @@ Sin visibilidad, la migración se alarga, se duplican esfuerzos y se olvidan cas
 ## Referencias
 
 - [Migration Feature Parity Practices](https://martinfowler.com/)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)

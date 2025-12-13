@@ -16,23 +16,36 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- Reescritura big bang congela releases y genera regresiones masivas.
+- Dependencias cíclicas y sin control hacen la modularización ingobernable.
+- Sin CI por paquete, el refactor rompe áreas que no se probaron.
+
 ### Escenario de Negocio
 
 > *"Como equipo, necesitamos modularizar un monolito Flutter grande sin parar releases."*
 
-Refactors grandes pueden bloquear el delivery si no se hacen incrementalmente.
+### Incidentes reportados
+- **Migraciones fallidas:** Big bang causó meses sin releases y regresiones.
+- **Ciclos de dependencia:** Dificultaron extraer features y frenaron velocity.
 
-### Evidencia de Industria
+### Analítica y prevalencia (industria)
 
-- **Migraciones exitosas:** Usan enfoque incremental con paquetes internos y flags.
-- **Monorepos:** Facilitan extracción de features sin duplicar código.
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| Migraciones móviles | Global | Enfoque incremental con packages y flags reduce riesgo. |
+| Monorepos | Global | CI por paquetes afectados acelera feedback. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; gobernanza de dependencias/config es débil. |
+
+**Resumen global**
+- Strangler incremental con paquetes, flags y CI por afectación permite seguir liberando mientras se modulariza; big bang es de alto riesgo.
 
 ### Riesgos
 
 | Tipo | Impacto |
 |:-----|:--------|
 | **Productivo** | Congelamiento si se hace big bang |
-| **Técnico** | Regressiones por mover código masivo |
+| **Técnico** | Regresiones por mover código masivo |
 | **Reputacional** | Releases atrasados afectan negocio |
 
 ---
@@ -53,7 +66,48 @@ Refactors grandes pueden bloquear el delivery si no se hacen incrementalmente.
 |:----------|:----------------|
 | **Capacidades (SÍ permite)** | Extraer features a packages internos gradualmente. Mantener releases continuos. Tests/CI por paquete afectado. Flags para alternar nueva/antigua implementación. |
 | **Restricciones Duras (NO permite)** | **Big bang:** Evitar. **Dependencias cíclicas:** Requiere disciplina. **Versionado:** Paquetes internos deben versionarse/lockearse. |
-| **Criterio de Selección** | Strangler; paquetes por dominio; melos/monorepo; flags para cutover; monitoreo de regresiones por módulo. |
+| **Criterio de Selección** | Strangler; paquetes por dominio; Melos/monorepo; flags para cutover; monitoreo de regresiones por módulo. |
+
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Tests por paquete | Integridad tras extracción | QA/Móvil |
+| Afectados | CI ejecuta solo lo impactado | DevOps |
+| Flags | Cutover seguro y rollback | Móvil/QA |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Rollout | Activar nuevas rutas por flag | Riesgo acotado |
+| Observabilidad | Métricas por módulo extraído | Control |
+| Degradación | Fallback a código viejo si falla nuevo | Estabilidad |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Gobernanza | Grafo de dependencias y lint de ciclos | Salud |
+| Versionado | Semver/lock de paquetes internos | Consistencia |
+| Plan | Roadmap de extracción y hitos por dominio | Transparencia |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Modularizar sin frenar releases ni introducir regresiones masivas. |
+| Opciones evaluadas | Big bang; extracción sin plan; strangler incremental con paquetes/flags/CI afectado. |
+| Decisión | Strangler incremental con paquetes por dominio, flags de cutover y CI por afectación. |
+| Consecuencias | Overhead de coordinación y gobernanza de dependencias; esfuerzo en configurar CI. |
+| Riesgos aceptados | Complejidad inicial; deuda temporal durante transición. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Tiempo de build/tests | ↓ con CI por afectación | Warning si no baja | Velocidad |
+| Regresiones por módulo | Tendencia a la baja | Crítico si sube | Estabilidad |
+| Bloqueos de release | 0 por modularización | Crítico si hay | Continuidad |
+| Dependencias cíclicas | 0 detectadas | Crítico si >0 | Salud del repo |
 
 ---
 
@@ -75,3 +129,4 @@ Refactors grandes pueden bloquear el delivery si no se hacen incrementalmente.
 
 - [Strangler Fig](https://martinfowler.com/bliki/StranglerFigApplication.html)
 - [Melos Monorepo](https://melos.invertase.dev/)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)

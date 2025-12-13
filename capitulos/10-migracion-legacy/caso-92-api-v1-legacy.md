@@ -16,16 +16,29 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- Cortar v1 sin plan rompe clientes legacy y fuerza updates masivos.
+- Mantener v1 indefinidamente perpetúa deuda y frena evolución.
+- Sin métricas de uso, no se sabe cuándo ni cómo hacer sunset seguro.
+
 ### Escenario de Negocio
 
 > *"Como app, debo soportar v1 mientras migro a v2/v3 sin romper a usuarios antiguos."*
 
-Cambios de API sin compatibilidad generan fallas masivas en clientes legacy.
+### Incidentes reportados
+- **Deprecaciones abruptas:** Rompieron apps legacy y generaron parches urgentes.
+- **Falta de métricas:** Equipos no sabían quién seguía en v1 y retrasaron el sunset.
 
-### Evidencia de Industria
+### Analítica y prevalencia (industria)
 
-- **APIs públicas:** Mantienen compatibilidad mientras migran; adaptan en gateway.
-- **Incidentes:** Deprecaciones abruptas rompen apps y obligan a updates forzados.
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| APIs públicas | Global | Compatibilidad prolongada con adapters/gateway es práctica común. |
+| Postmortems de deprecación | Varios | Cortes sin plan causaron fallas masivas. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; contratos/versionado suelen ser frágiles. |
+
+**Resumen global**
+- Gateway/adapters con flags y métricas permiten migrar versiones sin romper clientes; deprecaciones sin plan generan incidentes masivos.
 
 ### Riesgos
 
@@ -55,6 +68,47 @@ Cambios de API sin compatibilidad generan fallas masivas en clientes legacy.
 | **Restricciones Duras (NO permite)** | **Compatibilidad infinita:** Deuda aumenta; requiere sunset. **Testing complejo:** Matriz de versiones. **Payload divergente:** Adapters crecen si contratos difieren mucho. |
 | **Criterio de Selección** | Adapter/gateway, flags para rollout, métricas y fechas de deprecación, plan de comunicación. |
 
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Contract tests | Adapters por versión y gateway traducen correctamente | QA/Backend |
+| Rollout | Flags por versión/cohorte funcionan | Móvil/QA |
+| Observabilidad | Uso de v1/v2/v3 y errores por versión | Móvil/SRE |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Mensajes | Notificar deprecación y fechas límite | Transparencia |
+| Fallback | Mantener experiencia estable en legacy hasta sunset | UX |
+| Soporte | Plan de acompañamiento para actualizar | Operación |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Sunset | Fechas y checklist de retiro de v1 | Disciplina |
+| Debt | Retirar código v1 tras sunset | Salud |
+| Gobernanza | Catálogo de versiones y contratos | Control |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Migrar v1 a v2/v3 sin romper clientes legacy. |
+| Opciones evaluadas | Cortar v1; mantener indefinidamente; gateway/adapters + plan de sunset con flags/metrics. |
+| Decisión | Gateway/adapters con flags, telemetría y plan de sunset comunicado. |
+| Consecuencias | Matriz de versiones y mantenimiento temporal; requiere gobernanza. |
+| Riesgos aceptados | Deuda temporal; complejidad de testing multiplataforma. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Uso de v1 | ↓ progresivo | Alerta si no baja | Migración |
+| Regresiones por versión | Tendencia a la baja | Crítico si sube | Estabilidad |
+| Tickets por ruptura | ↓ vs baseline | Alerta si sube | Soporte |
+| Tiempo de sunset | Cumplido según plan | Warning si se extiende | Deuda controlada |
+
 ---
 
 ## Glosario de Términos Clave
@@ -75,3 +129,4 @@ Cambios de API sin compatibilidad generan fallas masivas en clientes legacy.
 
 - [API Versioning](https://martinfowler.com/articles/enterpriseREST.html#versioning)
 - [Deprecation Policies](https://cloud.google.com/apis/design/versioning)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)

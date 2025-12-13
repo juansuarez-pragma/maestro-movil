@@ -16,16 +16,29 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- Romper contratos y forzar update provoca fallas masivas en clientes legacy.
+- Branches por versión dispersos crean espagueti y regresiones.
+- Sin métricas y sunset, la deuda de versiones crece sin control.
+
 ### Escenario de Negocio
 
 > *"Como app, debo convivir con v1/v2/v3 de API mientras los usuarios actualizan."*
 
-Sin compatibilidad, clientes antiguos fallan y generan incidentes.
+### Incidentes reportados
+- **Deprecaciones abruptas:** Rompieron clientes no actualizados.
+- **Código espagueti:** `if version` disperso generó bugs al migrar a v3.
 
-### Evidencia de Industria
+### Analítica y prevalencia (industria)
 
-- **APIs públicas:** Mantienen compatibilidad y adaptan en gateway.
-- **Mobile:** Actualizaciones escalonadas requieren coexistencia temporal.
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| APIs públicas | Global | Compatibilidad prolongada con adapters/gateway. |
+| Postmortems de migración | Varios | Falta de capa de compatibilidad causó regresiones. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; contratos/versionado son fuente de bugs. |
+
+**Resumen global**
+- Capa de compatibilidad con adapters, flags y pruebas contractuales permite migrar sin romper clientes; branches ad-hoc crean deuda y fallas.
 
 ### Riesgos
 
@@ -55,6 +68,47 @@ Sin compatibilidad, clientes antiguos fallan y generan incidentes.
 | **Restricciones Duras (NO permite)** | **Deuda acumulada:** Debe retirarse soporte a versiones viejas. **Matriz de pruebas grande:** Necesita automatización. **Adapters complejos:** Si cambios son profundos, pueden inflarse. |
 | **Criterio de Selección** | Adapter/gateway, flags para rollout, tests contractuales, métricas y plan de deprecación. |
 
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Contract tests | v1/v2/v3 cumplen contratos en adapters | QA/Backend |
+| Integration (CI) | Headers/version y flags se aplican | Móvil/QA |
+| Observabilidad | Uso por versión y errores asociados | Móvil/SRE |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Rollout | Flags por cohorte/versión | Migración controlada |
+| Sunset | Comunicar y retirar versiones | Deuda bajo control |
+| Errores | Mensajes claros en versión no soportada | UX |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Gobernanza | Catálogo de endpoints/contratos por versión | Trazabilidad |
+| Testing | Matriz de versiones automatizada | Previene regresiones |
+| Deprecación | Fechas y checklist de retiro | Disciplina |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Convivir con v1/v2/v3 sin romper clientes ni crear espagueti. |
+| Opciones evaluadas | Forzar update; branches dispersos; capa de compatibilidad con adapters/flags/tests. |
+| Decisión | Capa de compatibilidad con adapters por módulo, flags y pruebas contractuales + plan de sunset. |
+| Consecuencias | Matriz de pruebas mayor; requiere gobernanza de contratos. |
+| Riesgos aceptados | Deuda temporal; complejidad de adapters si divergencia es grande. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Regresiones por versión | ↓ vs baseline | Crítico si sube | Estabilidad |
+| Uso de versiones legacy | ↓ progresivo | Alerta si no baja | Migración |
+| Tickets por ruptura | ↓ | Alerta si suben | Soporte |
+| Tiempo de sunset | Cumplido según plan | Warning si se extiende | Deuda controlada |
+
 ---
 
 ## Glosario de Términos Clave
@@ -75,3 +129,4 @@ Sin compatibilidad, clientes antiguos fallan y generan incidentes.
 
 - [API Versioning](https://martinfowler.com/articles/enterpriseREST.html#versioning)
 - [Consumer-Driven Contracts](https://martinfowler.com/articles/consumerDrivenContracts.html)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)

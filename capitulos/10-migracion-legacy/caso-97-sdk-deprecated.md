@@ -16,16 +16,29 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- El proveedor cierra en 30 días; SDK queda sin soporte y puede fallar.
+- Migración big bang en la última semana es riesgosa sin rollback.
+- Sin telemetría comparativa, el cutover es ciego.
+
 ### Escenario de Negocio
 
 > *"Como equipo, un proveedor cerró en 30 días; debemos migrar sin romper producción."*
 
-SDKs deprecated dejan de funcionar o recibir soporte; se necesita migración acelerada y segura.
+### Incidentes reportados
+- **Deprecaciones abruptas:** Cortes por no migrar a tiempo.
+- **Fallas en SDK viejo:** Sin soporte, se volvieron vector de riesgo/bugs.
 
-### Evidencia de Industria
+### Analítica y prevalencia (industria)
 
-- **Incidentes de terceros:** Cortes por deprecación sin migración a tiempo.
-- **Buenas prácticas:** Dual stack y cutover gradual con flags.
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| Migraciones urgentes | Global | Dual stack con flags reduce riesgo en ventanas cortas. |
+| Postmortems de terceros | Varios | Big bang tardío generó outages. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; dependencias obsoletas son comunes. |
+
+**Resumen global**
+- Dual stack + flags + telemetría comparativa permite migrar rápido y revertir; dejar un SDK EOL es un riesgo crítico.
 
 ### Riesgos
 
@@ -55,6 +68,47 @@ SDKs deprecated dejan de funcionar o recibir soporte; se necesita migración ace
 | **Restricciones Duras (NO permite)** | **Tiempo limitado:** 30 días obliga a priorizar. **SDK viejo sin soporte:** Puede fallar; plan de contingencia necesario. **Costo:** Doble mantenimiento temporal. |
 | **Criterio de Selección** | Wrapper unificado, dual stack, flags y telemetría comparativa, plan de sunset y comunicación. |
 
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Comparativa | Errores/latencia viejo vs nuevo | Móvil/SRE |
+| Cutover | Flags por cohorte y rollback operan | QA/Móvil |
+| Seguridad | Dependencias y permisos del nuevo SDK | Seguridad |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Mensajes | Transparencia mínima; evitar impacto visible | UX |
+| Cohortes | Activar gradualmente para acotar riesgo | Control |
+| Soporte | Runbook de rollback rápido | Respuesta |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Telemetría | Eventos `sdk.migration.*` con resultados | Observabilidad |
+| Sunset | Fecha límite y checklist de retiro del SDK viejo | Disciplina |
+| Dependencias | Revisar licencias y permisos del nuevo SDK | Compliance |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Migrar un SDK EOL en 30 días sin romper producción. |
+| Opciones evaluadas | Big bang tardío; migración directa sin rollback; dual stack con flags y telemetría. |
+| Decisión | Dual stack con wrapper común, flags por cohorte y telemetría comparativa; rollback hasta sunset del viejo. |
+| Consecuencias | Doble mantenimiento temporal; mayor esfuerzo de observabilidad. |
+| Riesgos aceptados | Dependencia temporal del SDK viejo; esfuerzo operativo. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Errores por SDK | ↓ en nuevo vs viejo | Warning si no | Estabilidad |
+| Tiempo de migración | ≤ 30 días | Crítico si se extiende | Cumplimiento |
+| Rollback time | Minutos vía flags | Crítico si tarda | Riesgo acotado |
+| Incidentes de dependencia EOL | 0 | Crítico si >0 | Seguridad |
+
 ---
 
 ## Glosario de Términos Clave
@@ -74,3 +128,4 @@ SDKs deprecated dejan de funcionar o recibir soporte; se necesita migración ace
 ## Referencias
 
 - [Strangler Pattern](https://martinfowler.com/bliki/StranglerFigApplication.html)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)
