@@ -129,3 +129,4 @@
 
 - [gRPC for Mobile](https://grpc.io/docs/platforms/mobile/)
 - [Mutual TLS](https://cloud.google.com/load-balancing/docs/ssl-certificates/ssl-policies-concepts)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)

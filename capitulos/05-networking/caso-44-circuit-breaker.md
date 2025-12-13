@@ -129,3 +129,4 @@
 
 - [Martin Fowler - Circuit Breaker](https://martinfowler.com/bliki/CircuitBreaker.html)
 - [Polly/AWS SDK Retry & CB Patterns](https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)

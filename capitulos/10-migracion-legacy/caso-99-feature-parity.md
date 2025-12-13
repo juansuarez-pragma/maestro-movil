@@ -129,3 +129,4 @@
 
 - [Migration Feature Parity Practices](https://martinfowler.com/)
 - [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)
+- [Strangler Fig Pattern](https://martinfowler.com/bliki/StranglerFigApplication.html)

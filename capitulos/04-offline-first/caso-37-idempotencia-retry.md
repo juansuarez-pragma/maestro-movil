@@ -130,3 +130,4 @@
 
 - [Stripe Idempotency](https://stripe.com/docs/idempotency)
 - [AWS Architecture - Backoff](https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter/)
+- [Google SRE - Handling Overload](https://sre.google/sre-book/handling-overload/)

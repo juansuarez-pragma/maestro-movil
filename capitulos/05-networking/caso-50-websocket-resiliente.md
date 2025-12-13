@@ -129,3 +129,4 @@
 
 - [WebSocket Best Practices](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API)
 - [Realtime Messaging Patterns](https://ably.com/topic/websockets)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)

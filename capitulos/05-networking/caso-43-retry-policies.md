@@ -129,3 +129,4 @@
 
 - [Google SRE Book - Handling Overload](https://sre.google/sre-book/handling-overload/)
 - [AWS Architecture Blog - Exponential Backoff](https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter/)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)

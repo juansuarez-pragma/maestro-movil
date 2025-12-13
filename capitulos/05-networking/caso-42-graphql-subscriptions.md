@@ -129,3 +129,4 @@
 
 - [GraphQL Subscriptions Spec](https://github.com/graphql/graphql-spec)
 - [Apollo Subscriptions Best Practices](https://www.apollographql.com/docs/react/data/subscriptions/)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)

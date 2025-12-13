@@ -129,3 +129,4 @@
 
 - [Pagination Best Practices](https://developer.twitter.com/en/docs/twitter-api/pagination)
 - [infinite_scroll_pagination](https://pub.dev/packages/infinite_scroll_pagination)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)

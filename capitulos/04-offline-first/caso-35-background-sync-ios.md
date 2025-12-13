@@ -129,3 +129,4 @@
 
 - [Apple BGTaskScheduler](https://developer.apple.com/documentation/backgroundtasks)
 - [Apple Push Notifications](https://developer.apple.com/documentation/usernotifications)
+- [Apple Energy Efficiency Guide](https://developer.apple.com/library/archive/documentation/Performance/Conceptual/EnergyGuide-iOS/)

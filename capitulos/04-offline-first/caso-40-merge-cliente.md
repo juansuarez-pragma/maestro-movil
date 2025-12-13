@@ -129,3 +129,4 @@
 
 - [CRDTs and Tombstones](https://martin.kleppmann.com/papers/crdt-apps.pdf)
 - [Conflict Resolution Patterns](https://martinfowler.com/articles/patterns-of-distributed-systems/conflict-resolution.html)
+- [CRDTs (overview)](https://crdt.tech/)

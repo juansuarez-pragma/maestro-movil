@@ -129,3 +129,4 @@
 
 - [CRDTs in Mobile Applications](https://martin.kleppmann.com/papers/crdt-apps.pdf)
 - [JSON Patch RFC 6902](https://datatracker.ietf.org/doc/html/rfc6902)
+- [CRDTs (overview)](https://crdt.tech/)

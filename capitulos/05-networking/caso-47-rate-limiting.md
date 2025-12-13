@@ -129,3 +129,4 @@
 
 - [HTTP 429 Spec](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429)
 - [AWS/Azure Rate Limit Guidance](https://learn.microsoft.com/en-us/azure/architecture/best-practices/api-design#throttling)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)

@@ -130,3 +130,4 @@
 
 - [Event Sourcing y Deltas](https://martinfowler.com/eaaDev/EventSourcing.html)
 - [Retail Inventory Conflicts](https://www.nngroup.com/articles/)
+- [Designing Data-Intensive Applications](https://dataintensive.net/)

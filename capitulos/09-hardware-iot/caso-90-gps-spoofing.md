@@ -129,3 +129,4 @@
 
 - [Android Location (overview)](https://developer.android.com/develop/sensors-and-location/location)
 - [OWASP MAS](https://mas.owasp.org/)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)

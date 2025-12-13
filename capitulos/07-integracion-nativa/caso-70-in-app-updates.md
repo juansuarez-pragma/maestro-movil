@@ -129,3 +129,4 @@
 
 - [Android In-app updates](https://developer.android.com/guide/playcore/in-app-updates)
 - [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)
+- [Google Play - Staged rollouts](https://support.google.com/googleplay/android-developer/answer/6346149)

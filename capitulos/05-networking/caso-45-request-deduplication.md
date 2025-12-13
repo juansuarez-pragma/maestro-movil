@@ -128,3 +128,4 @@
 
 - [Stripe Idempotency](https://stripe.com/docs/idempotency)
 - [Dio Interceptors](https://pub.dev/packages/dio)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)

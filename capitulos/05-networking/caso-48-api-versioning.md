@@ -129,3 +129,4 @@
 
 - [API Versioning Best Practices](https://martinfowler.com/articles/enterpriseREST.html#versioning)
 - [Google API Guidelines](https://cloud.google.com/apis/design/versioning)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)

@@ -130,3 +130,4 @@
 
 - [Change Data Capture Patterns](https://martinfowler.com/articles/cdc.html)
 - [SQLite Bulk Operations](https://www.sqlite.org/cli.html)
+- [RFC 3229 - Delta encoding in HTTP](https://www.rfc-editor.org/rfc/rfc3229)

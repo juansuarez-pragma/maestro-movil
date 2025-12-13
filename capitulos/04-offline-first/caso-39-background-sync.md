@@ -129,3 +129,4 @@
 
 - [Android WorkManager](https://developer.android.com/topic/libraries/architecture/workmanager)
 - [iOS Background Tasks](https://developer.apple.com/documentation/backgroundtasks)
+- [Android Background Execution Limits](https://developer.android.com/about/versions/oreo/background)

@@ -129,3 +129,4 @@
 
 - [Version Vectors (Petersen et al.)](https://www.cs.cornell.edu/home/rvr/papers/VersionVectors.pdf)
 - [Distributed Systems - Conflict Detection](https://martin.kleppmann.com/papers/)
+- [Designing Data-Intensive Applications](https://dataintensive.net/)

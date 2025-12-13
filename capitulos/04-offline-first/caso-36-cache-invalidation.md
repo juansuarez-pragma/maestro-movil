@@ -129,3 +129,4 @@
 
 - [HTTP Caching (RFC 7234)](https://httpwg.org/specs/rfc7234.html)
 - [Stale-While-Revalidate Pattern](https://web.dev/stale-while-revalidate/)
+- [Cache Invalidation](https://martinfowler.com/bliki/CacheInvalidation.html)
