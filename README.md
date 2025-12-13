@@ -56,12 +56,12 @@ maestro-movil/
 
 Estructura común optimizada para indexación RAG (sin código de implementación):
 - **0. Metadata (AI-Tags):** Palabras clave de negocio, patrón técnico, stack, criticidad.
-- **1. Planteamiento del Problema:** Problema técnico + escenario de negocio, incidentes reportados y riesgos.
-- **2. Matriz de Soluciones:** BAJA / ACEPTABLE / ENTERPRISE con análisis de trade-offs.
-- **3. Profundización:** Capacidades vs límites, criterio de selección y tablas de V&V/UX/seguridad/operación cuando apliquen.
-- **4. Impacto esperado:** KPIs y resultados de negocio.
-- **Glosario de términos clave:** Tabla con ancla `#glosario-de-terminos-clave`; cada término define su `id` (`#term-*`) y el texto del caso debe enlazar a esos términos para habilitar tooltips internos.
-- **Referencias:** 3–5 fuentes externas (incidentes, normas, guías).
+- **1. Planteamiento:** Problema técnico + escenario de negocio, incidentes y analítica de prevalencia (tabla) con riesgos.
+- **2. Matriz de Soluciones:** BAJA / ACEPTABLE / ENTERPRISE con trade-offs claros.
+- **3. Profundización:** Capacidades vs límites, criterio de selección y tablas de V&V, UX/operación/seguridad, mini-ADR (decisión) y observabilidad.
+- **4. Impacto esperado:** KPIs con objetivos/umbrales e impacto.
+- **Glosario:** Tabla con ancla `#glosario-de-terminos-clave`; cada término define su `id` (`#term-*`) y el texto del caso enlaza a esos términos para tooltips internos.
+- **Referencias:** 3–5 fuentes (incidentes, normas, guías, estudios de seguridad como NowSecure).
 
 ---
 
@@ -105,66 +105,54 @@ Estructura común optimizada para indexación RAG (sin código de implementació
 
 | # | Capítulo | Casos | Estado |
 |:-:|:---------|:-----:|:------:|
-| 1 | Seguridad Bancaria y Gestión de Identidad | 1-10 | ✅ Completado |
-| 2 | Gestión de Estado Compleja | 11-20 | ✅ Completado |
-| 3 | Optimización de Rendimiento | 21-30 | ✅ Completado |
-| 4 | Estrategias Offline-First | 31-40 | ✅ Completado |
-| 5 | Networking Avanzado | 41-50 | ✅ Completado |
-| 6 | Arquitectura Modular | 51-60 | ✅ Completado |
-| 7 | Integración Nativa | 61-70 | ✅ Completado |
-| 8 | DevOps y CI/CD | 71-80 | ✅ Completado |
-| 9 | Hardware, IoT y Biometría | 81-90 | ✅ Completado |
-| 10 | Migración de Legacy | 91-100 | ✅ Completado |
-
-**Leyenda:** ✅ Completado
+| 1 | Seguridad Bancaria y Gestión de Identidad | 1-10 | ✅ |
+| 2 | Gestión de Estado Compleja | 11-20 | ✅ |
+| 3 | Optimización de Rendimiento | 21-30 | ✅ |
+| 4 | Estrategias Offline-First | 31-40 | ✅ |
+| 5 | Networking Avanzado | 41-50 | ✅ |
+| 6 | Arquitectura Modular | 51-60 | ✅ |
+| 7 | Integración Nativa | 61-70 | ✅ |
+| 8 | DevOps y CI/CD | 71-80 | ✅ |
+| 9 | Hardware, IoT y Biometría | 81-90 | ✅ |
+| 10 | Migración de Legacy | 91-100 | ✅ |
 
 ---
 
 ## Uso con Agente IA (RAG)
 
-Este contenido está diseñado para ser consumido por un Agente de IA. Los tags de metadata en cada caso permiten búsqueda semántica precisa:
+El contenido está diseñado para búsqueda semántica y respuestas estructuradas:
 
 ```
-Usuario: "¿Cómo implemento refresh tokens seguros en Flutter?"
-Agente: [Busca en metadata: "refresh token", "Token Rotation", "flutter_secure_storage"]
-        → Retorna Caso 1 con:
-          - Solución ENTERPRISE completa
-          - TACs específicos por plataforma (Flutter, Android, iOS)
-          - Escenarios de prueba críticos
+Usuario: "¿Cómo manejar refresh tokens rotativos?"
+Agente: Busca metadata ("refresh", "rotation", "token_family") → retorna Caso 1 con:
+  - Matriz BAJA/ACEPTABLE/ENTERPRISE
+  - Tablas de V&V y UX/operación
+  - KPIs de impacto (p95 refresh, reuse=0)
 ```
 
-### Ejemplo de Query por Plataforma
 ```
-Usuario: "¿Qué configuración necesito en iOS para certificate pinning?"
-Agente: [Busca: "certificate pinning", "iOS", "ATS"]
-        → Retorna Caso 3, sección 2.3 iOS y TACs iOS específicos
+Usuario: "¿Cómo habilitar gRPC en Flutter con fallback?"
+Agente: Busca ("gRPC", "fallback", "HTTP/2") → Caso 49 con capacidades/restricciones,
+  mini-ADR y KPIs (latencia, disponibilidad).
 ```
 
 ---
 
 ## Convenciones del Proyecto
 
-### Nomenclatura de Archivos
-- `caso-XX-nombre-descriptivo.md` donde XX es el número del caso
-- Nombres en kebab-case, descriptivos del problema
-
-### Referencias a Casos Reales
-Cada caso incluye 3–5 referencias a:
-- Incidentes de seguridad documentados
-- Estadísticas de industria (Verizon, Kaspersky, ACFE)
-- Normativas (PCI-DSS, GDPR, PSD2, NIST)
+- Archivos `caso-XX-nombre-descriptivo.md` (kebab-case, con cero a la izquierda).
+- Cada caso enlaza términos clave a su glosario (`#term-*`) y referencias externas (incidentes, normas, guías, estudios de seguridad/observabilidad).
+- Guía editorial y de contribución: ver `AGENTS.md` (formato, anchors de glosario, estilo, commits).
 
 ---
 
 ## Contribución
 
-Este es un repositorio privado de contenido propietario. Las contribuciones se manejan internamente siguiendo el proceso:
-
-1. Crear rama `feature/caso-XX-descripcion`
-2. Seguir el formato de 6 secciones
-3. Incluir al menos 2 referencias de industria
-4. Separar TACs por plataforma
-5. Pull Request con revisión de arquitectura
+Repositorio privado; contribuciones internas siguen:
+1. Rama `feature/caso-XX-descripcion`.
+2. Formato 0–4 + glosario + referencias (tablas de analítica/V&V/UX/operación donde apliquen).
+3. Mínimo 3 referencias de industria/seguridad; anclas de glosario con `#term-*`.
+4. PR con revisión técnica/arquitectura.
 
 ---
 
@@ -175,21 +163,18 @@ Contenido propietario. Todos los derechos reservados.
 ---
 
 **Autor:** Arquitectura de Soluciones - Pragma
-**Versión:** 1.1.0
-**Última actualización:** Diciembre 2024
+**Versión:** 1.2.0
+**Última actualización:** Enero 2025
 
 ---
 
 ## Changelog
 
-### v1.1.0 (Diciembre 2024)
-- Actualizado formato de matriz de soluciones: BAJA/ACEPTABLE/ENTERPRISE
-- Añadida sección "Justificación del Plan" en cada caso
-- Reorganizada Fase 2 por plataforma (Flutter, Android, iOS)
-- TACs ahora separados por plataforma
-- Añadida columna Plataforma en escenarios de prueba
-- Creado CLAUDE.md para contexto del agente
+### v1.2.0 (Enero 2025)
+- Todos los 100 casos alineados al formato enriquecido (analítica de industria, tablas de V&V/UX/operación, mini-ADR, KPIs de impacto, glosario con anchors).
+- Referencias reforzadas con estudios recientes (NowSecure 2024, guías oficiales).
+- Guía de contribución consolidada en `AGENTS.md`.
 
-### v1.0.0 (Diciembre 2024)
-- Release inicial con Capítulo 1 completo (10 casos)
-- Tabla de contenidos de 100 casos
+### v1.1.0 (Diciembre 2024)
+- Formato con matriz BAJA/ACEPTABLE/ENTERPRISE y metadata AI-Tags para RAG.
+- CLAUDE.md agregado para contexto del agente.
