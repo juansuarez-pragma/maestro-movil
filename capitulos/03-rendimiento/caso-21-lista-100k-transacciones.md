@@ -16,16 +16,30 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- Listas grandes con celdas ricas sin virtualización ni paginación → jank, OOM, cierres.
+- Parsing en el hilo UI y requests duplicadas al hacer scroll rápido saturan CPU/red.
+- Sin placeholders y cache, la UX se ve interrumpida (pop-in, flashes de layout).
+
 ### Escenario de Negocio
 
 > *"Como usuario, quiero navegar 100,000 transacciones sin que la app se congele ni se coma la memoria."*
 
-Listas grandes con celdas ricas (avatars, montos formateados) generan jank y OOM si no se virtualizan y cachean correctamente.
-
-### Evidencia de Industria
-
+### Incidentes reportados
 - **Apps bancarias:** Quejas de jank al cargar historial largo; mitigado con paginación y placeholders.
 - **Flutter perf guides:** Recomiendan builders perezosos y evitar `shrinkWrap`/layouts costosos.
+
+### Analítica y prevalencia (industria)
+
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| Reportes de soporte bancario (2023) | Historiales largos | Jank/ANR al listar +50K items sin paginación. |
+| Flutter perf (guías) | Global | Builders perezosos y virtualización reducen uso de memoria y jank. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; renderizado/listas son foco común de bugs de perf. |
+
+**Resumen global**
+- Listas sin virtualización/paginación causan jank y cierres en historiales grandes.
+- Parsing en UI y requests duplicadas aumentan consumo y soporte.
 
 ### Riesgos
 
@@ -55,6 +69,50 @@ Listas grandes con celdas ricas (avatars, montos formateados) generan jank y OOM
 | **Restricciones Duras (NO permite)** | **Sin API paginada:** Si backend no expone cursor/offset, se degrada a fetch completo. **Layouts complejos con shrinkWrap:** Aumentan costo de layout. **Orden garantizado:** Cambios en backend pueden invalidar posición; requiere stable IDs. |
 | **Criterio de Selección** | Virtualización de celdas con builders; paginador estructurado para estados claros; cache local para offline breve; Isolate para parsing de lotes grandes. |
 
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Unit (CI) | Paginador maneja estados loading/error/empty y no duplica requests | Equipo móvil, CI |
+| Integration (CI) | Prefetch al 80% y backoff en fallos; cache local reusa páginas | Móvil/Backend, CI |
+| Performance | FPS/jank aceptable con 100K items; memoria estable | QA/Perf, dispositivos reales |
+| Observabilidad | Eventos `list.page` con cursor, latencia y errores | Móvil/SRE |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Placeholders | Skeleton/blur mientras carga página | Evita pop-in |
+| Prefetch | Siguiente página al 70-80% del scroll | Scroll suave |
+| Reintentos | Backoff y botón “reintentar” por página | Control de fallos |
+| Offline breve | Mostrar cache y estado “posible desactualizado” | Transparencia |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Stable IDs | Requeridos para mantener posición y evitar parpadeos | Consistencia visual |
+| Cache TTL | Definir TTL de páginas y limpieza | Control de memoria |
+| Isolates | Parsing de lotes pesados fuera del UI thread | Previene jank |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Jank/OOM al listar 100K items sin virtualización. |
+| Opciones evaluadas | Lista completa en memoria; builder con paginación manual; paginador estructurado + cache + isolates. |
+| Decisión | Paginación estructurada + cache local + parsing en Isolate + placeholders/prefetch. |
+| Consecuencias | Más complejidad en estados de lista y cache; requiere API paginada. |
+| Riesgos aceptados | Sin API paginada el beneficio es menor; depende de IDs estables. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Jank/FPS en lista | Scroll estable; sin dropped frames visibles | Alerta si jank sube | UX fluida |
+| Memoria usada | Estable; sin OOM al llegar a 100K | Crítico si crece sin límite | Estabilidad |
+| Latencia de página | p95 < 700 ms | Warning si se acerca | Percepción de rapidez |
+| Reintentos fallidos | < 1% de páginas | Alerta si supera | Resiliencia |
+| Tickets por lista lenta | ↓ vs baseline | Alerta si no baja | Menos soporte |
+
 ---
 
 ## Glosario de Términos Clave
@@ -68,6 +126,7 @@ Listas grandes con celdas ricas (avatars, montos formateados) generan jank y OOM
 | Placeholder/Skeleton | Celda de carga que mantiene estabilidad del layout. |
 | Prefetch | Solicitar anticipadamente la siguiente página cerca del final del scroll. |
 | Isolate | Hilo ligero de Dart para trabajo pesado sin bloquear UI. |
+| Stable ID | Identificador consistente para cada ítem, usado para claves de lista. |
 
 ---
 
@@ -76,3 +135,4 @@ Listas grandes con celdas ricas (avatars, montos formateados) generan jank y OOM
 - [Flutter Performance Best Practices](https://docs.flutter.dev/perf/best-practices)
 - [infinite_scroll_pagination](https://pub.dev/packages/infinite_scroll_pagination)
 - [Google Perf - Large Lists](https://developer.android.com/topic/performance/rendering/optimize-view-hierarchies)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)
