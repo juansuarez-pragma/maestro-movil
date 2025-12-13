@@ -6,7 +6,12 @@ Este archivo proporciona contexto a Claude Code cuando trabaja en este repositor
 
 ## Descripción del Proyecto
 
-**Maestría Empresarial Móvil** es un libro/guía de arquitectura Flutter para aplicaciones de Banca y E-commerce de nivel empresarial. El contenido consiste en **100 casos prácticos** que alimentan una base de conocimiento RAG para un agente de IA "Líder Técnico".
+**Maestría Empresarial Móvil** es un libro/guía de arquitectura Flutter para aplicaciones de Banca y E-commerce de nivel empresarial. El contenido consiste en casos prácticos que alimentan una base de conocimiento RAG para un agente de IA "Líder Técnico".
+
+**Estado actual (repo):**
+- Casos publicados: **95** (`capitulos/**/caso-*.md`).
+- Casos faltantes por incorporar: **67–70** y **90**.
+- Capítulo 1 renombrado a `capitulos/01-seguridad/` (antes `01-seguridad-bancaria/`).
 
 ---
 
@@ -16,7 +21,7 @@ Este archivo proporciona contexto a Claude Code cuando trabaja en este repositor
 maestro-movil/
 ├── README.md                    # Documentación principal
 ├── CLAUDE.md                    # Este archivo (contexto para Claude)
-├── TABLA_DE_CONTENIDOS.md       # Índice de los 100 casos
+├── TABLA_DE_CONTENIDOS.md       # Índice de los casos publicados
 └── capitulos/
     ├── 01-seguridad/            # Casos 1-10 (COMPLETADO)
     ├── 02-gestion-estado/       # Casos 11-20
@@ -24,32 +29,32 @@ maestro-movil/
     ├── 04-offline-first/        # Casos 31-40
     ├── 05-networking/           # Casos 41-50
     ├── 06-arquitectura-modular/ # Casos 51-60
-    ├── 07-integracion-nativa/   # Casos 61-70
+    ├── 07-integracion-nativa/   # Casos 61-66 (faltan 67-70)
     ├── 08-devops-cicd/          # Casos 71-80
-    ├── 09-hardware-iot/         # Casos 81-90
+    ├── 09-hardware-iot/         # Casos 81-89 (falta 90)
     └── 10-migracion-legacy/     # Casos 91-100
 ```
 
 ---
 
-## Formato Obligatorio de Cada Caso
+## Formato de Documentación (para RAG)
 
 Cada archivo `caso-XX-*.md` DEBE seguir esta estructura (agnóstica y sin código):
 
 - **Sección 0: Metadata para Indexación (AI-Tags)**  
   Palabras clave de negocio, patrón técnico, stack seleccionado, criticidad.
-- **Sección 1: Planteamiento del Problema (El "Trigger")**  
-  Problema técnico + escenario de negocio (quote), incidentes reportados y riesgos (tabla).
+- **Sección 1: Planteamiento (El "Trigger")**  
+  Problema técnico + escenario de negocio (quote), incidentes reportados y analítica/prevalencia (tabla) + riesgos (tabla).
 - **Sección 2: Matriz de Soluciones y Selección de Herramientas**  
   BAJA / ACEPTABLE / ENTERPRISE con trade-offs claros.
 - **Sección 3: Profundización**  
-  Capacidades (SÍ), restricciones (NO), criterio de selección y tablas de V&V/UX/seguridad/operación cuando apliquen.
+  Capacidades (SÍ), restricciones (NO), criterio de selección y tablas de V&V/UX/operación/seguridad + mini-ADR (decisión) cuando aplique.
 - **Sección 4: Impacto esperado**  
   KPIs/umbrales y resultado de negocio.
 - **Glosario de Términos Clave**  
   Tabla con ancla `#glosario-de-terminos-clave`; cada término debe tener su propio `id` (`#term-*`) y los términos del texto deben enlazar a esos anchors para habilitar tooltips.
 - **Referencias**  
-  3–5 fuentes externas relevantes (incidentes, normas, guías).
+  3–5 fuentes externas relevantes (incidentes, normas, guías/estudios).
 
 **Regla NO-CODE (se mantiene):** No incluir bloques de código de implementación (Dart/Kotlin/Swift). Usa tablas, descripciones paso a paso, contratos de datos y diagramas ASCII si aplica.
 
@@ -167,10 +172,16 @@ Cuando trabajes en este proyecto:
    - Usar diferentes tecnologías de persistencia según el caso.
    - Evitar repetir el mismo stack en casos consecutivos.
 
+## Nota para Agentes (Claude/Codex)
+
+- Prioriza consistencia de headings (0–4 + glosario + referencias) para maximizar recuperación en RAG.
+- No generes código de implementación; el repositorio es documentación agnóstica (tablas, políticas, flujos ASCII, KPIs).
+- Antes de afirmar “100 casos”, valida conteo real en `capitulos/**/caso-*.md` y revisa `TABLA_DE_CONTENIDOS.md`.
+
 ---
 
 ## Contacto
 
 **Repositorio:** `git@github.com:juansuarez-pragma/maestro-movil.git`
 **Organización:** Pragma
-**Última actualización:** Diciembre 2024
+**Última actualización:** Enero 2025

@@ -1,8 +1,8 @@
-# Capítulo 1: Seguridad Bancaria y Gestión de Identidad
+# Capítulo 1: Seguridad
 
 ## Resumen del Capítulo
 
-Este capítulo aborda los 10 escenarios más críticos de seguridad en aplicaciones móviles bancarias y de e-commerce. Cada caso presenta un problema real de la industria con soluciones arquitectónicas probadas.
+Este capítulo aborda 10 escenarios críticos de seguridad para apps móviles (banca y e-commerce). Cada caso presenta un problema realista, evidencia de industria y una solución arquitectónica en niveles **BAJA/ACEPTABLE/ENTERPRISE**.
 
 ## Casos Incluidos
 
@@ -45,6 +45,13 @@ Este capítulo aborda los 10 escenarios más críticos de seguridad en aplicacio
 - **GDPR:** Caso 10
 - **SOX:** Caso 10
 - **Regulaciones bancarias locales:** Todos
+
+## Fuentes y literatura base (referencias del capítulo)
+
+- OWASP MASVS/MAS: https://mas.owasp.org/
+- OWASP MSTG: https://owasp.org/www-project-mobile-security-testing-guide/
+- NIST (autenticación/identidad): https://pages.nist.gov/800-63-3/
+- NowSecure 2024 (seguridad móvil): https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/
 
 ## Prerequisitos
 

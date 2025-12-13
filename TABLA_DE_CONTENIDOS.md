@@ -118,6 +118,8 @@
 
 ## Capítulo 7: Integración Nativa y Platform Channels
 
+> Nota: en este repositorio aún no están publicados los casos **67–70**.
+
 | Caso | Título | Archivo |
 |:----:|:-------|:--------|
 | 61 | **Integrar SDKs Nativos (Stripe/Facetec) en Flutter** | [caso-61-platform-channels](capitulos/07-integracion-nativa/caso-61-platform-channels.md) |
@@ -147,6 +149,8 @@
 ---
 
 ## Capítulo 9: Hardware, IoT y Biometría
+
+> Nota: en este repositorio aún no está publicado el caso **90**.
 
 | Caso | Título | Archivo |
 |:----:|:-------|:--------|

@@ -4,10 +4,13 @@
 - Casos en `capitulos/<nn>-<tema>/caso-XX-nombre.md` (XX con cero a la izquierda). Usa la carpeta de capítulo correcta.
 - Archivos base: `README.md` (visión general), `TABLA_DE_CONTENIDOS.md` (índice real), `CLAUDE.md` (contexto/formatos), `AGENTS.md` (esta guía).
 - Cada caso sigue el template 0–4 + glosario + referencias, sin código de implementación.
+  - Nota: el capítulo 1 vive en `capitulos/01-seguridad/` (antes `capitulos/01-seguridad-bancaria/`).
+  - Conteo actual: 95 casos publicados; faltan por incorporar 67–70 y 90.
 
 ## Formato Obligatorio de Cada Caso
 - **0. Metadata (AI-Tags):** Palabras clave, patrón técnico, stack y criticidad.
 - **1. Planteamiento:** Problema técnico + escenario de negocio, incidentes reportados y riesgos (tabla).
+- **Analítica:** Incluir tabla de prevalencia/industria y un resumen global cuando aplique.
 - **2. Matriz de Soluciones:** BAJA / ACEPTABLE / ENTERPRISE con trade-offs claros.
 - **3. Profundización:** Capacidades vs límites, criterio de selección y tablas de V&V/UX/seguridad/operación según aplique.
 - **4. Impacto esperado:** KPIs/umbrales y resultados de negocio.  
