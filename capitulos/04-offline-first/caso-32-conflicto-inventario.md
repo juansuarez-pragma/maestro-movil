@@ -16,16 +16,29 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- Deltas offline sin reservas ni merge determinista generan sobreventa y datos inconsistentes.
+- LWW basado solo en timestamp descarta ediciones válidas y depende de reloj (skew).
+- Sin log de conflictos/resolución, soporte y auditoría son difíciles.
+
 ### Escenario de Negocio
 
 > *"Como vendedor offline, quiero actualizar stock sin vender por encima de lo disponible."*
 
-Ediciones concurrentes en stock offline pueden causar sobreventa si no hay reservas ni reconciliación adecuada.
-
-### Evidencia de Industria
-
+### Incidentes reportados
 - **Retail omnicanal:** Sobreventa común sin reservas temporales.
-- **Casos POS:** Ajustes de stock conflictivos generan pérdidas y devoluciones.
+- **Casos POS:** Ajustes conflictivos generan pérdidas/devoluciones.
+
+### Analítica y prevalencia (industria)
+
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| Retail omnicanal | Global | Sobreventa cuando no hay reservas/merge sólido. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; sync/merge es fuente de bugs. |
+| Casos POS 2022 | Retail | Inventario desalineado por LWW sin contexto. |
+
+**Resumen global**
+- Sin reservas y merges con contexto, la sobreventa y desalineación son frecuentes.
 
 ### Riesgos
 
@@ -54,6 +67,48 @@ Ediciones concurrentes en stock offline pueden causar sobreventa si no hay reser
 | **Capacidades (SÍ permite)** | Guardar deltas de stock con actor y timestamp. Aplicar reservas temporales en backend. Detectar conflictos y solicitar resolución (usuario o regla de dominio). Registrar merges para auditoría. |
 | **Restricciones Duras (NO permite)** | **Sin backend de reservas:** El cliente solo sugiere, backend decide. **Offline largo:** Deltas pueden expirar o invalidarse. **Conflictos semánticos:** Algunos requieren revisión manual. |
 | **Criterio de Selección** | Deltas en vez de valores absolutos para merges; políticas de reserva en backend; cola local para offline. |
+
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Unit (CI) | Merges por delta y detección de conflictos | Equipo móvil, CI |
+| Integration (CI) | Reservas temporales aplican; reconciliación backend-cliente consistente | Móvil/Backend, CI |
+| Seguridad/consistencia | Log de conflictos/resolución sin PII innecesaria | QA/Seguridad |
+| Observabilidad | Eventos `inventory.merge` con política aplicada | Móvil/SRE |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Conflictos | Mostrar prompt/resumen cuando la regla de dominio no resuelve | Transparencia |
+| Reservas | Indicar reservas temporales y expiración | Claridad operativa |
+| Offline | Avisar expiración de deltas; permitir re-sync controlado | Controla expectativas |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Expiración | TTL para deltas/reservas; limpiar y notificar | Evita datos obsoletos |
+| Política de merge | CRDT/OT o reglas por campo; LWW solo como fallback | Consistencia mejorada |
+| Auditoría | Registrar merges y conflictos | Forense y soporte |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Ediciones concurrentes de stock offline causan sobreventa y datos inconsistentes. |
+| Opciones evaluadas | Server-wins/client-wins; LWW; deltas + reservas + merge por dominio. |
+| Decisión | Deltas + reservas temporales en backend + políticas de merge con contexto + prompts si aplica. |
+| Consecuencias | Mayor complejidad de dominio y backend; requiere UX para conflictos. |
+| Riesgos aceptados | Expiración de deltas; casos semánticos aún requieren intervención. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Sobreventa por conflicto | 0 incidentes | Crítico si > 0 | Evita pérdidas/devoluciones |
+| Conflictos no resueltos | < 0.5% | Alerta si supera | Soporte manejable |
+| Latencia de reconciliación | p95 < SLA | Warning si sube | Operación estable |
+| Tickets por stock inconsistente | ↓ vs baseline | Alerta si no baja | Menos soporte |
 
 ---
 

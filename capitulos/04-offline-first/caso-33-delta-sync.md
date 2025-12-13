@@ -16,16 +16,29 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- Full sync en redes 2G/3G consume datos y falla por timeouts; sin delta ni resume el usuario queda bloqueado.
+- Falta de tombstones/CDC produce datasets inconsistentes (no se aplican borrados).
+- Sin priorización, tablas críticas compiten con secundarias y se alarga el sync.
+
 ### Escenario de Negocio
 
 > *"Como usuario en red lenta, solo quiero descargar cambios, no todo el dataset."*
 
-Sin delta sync, las sincronizaciones son pesadas, consumen datos y fallan en 2G/3G o con planes limitados.
+### Incidentes reportados
+- **Apps de campo/logística:** Delta reduce uso de datos/tiempo de sync.
+- **BDs con CDC:** LSN/offset para replicar solo cambios; sin ellos se transfiere todo.
 
-### Evidencia de Industria
+### Analítica y prevalencia (industria)
 
-- **Apps de campo/logística:** Delta reduce uso de datos y tiempo de sync.
-- **BDs con CDC:** Usan LSN/offset para replicar solo cambios.
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| Apps de campo/logística | Global | Delta reduce consumo y tiempos; full sync falla en redes pobres. |
+| CDC en BD | Global | Replicación eficiente vía LSN/offset; requiere tombstones. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; sync/eficiencia es hallazgo frecuente. |
+
+**Resumen global**
+- Delta/CDC es esencial en redes pobres; full sync genera fallos y costos de datos.
 
 ### Riesgos
 
@@ -54,6 +67,48 @@ Sin delta sync, las sincronizaciones son pesadas, consumen datos y fallan en 2G/
 | **Capacidades (SÍ permite)** | Usar `lastSyncToken`/offset para pedir solo cambios. Aplicar cambios en lote en SQLite/Isar. Reanudar descargas parciales. Comprimir payloads. Priorizar tablas críticas y diferir secundarias. |
 | **Restricciones Duras (NO permite)** | **Sin soporte backend:** Requiere API/CDC. **Conflictos:** Cambios concurrentes necesitan merge/OT/CRDT. **Datos borrados:** Necesita tombstones o GC controlado. |
 | **Criterio de Selección** | Delta sobre full sync para usuarios en redes pobres; resume para resiliencia; compresión y priorización para eficiencia. |
+
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Unit (CI) | Aplicación de deltas y tombstones en cache local | Equipo móvil, CI |
+| Integration (CI) | Resume de descargas tras interrupción; prioridad por tabla | Móvil/Backend, CI |
+| Rendimiento | Uso de datos/tiempo de sync en redes simuladas 2G/3G | QA/Perf |
+| Observabilidad | Métricas `sync.delta` (latencia, bytes, errores) | Móvil/SRE |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Feedback | Mostrar progreso y modo “ahorro de datos” | Transparencia |
+| Priorización | Tablas críticas primero; diferir secundarias | UX más rápida |
+| Reintentos | Resume con backoff; limitar intentos en redes pobres | Resiliencia |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Tombstones | Requeridos para borrados; GC con TTL | Consistencia |
+| Tokens de sync | Gestionar expiración/rotación de `lastSyncToken` | Seguridad |
+| CDC backend | Necesario para eficiencia; fallback a full solo si inevitable | Control de costos |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Full sync en redes lentas falla y consume datos. |
+| Opciones evaluadas | Full sync; filtros básicos; delta/CDC con resume/prioridad. |
+| Decisión | Delta sync con offset/LSN, resume, compresión, priorización. |
+| Consecuencias | Requiere API/CDC y manejo de tombstones; mayor complejidad. |
+| Riesgos aceptados | Dependencia del backend; sync parcial si tokens expiran. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Uso de datos en sync | ↓ vs full sync | Alerta si no baja | Costos controlados |
+| Tiempo de sync en 2G/3G | p95 dentro de SLA | Warning si sube | Operación viable |
+| Reintentos/resume | Éxito > 99% tras interrupción | Alerta si baja | Resiliencia |
+| Consistencia (deltas/tombstones) | 0 registros fantasma | Crítico si > 0 | Datos confiables |
 
 ---
 
