@@ -16,23 +16,37 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- Sin kernel acotado, se duplican modelos/contratos y aparecen dependencias cíclicas.
+- Un paquete gigante obliga a publicar todo ante cambios pequeños.
+- Cambios sin semver ni contratos rompen múltiples módulos a la vez.
+
 ### Escenario de Negocio
 
 > *"Como equipo, necesitamos compartir modelos/contratos sin acoplar todos los módulos."*
 
-Sin un kernel común bien gobernado, se duplican modelos y se generan dependencias cíclicas o un monolito disfrazado.
+### Incidentes reportados
+- **DDD:** Shared Kernel debe ser pequeño/estable; kernels grandes derivan en monolitos disfrazados.
+- **Monorepos:** Cambios sin semver causaron builds rotos en múltiples apps.
 
-### Evidencia de Industria
+### Analítica y prevalencia (industria)
 
-- **DDD:** Shared Kernel debe ser pequeño y estable; cambios controlados.
-- **Monorepos grandes:** Requieren versionado y gobernanza para evitar ripple effects.
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| Proyectos DDD | Global | Shared kernels grandes generan ripple effects y deuda. |
+| Monorepos móviles | LATAM/EU | Semver y contratos reducen roturas de build. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; gobernanza de dependencias es crítica. |
+
+**Resumen global**
+- Kernel pequeño y versionado reduce acoplamiento y roturas masivas; gobernanza y contract testing son clave.
 
 ### Riesgos
 
 | Tipo | Impacto |
 |:-----|:--------|
 | **Técnico** | Acoplamiento, actualizaciones masivas, regresiones |
-| **Productivo** | Velocidad de desarrollo se frena por dependencias frágiles |
+| **Productivo** | Velocidad se frena por dependencias frágiles |
+| **Operacional** | Sin contratos/semver, los release trains se rompen |
 
 ---
 
@@ -51,8 +65,49 @@ Sin un kernel común bien gobernado, se duplican modelos y se generan dependenci
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
 | **Capacidades (SÍ permite)** | Definir modelos/contratos comunes estables. Publicar como package interno versionado. Ejecutar tests contractuales entre módulos. Minimizar dependencias hacia el kernel. |
-| **Restricciones Duras (NO permite)** | **Kernel gigante:** Debe ser pequeño. **Cambios frecuentes:** Aumentan rompimientos; requiere governance. **Dependencias cíclicas:** Prohibidas; revisar gráfos de dependencias. |
-| **Criterio de Selección** | Kernel con semver, revisión de cambios, tests contractuales; uso de melos/monorepo para manejo de versiones y releases. |
+| **Restricciones Duras (NO permite)** | **Kernel gigante:** Debe ser pequeño. **Cambios frecuentes:** Aumentan rompimientos; requiere governance. **Dependencias cíclicas:** Prohibidas; revisar grafos de dependencias. |
+| **Criterio de Selección** | Kernel con semver, revisión de cambios, tests contractuales; uso de Melos/monorepo para manejo de versiones y releases. |
+
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Contract tests | Consumidores y kernel coinciden en modelos/contratos | QA/Móvil |
+| Integration (CI) | Versiones compatibles en release trains | Móvil/CI |
+| Observabilidad | Grafo de dependencias y cambios por versión | Móvil/SRE |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Compatibilidad | Mantener backward compatibility en cambios menores | Evita regresiones |
+| Documentación | Changelog y migra guías por versión | Onboarding rápido |
+| Distribución | Paquetes internos firmados/cacheados | Confiabilidad |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Gobernanza | Board de cambios y semver obligatorio | Estabilidad |
+| Tamaño | Límite de superficie del kernel; revisión de nuevas dependencias | Control de alcance |
+| Automatización | CI que bloquea dependencias cíclicas | Salud del repo |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Reusar modelos/contratos sin caer en monolito o ripple effects. |
+| Opciones evaluadas | Sin kernel; kernel gigante; kernel acotado con semver y contratos. |
+| Decisión | Kernel acotado, versionado semver, con contract tests y revisión de cambios. |
+| Consecuencias | Requiere gobernanza y tooling de monorepo; disciplina de cambios. |
+| Riesgos aceptados | Overhead de versiones; esfuerzo de mantener contratos. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Roturas por cambio de kernel | Tendencia a la baja | Crítico si sube | Estabilidad |
+| Tiempo de adopción de versión | Ciclo predecible | Warning si se extiende | Release cadence |
+| Tamaño del kernel | Mantener acotado (budget) | Alerta si crece | Modularidad |
+| Dependencias cíclicas | 0 | Crítico si >0 | Salud del repo |
 
 ---
 
@@ -75,3 +130,4 @@ Sin un kernel común bien gobernado, se duplican modelos y se generan dependenci
 - [Domain-Driven Design - Shared Kernel](https://www.domainlanguage.com/ddd/)
 - [Semantic Versioning](https://semver.org/)
 - [Melos](https://melos.invertase.dev/)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)

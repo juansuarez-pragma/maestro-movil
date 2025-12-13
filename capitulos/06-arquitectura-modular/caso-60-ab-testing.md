@@ -16,16 +16,29 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- Hardcodear variantes obliga a publicar y no permite rollback controlado.
+- Sin tracking, no se sabe qué variante ve cada usuario ni su impacto.
+- Experimentos sin cleanup dejan código muerto y deuda.
+
 ### Escenario de Negocio
 
 > *"Como equipo, quiero probar dos UIs sin mantener ramas separadas ni romper consistencia."*
 
-Sin experimentos controlados, los cambios se despliegan a todos y es difícil medir impacto.
+### Incidentes reportados
+- **Experimentación en producto:** Mejora conversión; experimentos sin expiración han roto UX meses después.
+- **Banca/fintech:** Necesitan gobernanza y privacidad para tracking de variantes.
 
-### Evidencia de Industria
+### Analítica y prevalencia (industria)
 
-- **Experimentation en producto:** Mejora conversión y UX; flags permiten rollout seguro.
-- **Riesgos:** Experimentos mal gobernados generan deuda y UX inconsistente.
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| Product experimentation | Global | A/B bien gobernado mejora métricas; sin cleanup genera deuda. |
+| Postmortems de flags | Varios | Falta de expiración provocó comportamientos inconsistentes. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; configuración/flags suele carecer de controles. |
+
+**Resumen global**
+- Framework de experimentos + flags tipados habilita medición y rollback seguro; requiere expiración, privacidad y catálogo de variantes.
 
 ### Riesgos
 
@@ -55,6 +68,47 @@ Sin experimentos controlados, los cambios se despliegan a todos y es difícil me
 | **Restricciones Duras (NO permite)** | **Sin governance:** Riesgo de proliferación de flags. **Latencia de fetch:** Necesita defaults y cache. **Privacidad:** Cumplir GDPR/consentimientos para tracking. |
 | **Criterio de Selección** | SDK de experiments/flags; Riverpod para exponer variantes; analytics integrados; política de expiración/cleanup. |
 
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Unit/Contract | Asignación y defaults de variantes | Móvil/CI |
+| Integration (CI) | Tracking por variante y rollback vía flag | QA/Móvil |
+| Observabilidad | Métricas `exp.*` (exposición, conversión, error) | Móvil/Data |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Consistencia | Un usuario siempre recibe la misma variante | Evita confusión |
+| Mensajes | No revelar experimentos al usuario | Profesional |
+| Expiración | TTL y limpieza de código al cerrar experimento | Sin deuda |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Gobernanza | Catálogo de experimentos y dueños | Control |
+| Privacidad | Anonimizar IDs y respetar consentimientos | Cumplimiento |
+| Rollback | Kill switch si métricas empeoran | Riesgo acotado |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Probar variantes sin ramas separadas ni pérdida de control. |
+| Opciones evaluadas | Hardcode; flags simples; framework de experimentos con métricas/cleanup. |
+| Decisión | Framework de experimentos con asignación estable, métricas y expiración/cleanup. |
+| Consecuencias | Requiere catálogo y gobernanza; integra analytics/privacidad. |
+| Riesgos aceptados | Sobrecarga de configuración; dependencia del SDK. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Tiempo de rollback de variante | Inmediato vía flag | Crítico si > minutos | Riesgo acotado |
+| Debt de experimentos | 0 experimentos vencidos sin cleanup | Warning si hay | Código limpio |
+| Conversión por variante | Medida y comparada | Alerta si cae | Decisiones basadas en datos |
+| Incidentes por variante | 0 | Crítico si >0 | Calidad |
+
 ---
 
 ## Glosario de Términos Clave
@@ -75,3 +129,4 @@ Sin experimentos controlados, los cambios se despliegan a todos y es difícil me
 
 - [A/B Testing Best Practices](https://www.optimizely.com/optimization-glossary/ab-testing/)
 - [Feature Flags/Experimentation](https://martinfowler.com/articles/feature-toggles.html)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)

@@ -16,16 +16,29 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- Plugins con acceso amplio pueden filtrar datos o degradar la app.
+- Sin contratos/firmas, terceros pueden romper compatibilidad o introducir malware.
+- Falta de monitoreo/revocación hace difícil contener incidentes.
+
 ### Escenario de Negocio
 
 > *"Como plataforma, quiero que terceros agreguen funcionalidades sin comprometer seguridad ni estabilidad."*
 
-Permitir plugins requiere contratos claros, aislamiento y control de permisos.
+### Incidentes reportados
+- **Super apps:** Exponen SDKs/plugin systems con APIs limitadas y procesos de review; plugins maliciosos llevaron a restricciones más fuertes.
+- **Apps con extensiones:** Sin políticas de permisos se degradó la UX y se filtraron datos.
 
-### Evidencia de Industria
+### Analítica y prevalencia (industria)
 
-- **Super apps:** Exponen SDKs/plugin systems con APIs limitadas.
-- **Riesgos:** Plugins maliciosos/fallidos pueden filtrar datos o romper UX.
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| Super apps (APAC) | APAC | Plugins limitados por API/permiso y revisión previa. |
+| Postmortems de extensiones | Varios | Falta de sandbox generó fugas de datos y crashes. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; controles de plugins/extensiones son críticos. |
+
+**Resumen global**
+- Extender apps sin sandbox y permisos controlados es riesgoso; se requieren contratos mínimos, firmas, telemetría y kill-switch.
 
 ### Riesgos
 
@@ -41,9 +54,9 @@ Permitir plugins requiere contratos claros, aislamiento y control de permisos.
 
 | Nivel de Madurez | Solución y Herramienta | Análisis de Decisión (Trade-offs) |
 |:-----------------|:-----------------------|:----------------------------------|
-| **BAJA** | Plugins con acceso total al app core | **INADECUADO:** Riesgo alto de seguridad/estabilidad. |
-| **ACEPTABLE** | APIs limitadas pero sin sandbox | **MEJORA:** Reduce riesgo, pero aún acoplado. |
-| **ENTERPRISE** | **Plugins sandbox:** contratos de API, permisos explícitos, revisión/firmas, monitoreo, revocación | **ÓPTIMO:** Extensible con control y seguridad. |
+| **BAJA** | Plugins con acceso total al core | **INADECUADO:** Riesgo alto de seguridad/estabilidad. |
+| **ACEPTABLE** | APIs limitadas pero sin sandbox/firmas | **MEJORA:** Reduce riesgo, pero aún acoplado. |
+| **ENTERPRISE** | **Plugins sandbox:** contratos de API, permisos explícitos, revisión/firmas, monitoreo y revocación | **ÓPTIMO:** Extensible con control y seguridad. |
 
 ---
 
@@ -51,9 +64,50 @@ Permitir plugins requiere contratos claros, aislamiento y control de permisos.
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Exponer APIs contractuales limitadas (pagos, perfiles). Control de permisos por plugin. Firmar y verificar plugins. Telemetría y aislamiento lógico. Revocar/actualizar plugins centralmente. |
-| **Restricciones Duras (NO permite)** | **Aislamiento total:** Flutter no provee sandbox duro; políticas deben ser estrictas. **Plugins nativos:** Requieren revisión adicional. **Versioning:** Cambios de API implican gestionar compatibilidad. |
+| **Capacidades (SÍ permite)** | Exponer APIs contractuales limitadas (pagos, perfil). Control de permisos por plugin. Firmar y verificar plugins. Telemetría y aislamiento lógico. Revocar/actualizar plugins centralmente. |
+| **Restricciones Duras (NO permite)** | **Aislamiento total:** Flutter no provee sandbox duro; políticas deben ser estrictas. **Plugins nativos:** Requieren revisión adicional. **Compatibilidad:** Cambios de API requieren versionado y contrato claro. |
 | **Criterio de Selección** | Diseñar contratos mínimos; permisos explícitos; proceso de revisión/firmado; monitoreo de performance/seguridad de plugins. |
+
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Seguridad | Permisos y acceso a APIs respetados | Seguridad/QA |
+| Integration (CI) | Compatibilidad de contratos plugin-host | Móvil/QA |
+| Observabilidad | Telemetría `plugin.*` (latencia, errores, permisos usados) | Móvil/SRE |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Onboarding de plugin | Checklist de revisión + firma | Calidad |
+| Degradación | Desactivar plugin ante fallo; fallback a experiencia base | UX protegida |
+| Mensajes | Avisos claros de permisos y origen de plugin | Transparencia |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Kill-switch | Revocar plugins desde backend | Contención |
+| Versionado | Semver y compatibilidad de contratos | Estabilidad |
+| Auditoría | Registro de instalaciones y permisos | Cumplimiento |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Extender la app con plugins sin comprometer seguridad/estabilidad. |
+| Opciones evaluadas | Acceso total; APIs limitadas sin sandbox; plugins con contratos, permisos y revisión. |
+| Decisión | Plugins con contratos mínimos, permisos explícitos, firmas y monitoreo con kill-switch. |
+| Consecuencias | Requiere proceso de revisión/auditoría y tooling de firma. |
+| Riesgos aceptados | Sandbox no es completo; overhead operativo. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Incidentes de seguridad por plugins | 0 | Crítico si >0 | Seguridad |
+| Latencia/errores por plugin | Controlados y observables | Alerta si suben | UX estable |
+| Tiempo de publicación de plugin | Predictible con checklist | Warning si crece | Flujo de partners |
+| Revocaciones | Ejecutables en minutos | Crítico si no | Contención |
 
 ---
 
@@ -75,3 +129,4 @@ Permitir plugins requiere contratos claros, aislamiento y control de permisos.
 
 - [Plugin Architecture Patterns](https://martinfowler.com/articles/micro-frontends.html)
 - [Capability-based Security](https://en.wikipedia.org/wiki/Capability-based_security)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)
