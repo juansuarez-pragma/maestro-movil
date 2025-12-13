@@ -16,16 +16,29 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- Llaves compartidas por chat/email se filtran y permiten firmar apps maliciosas.
+- Perfiles vencidos rompen builds en el momento del release.
+- Sin rotación ni auditoría, el cumplimiento se debilita.
+
 ### Escenario de Negocio
 
 > *"Como equipo, necesito firmar builds Android/iOS sin compartir llaves por chat ni romper provisioning."*
 
-Manejo manual de llaves y perfiles provoca builds fallidos y riesgo de filtración.
+### Incidentes reportados
+- **Fastlane match/cert:** Estándar para compartir credenciales; equipos sin match sufrieron revocaciones por filtración.
+- **Llaves expuestas:** Repos públicos/privados mal configurados filtraron keystores.
 
-### Evidencia de Industria
+### Analítica y prevalencia (industria)
 
-- **Fastlane match/cert:** Estándar para compartir credenciales de forma segura.
-- **Incidentes:** Llaves expuestas en repos generan compromisos de apps.
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| Incidentes de claves expuestas | Global | Filtraciones provocaron revocaciones y reprovisionamientos urgentes. |
+| Prácticas móviles | Global | Automatizar firmas reduce fallos de release y mejora cumplimiento. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; gestión de secretos es brecha común. |
+
+**Resumen global**
+- Firmas seguras requieren vault + automatización + rotación; el manejo manual expone seguridad y frena releases.
 
 ### Riesgos
 
@@ -52,8 +65,49 @@ Manejo manual de llaves y perfiles provoca builds fallidos y riesgo de filtraci�
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
 | **Capacidades (SÍ permite)** | Almacenar keystores/profiles en vault o match repo cifrado. Rotar certificados y provisionings de forma controlada. Integrar con CI para firma automática. Auditoría de acceso. |
-| **Restricciones Duras (NO permite)** | **Llaves hardcodeadas:** Prohibido. **Rotación manual sin plan:** Riesgo de caducidad. **Dependencia de personas:** Se elimina con automatización. |
+| **Restricciones Duras (NO permite)** | **Llaves hardcodeadas:** Prohibido. **Rotación manual sin plan:** Riesgo de caducidad. **Dependencia de personas:** Evitar mediante automatización y roles. |
 | **Criterio de Selección** | Fastlane para automatizar firmas; Secret Manager/Vault para llaves; acceso por rol; rotación documentada; monitoreo de expiración. |
+
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Seguridad | Llaves no están en repo/logs; acceso auditado | Seguridad/DevOps |
+| Release dry-run | Firma automática en CI con perfiles vigentes | Móvil/QA |
+| Rotación | Renovación programada sin romper builds | DevOps |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Alertas | Notificar expiración próxima de perfiles/certs | Prevención |
+| Acceso | Roles mínimos para firmar | Menor superficie |
+| Documentación | Pasos de recuperación/rotación | Resiliencia |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Vault | Secret Manager/Vault cifrado y versionado | Seguridad |
+| Match repo | Cifrado y accesos limitados | Control |
+| Auditoría | Logs de acceso/uso de llaves | Cumplimiento |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Firmar apps con llaves seguras y provisioning vigente sin riesgo de filtración. |
+| Opciones evaluadas | Compartir llaves; repo cifrado; vault + fastlane automatizado con rotación. |
+| Decisión | Vault + fastlane (match/cert) con rotación y auditoría. |
+| Consecuencias | Necesita setup inicial y gobernanza de accesos. |
+| Riesgos aceptados | Dependencia de servicios de vault; coordinación en rotaciones. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Incidentes por claves expuestas | 0 | Crítico si >0 | Seguridad |
+| Builds fallidos por perfiles | Tendencia a la baja | Warning si sube | Estabilidad |
+| Tiempo de rotación | Predecible y sin downtime | Alerta si se extiende | Continuidad |
+| Auditorías exitosas | 100% | Alerta si falla | Cumplimiento |
 
 ---
 
@@ -75,3 +129,4 @@ Manejo manual de llaves y perfiles provoca builds fallidos y riesgo de filtraci�
 
 - [Fastlane Match](https://docs.fastlane.tools/actions/match/)
 - [Fastlane Cert/Pilot](https://docs.fastlane.tools/actions/)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)

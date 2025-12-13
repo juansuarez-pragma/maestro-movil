@@ -16,16 +16,29 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- Bundle crece sin visibilidad; se detecta tarde y bloquea releases.
+- Tamaño elevado reduce instalaciones en mercados con datos limitados y ralentiza arranque.
+- Sin budgets/gates, no hay accountability ni plan de optimización.
+
 ### Escenario de Negocio
 
 > *"Como equipo, quiero ser alertado si la app supera 100MB antes de publicar."*
 
-Bundles grandes afectan instalaciones, arranques y retención, especialmente en mercados con dispositivos de gama media/baja.
+### Incidentes reportados
+- **Play/App Store:** Límites de tamaño afectaron descargas sin WiFi.
+- **Apps pesadas:** Installs y retención caen en dispositivos de gama media/baja.
 
-### Evidencia de Industria
+### Analítica y prevalencia (industria)
 
-- **Play/App Store:** Límites de tamaño afectan descargas sin WiFi.
-- **Perf móvil:** Apps más pequeñas cargan más rápido y consumen menos datos.
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| Google Play size guidance | Global | Tamaño afecta conversión en descargas móviles. |
+| Estudios de perf móvil | Global | Apps más ligeras reducen TTI y consumo de datos. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; optimización y configuración deficiente común. |
+
+**Resumen global**
+- Budgets con gates en CI y reportes por ABI previenen inflar el app y protegen conversión en mercados sensibles a tamaño.
 
 ### Riesgos
 
@@ -51,9 +64,50 @@ Bundles grandes afectan instalaciones, arranques y retención, especialmente en 
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Medir tamaño de AAB/APK/IPA por ABI. Configurar budgets (p. ej., 100MB) y fallar pipeline si se excede. Reportar diffs de tamaño por commit. Sugerir acciones (split per ABI, shrink resources, deferred components). |
-| **Restricciones Duras (NO permite)** | **Optimización automática limitada:** Algunas acciones requieren intervención manual. **Dependencias pesadas:** Pueden ser necesarias; requiere negociación. **iOS:** IPA incluye símbolos si no se filtra. |
-| **Criterio de Selección** | Budget definido por negocio/mercados; CI con step de medición y gate; seguimiento histórico para detectar regresiones. |
+| **Capacidades (SÍ permite)** | Medir tamaño de AAB/APK/IPA por ABI. Configurar budgets (ej. 100MB) y fallar pipeline si se excede. Reportar diffs por commit. Sugerir split per ABI, shrink resources, deferred components. |
+| **Restricciones Duras (NO permite)** | **Optimización automática limitada:** Algunas acciones requieren intervención manual. **Dependencias pesadas:** Negociar para reducir. **iOS:** IPA incluye símbolos si no se filtra. |
+| **Criterio de Selección** | Budget definido por negocio/mercados; step de medición y gate en CI; seguimiento histórico para detectar regresiones. |
+
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Size check CI | Tamaños por ABI vs budget | DevOps/CI |
+| Reportes | Diffs de tamaño por commit/release | Móvil/Perf |
+| Optimización | Acciones (shrink/split/deferred) aplicadas | Móvil/Perf |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Alertas | Notificar si se acerca al budget | Prevención |
+| Targets | Budgets por mercado/tienda | Ajuste local |
+| Transparencia | Dashboard de tamaño y tendencias | Visibilidad |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Gate | Pipeline falla si supera budget | Control |
+| Revisión | Checklist de dependencias pesadas | Disciplina |
+| Retención | Medir impacto en conversión/instalación | Negocio |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Falta de control sobre crecimiento del bundle. |
+| Opciones evaluadas | Medición manual; reporte sin gates; budget con gates y acciones de optimización. |
+| Decisión | Budgets con gates y reportes por ABI; plan de optimización. |
+| Consecuencias | Requiere CI con steps de medición y disciplina de dependencias. |
+| Riesgos aceptados | Posible fricción en releases si el budget es estricto. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Tamaño por ABI | ≤ budget (ej. 100MB) | Crítico si excede | Instalaciones |
+| TTI/arranque | Mejora o estable | Warning si empeora | UX |
+| Conversión de instalación | Estable/↑ en mercados sensibles | Alerta si cae | Negocio |
+| Incidentes por tamaño en store | 0 | Crítico si >0 | Compliance tienda |
 
 ---
 
@@ -75,3 +129,4 @@ Bundles grandes afectan instalaciones, arranques y retención, especialmente en 
 
 - [Flutter App Size Analysis](https://docs.flutter.dev/perf/app-size)
 - [Google Play App Size Limits](https://support.google.com/googleplay/android-developer/answer/113469#size)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)

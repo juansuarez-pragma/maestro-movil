@@ -16,16 +16,29 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- Logs locales y crash reports básicos no permiten correlacionar con backend.
+- Sin métricas UX/perf y umbrales, el equipo detecta incidentes tarde.
+- Falta de políticas de PII genera riesgo de cumplimiento.
+
 ### Escenario de Negocio
 
 > *"Como equipo, necesito ver qué pasa en prod: errores, latencia, flujos críticos, y correlacionar con backend."*
 
-Sin observabilidad, incidentes se diagnostican a ciegas y se alarga el MTTR.
+### Incidentes reportados
+- **SRE:** Falta de trazas y contextos prolonga MTTR.
+- **Banca:** Auditorías fallaron por registros incompletos y PII en logs.
 
-### Evidencia de Industria
+### Analítica y prevalencia (industria)
 
-- **SRE:** Logs estructurados, métricas y trazas reducen MTTR.
-- **Banca:** Cumplimiento y auditoría requieren registros confiables.
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| SRE reports | Global | Observabilidad 3 pilares reduce MTTR. |
+| Auditorías banca | LATAM/EU | PII en logs y falta de correlación son hallazgos frecuentes. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; observabilidad/config es brecha común. |
+
+**Resumen global**
+- Observabilidad completa (logs estructurados, métricas UX/negocio, trazas correlacionadas) acelera diagnóstico y cumple normativas; ausencia de PII policies y correlación incrementa MTTR y riesgo legal.
 
 ### Riesgos
 
@@ -51,9 +64,50 @@ Sin observabilidad, incidentes se diagnostican a ciegas y se alarga el MTTR.
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Agregar trace/span IDs a requests y logs. Métricas de negocio (conversion, error rate) y UX (TTI, ANR). Logs estructurados sin PII. Sampling para performance. Alertas con umbrales. |
-| **Restricciones Duras (NO permite)** | **PII:** No loggear datos sensibles. **Costo:** APM y trazas generan costos; usar sampling. **Privacidad:** Cumplir GDPR/leyes locales. |
+| **Capacidades (SÍ permite)** | Agregar trace/span IDs a requests y logs. Métricas de negocio (conversión, error rate) y UX (TTI, ANR). Logs estructurados sin PII. Sampling para performance. Alertas con umbrales. |
+| **Restricciones Duras (NO permite)** | **PII:** No loggear datos sensibles. **Costo:** APM/trazas generan costos; usar sampling. **Privacidad:** Cumplir GDPR/leyes locales. |
 | **Criterio de Selección** | SDK APM confiable; correlación de IDs; políticas de PII; sampling; tableros y alertas claros. |
+
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Logs estructurados | Sin PII; campos clave presentes | Móvil/Sec |
+| Trazas y métricas | Correlación front-back, TTI/ANR/perf | Móvil/SRE |
+| Alertas | Umbrales de crash/ANR/latencia operan | SRE |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Tableros | Flujos críticos con métricas visibles | Prioriza respuesta |
+| Consentimiento | Respetar opt-in/opt-out de analítica | Cumplimiento |
+| Sampling | Balance costo vs detalle | Eficiencia |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| PII | Mascarar/omitir datos sensibles | Legal |
+| Retención | Políticas de retención alineadas a regulación | Cumplimiento |
+| Instrumentación | Checklist de spans/logs en features nuevas | Consistencia |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Incidentes sin visibilidad y riesgo de PII en logs. |
+| Opciones evaluadas | Crash básico; APM parcial; observabilidad completa con 3 pilares y políticas de PII. |
+| Decisión | Observabilidad 3 pilares con correlación, métricas UX/negocio y políticas de PII/sampling. |
+| Consecuencias | Requiere inversión en APM y disciplina de instrumentación. |
+| Riesgos aceptados | Costos de APM; sobrecarga si sampling es bajo. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| MTTR | ↓ vs baseline | Warning si no baja | Respuesta a incidentes |
+| Crash/ANR | Tendencia a la baja | Crítico si sube | Estabilidad |
+| Cobertura de trazas | Alta en flujos críticos | Alerta si baja | Diagnóstico |
+| Hallazgos de PII | 0 en auditorías | Crítico si >0 | Cumplimiento |
 
 ---
 
@@ -75,3 +129,4 @@ Sin observabilidad, incidentes se diagnostican a ciegas y se alarga el MTTR.
 
 - [OpenTelemetry](https://opentelemetry.io/)
 - [Firebase Crashlytics/Performance](https://firebase.google.com/docs)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)

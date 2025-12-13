@@ -16,24 +16,37 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- Releases se bloquean por features a medias o despliegan riesgos a todos sin control.
+- Sin kill switch, un bug en producción tarda horas en mitigarse.
+- Flags sin expiración se vuelven deuda y opacan la lógica.
+
 ### Escenario de Negocio
 
 > *"Como equipo, quiero liberar código a producción y controlar el impacto con flags sin retrasar deploys."*
 
-Sin flags bien gobernados, los releases quedan bloqueados o arriesgan a todos los usuarios.
+### Incidentes reportados
+- **Progressive delivery:** Falta de kill switch prolongó incidentes en producción.
+- **Equipos sin gobernanza:** Flags zombies generaron comportamiento impredecible meses después.
 
-### Evidencia de Industria
+### Analítica y prevalencia (industria)
 
-- **Progressive delivery:** Flags son esenciales para rollout y rollback rápido.
-- **Incidentes:** Falta de kill switch prolonga problemas en producción.
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| Progressive delivery reports | Global | Flags con kill switch reducen MTTR en incidentes. |
+| Postmortems de flags | Varios | Expiración ausente causa deuda y bugs tardíos. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; gobernanza de configuración/flags es débil. |
+
+**Resumen global**
+- Flags gobernados (kill switch, expiración, targeting, métricas) permiten deploy rápido y mitigación; flags sin control crean deuda y riesgo.
 
 ### Riesgos
 
 | Tipo | Impacto |
 |:-----|:--------|
 | **Económico/UX** | Impacto masivo ante bugs sin kill switch |
-| **Técnico** | Deuda de flags zombies, lógica compleja y opaca |
-| **Operacional** | Rollouts desordenados, difícil trazabilidad |
+| **Técnico** | Deuda de flags zombies, lógica compleja |
+| **Operacional** | Rollouts desordenados, trazabilidad baja |
 
 ---
 
@@ -51,9 +64,50 @@ Sin flags bien gobernados, los releases quedan bloqueados o arriesgan a todos lo
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Activar/desactivar features por segmento/porcentaje. Kill switch inmediato. Expirar y limpiar flags. Métricas de exposición/impacto. Defaults seguros en cliente. |
+| **Capacidades (SÍ permite)** | Activar/desactivar por segmento/porcentaje. Kill switch inmediato. Expirar y limpiar flags. Métricas de exposición/impacto. Defaults seguros en cliente. |
 | **Restricciones Duras (NO permite)** | **Gobernanza ausente:** Flags obsoletos generan deuda. **Latencia de fetch:** Requiere cache y defaults. **Seguridad:** No exponer lógica crítica en flags manipulables. |
-| **Criterio de Selección** | SDK con targeting y métricas; Riverpod para gating tipado; proceso de expiración y cleanup; kill switch obligatorio. |
+| **Criterio de Selección** | SDK con targeting y métricas; Riverpod para gating tipado; proceso de expiración/cleanup; kill switch obligatorio. |
+
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Unit/Contract | Defaults seguros y tipos de flags | Móvil/CI |
+| Integration (CI) | Kill switch y targeting por cohorte/porcentaje | QA/Móvil |
+| Observabilidad | Métricas de exposición/conversión/errores por flag | Móvil/SRE |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Mensajes | Flags no deben exponer roadmap | Privacidad |
+| Rollout | Progresivo con cohorts y rollback rápido | Control de riesgo |
+| Expiración | TTL y limpieza en cada release | Menos deuda |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Gobernanza | Dueño por flag y catálogo central | Trazabilidad |
+| Seguridad | Flags solo gating, no secretos | Protección |
+| Auditoría | Logs de cambios y toggles | Cumplimiento |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Controlar impacto de features sin frenar deploys. |
+| Opciones evaluadas | Flags hardcodeados; flags remotos sin gobernanza; flags gobernados con kill switch/expiración/métricas. |
+| Decisión | Flags gobernados con kill switch, expiración y métricas. |
+| Consecuencias | Requiere proceso de limpieza y catálogo; dependencia del SDK. |
+| Riesgos aceptados | Complejidad de configuración; retrasos de fetch si se abusa. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Tiempo de rollback | Inmediato vía kill switch | Crítico si > minutos | Riesgo acotado |
+| Flags zombies | 0 por release | Warning si hay | Código limpio |
+| Incidentes por flag | Tendencia a la baja | Crítico si sube | Estabilidad |
+| Cobertura de targeting | Medida por cohorte | Alerta si inconsistente | Control |
 
 ---
 
@@ -75,3 +129,4 @@ Sin flags bien gobernados, los releases quedan bloqueados o arriesgan a todos lo
 
 - [Feature Toggles (Fowler)](https://martinfowler.com/articles/feature-toggles.html)
 - [LaunchDarkly Best Practices](https://docs.launchdarkly.com/home/flags/best-practices)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)

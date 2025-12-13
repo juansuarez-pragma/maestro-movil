@@ -16,16 +16,29 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- Rollout 100% sin telemetría lleva bugs a todos los usuarios.
+- Sin umbrales/gates, el equipo no detiene a tiempo una regresión.
+- Sin segmentación/flags, el rollback es lento y afecta releases completos.
+
 ### Escenario de Negocio
 
 > *"Como equipo, quiero detectar regresiones en una pequeña cohorte antes de escalar a todos."*
 
-Sin canary y monitoreo, bugs llegan a toda la base de usuarios.
+### Incidentes reportados
+- **Progressive rollout:** Equipos sin gates lanzaron regresiones masivas y recibieron bajas reseñas.
+- **Banca/fintech:** Crash spikes sin canary generaron caídas de conversión y soporte elevado.
 
-### Evidencia de Industria
+### Analítica y prevalencia (industria)
 
-- **Progressive rollout:** Minimiza impacto de regresiones.
-- **Observabilidad móvil:** Crash rates y métricas UX deben guiar el rollout.
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| Progressive delivery | Global | Cohortes pequeñas reducen impacto de regresiones. |
+| Mobile observability | Global | Crash/ANR y perf son métricas clave para gates. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; falta de monitoreo/gobernanza en releases es común. |
+
+**Resumen global**
+- Canary con segmentación, métricas y gates automáticos reduce riesgo y MTTR; rollouts ciegos escalan incidentes a toda la base.
 
 ### Riesgos
 
@@ -51,9 +64,50 @@ Sin canary y monitoreo, bugs llegan a toda la base de usuarios.
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Desplegar a 1-5% con flags/segmentos. Medir crash rate, ANR, latencia, métricas UX. Definir umbrales de stop automático. Rollback inmediato via flag. Telemetría por versión/cohorte. |
-| **Restricciones Duras (NO permite)** | **Sin telemetría en tiempo real:** Decisiones tardías. **Segmentación limitada:** Necesita SDK que soporte targeting. **Falsos positivos:** Umbrales deben calibrarse para no detener sin motivo. |
+| **Capacidades (SÍ permite)** | Desplegar a 1-5% con flags/segmentos. Medir crash rate, ANR, latencia, métricas UX. Definir umbrales de stop automático. Rollback inmediato vía flag. Telemetría por versión/cohorte. |
+| **Restricciones Duras (NO permite)** | **Sin telemetría en tiempo real:** Decisiones tardías. **Segmentación limitada:** Necesita SDK que soporte targeting. **Falsos positivos:** Umbrales deben calibrarse. |
 | **Criterio de Selección** | Flags/segmentación, monitoreo en tiempo casi real, umbrales de stop, plan de rollback. |
+
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Canary | Habilitar 1-5% con métricas por cohorte | Móvil/QA |
+| Gates | Stop/rollback al superar umbrales | Móvil/SRE |
+| Observabilidad | Crash/ANR/perf/UX por versión/cohorte | SRE/Data |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Comunicación | Estado del canary visible para soporte/negocio | Alineación |
+| Rollout | Incrementos controlados (1%→5%→25%→100%) | Riesgo acotado |
+| Rollback | Flag/segmento para detener en minutos | MTTR bajo |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Thresholds | Umbrales claros (crash/ANR/perf/UX) | Consistencia |
+| Datos | Separar canary vs producción plena | Diagnóstico |
+| Auditoría | Registro de cambios de cohorte y resultados | Trazabilidad |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Lanzar sin canary ni métricas eleva riesgo masivo. |
+| Opciones evaluadas | Rollout 100%; rollout parcial sin gates; canary con métricas y stop automático. |
+| Decisión | Canary con segmentación, métricas y gates de stop/rollback. |
+| Consecuencias | Requiere observabilidad fuerte y calibrar umbrales. |
+| Riesgos aceptados | Posibles falsos positivos; complejidad de targeting. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Crash/ANR en canary | ≤ baseline | Crítico si sube | Estabilidad |
+| Tiempo a rollback | Minutos via flag | Crítico si tarda | MTTR |
+| Reseñas negativas | ↓ en releases | Alerta si suben | Reputación |
+| Cobertura de cohortes | Rollout escalonado cumplido | Warning si se detiene sin causa | Cadencia |
 
 ---
 
@@ -75,3 +129,4 @@ Sin canary y monitoreo, bugs llegan a toda la base de usuarios.
 
 - [Progressive Delivery](https://launchdarkly.com/blog/progressive-delivery/)
 - [Mobile Observability Metrics](https://firebase.google.com/docs/crashlytics)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)
