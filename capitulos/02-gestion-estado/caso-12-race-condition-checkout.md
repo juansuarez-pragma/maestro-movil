@@ -16,16 +16,30 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- Sin idempotencia end-to-end, taps rápidos o múltiples pestañas generan requests simultáneas que terminan en doble débito.
+- Throttle en UI no evita reintentos automáticos ni race en backend; sin `Idempotency-Key` y OCC, se duplican cargos.
+- Falta de correlación impide reconciliar respuestas tardías y auditar incidentes.
+
 ### Escenario de Negocio
 
 > *"Como usuario, al pagar desde dos pestañas, mi cuenta no debe ser debitada dos veces."*
 
-En dispositivos rápidos o con taps repetidos, se envían múltiples requests simultáneas al backend, generando doble débito si el servidor no aplica control de concurrencia.
+### Incidentes reportados
+- **Fintech LATAM 2022:** 0.4% de checkouts con cobros duplicados por reintentos simultáneos.
+- **Stripe/Adyen:** Guías oficiales exigen `Idempotency-Key` para pagos críticos.
 
-### Evidencia de Industria
+### Analítica y prevalencia (industria)
 
-- **Caso Fintech LATAM 2022:** 0.4% de checkouts generaron cobros duplicados por reintentos simultáneos.
-- **Stripe/Adyen Guidelines:** Recomiendan Idempotency-Key en operaciones financieras críticas.
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| Fintech LATAM 2022 | Checkouts móviles | 0.4% con cobros duplicados por reintentos simultáneos. |
+| PSPs (Stripe/Adyen) | Global | Idempotencia es requisito para pagos; duplicados generan disputas. |
+| ACFE Fraud 2022 | Global | Cobros indebidos/ATO aumentan costos de reverso y soporte. |
+
+**Resumen global**
+- Los duplicados erosionan confianza y disparan chargebacks.
+- La idempotencia es práctica estándar para eliminar doble cargo y soportar reintentos seguros.
 
 ### Riesgos
 
@@ -52,8 +66,51 @@ En dispositivos rápidos o con taps repetidos, se envían múltiples requests si
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
 | **Capacidades (SÍ permite)** | Generar `Idempotency-Key` por orden y reusar en reintentos. Mostrar estado `processing` mientras se resuelve el checkout. Persistir estado de orden en SQLite para reanudar. Reconciliar respuesta tardía sin duplicar cargos. |
-| **Restricciones Duras (NO permite)** | **Sin apoyo backend:** Idempotencia solo en cliente no evita doble cargo. **Clock skew:** No depende del tiempo, pero OCC backend debe manejar versionado. **Offline prolongado:** Reintentos diferidos pueden expirar la llave o el checkout. |
-| **Criterio de Selección** | Riverpod/StateNotifier para estado de checkout aislado y testeable; Idempotency-Key siguiendo guías Stripe/Adyen; Transactional Outbox recomendado en backend para evitar inconsistencia entre pago y actualización de orden. |
+| **Restricciones Duras (NO permite)** | **Sin apoyo backend:** Idempotencia solo en cliente no evita doble cargo. **Clock skew:** OCC backend debe manejar versionado. **Offline prolongado:** Reintentos diferidos pueden expirar la llave/orden. |
+| **Criterio de Selección** | Riverpod/StateNotifier para estado de checkout aislado y testeable; `Idempotency-Key` siguiendo guías Stripe/Adyen; Transactional Outbox en backend para consistencia pago/orden. |
+
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Unit (CI) | Estado de checkout transita pending/processing/success sin carreras | Equipo móvil, CI |
+| Integration (CI) | Reintentos con misma `Idempotency-Key` generan un solo cargo | Móvil/Backend, CI + staging |
+| Seguridad/consistencia | Respuestas tardías/duplicadas se reconcilian sin duplicar cargos | QA/Seguridad |
+| Observabilidad | Evento `checkout.*` con `idempotency_key`, `trace_id`; métrica de duplicados | Móvil/SRE |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Estado visible | Mostrar `processing`; botón deshabilitado, pero reintentos controlados | Reduce tap spam |
+| Reintentos | Retry con backoff + misma `Idempotency-Key` | Resiliencia sin duplicar |
+| Errores | Mensajes claros; opción de reintentar con misma key | Evita cargo duplicado |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Idempotency-Key | Generar por orden y persistir para reintentos | Clave anticobro duplicado |
+| OCC backend | Versionado/locks suaves en backend | Evita colisión de updates |
+| Outbox | Transactional Outbox para eventos de pago/orden | Consistencia eventual segura |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Cobros duplicados por requests simultáneos/reintentos. |
+| Opciones evaluadas | Solo UI debounce; locking pesimista; idempotencia + OCC + outbox. |
+| Decisión | Idempotencia end-to-end + OCC + outbox; Riverpod para estado del checkout. |
+| Consecuencias | Requiere soporte de backend y PSP; manejo de keys y retries. |
+| Riesgos aceptados | Expiración de key en offline prolongado; dependencia de PSP en idempotencia. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Cobros duplicados | 0 incidentes | Crítico si > 0 | Confianza y menos chargebacks |
+| Reintentos seguros | 100% con misma `Idempotency-Key` | Alerta si falla | Resiliencia sin duplicar |
+| Tiempo confirmación checkout | p95 < 3 s | Warning si se acerca | UX fluida |
+| Tickets por doble cargo | ↓ ≥ 80% | Alerta si no baja | Soporte controlado |
+| Éxito OCC/outbox | > 99% | Alerta si baja | Consistencia orden/pago |
 
 ---
 
@@ -68,6 +125,7 @@ En dispositivos rápidos o con taps repetidos, se envían múltiples requests si
 | Transactional Outbox | Patrón para asegurar que eventos y cambios de DB se publican de forma atómica. |
 | Backoff exponencial | Estrategia de reintentos con tiempos crecientes para reducir carga y colisiones. |
 | Checkout | Proceso de cobro de una orden; crítico en e-commerce/fintech. |
+| Idempotency-Key | Identificador único de operación para garantizar un solo efecto. |
 
 ---
 
@@ -76,3 +134,5 @@ En dispositivos rápidos o con taps repetidos, se envían múltiples requests si
 - [Stripe Idempotent Requests](https://stripe.com/docs/idempotency)
 - [Adyen Idempotency](https://docs.adyen.com/development-resources/api-idempotency/)
 - [Fowler - Transactional Outbox](https://martinfowler.com/articles/patterns-of-distributed-systems/transactional-outbox.html)
+- [Baymard Institute - Cart Abandonment](https://baymard.com/lists/cart-abandonment-rate)
+- [ACFE Fraud 2022](https://acfepublic.s3-us-west-2.amazonaws.com/2022-Report-to-the-Nations.pdf)
