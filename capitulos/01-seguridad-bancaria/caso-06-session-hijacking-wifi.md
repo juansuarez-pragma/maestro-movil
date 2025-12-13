@@ -34,6 +34,19 @@
 - **Firesheep (2010):** Demostró lo trivial de capturar cookies de sesión en redes no cifradas; millones afectados.
 - **Kaspersky 2023:** 25% de WiFi públicos sin cifrado, 25% con cifrado débil (WEP); superficie ideal para sidejacking.
 
+### Analítica y prevalencia (industria)
+
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| Kaspersky WiFi Report (2023) | Global | 25% de puntos públicos sin cifrado; 25% con WEP. |
+| NowSecure State of Mobile App Security (2024) | 1,000+ apps (US/EU) | 85% fallan ≥1 control MASVS; fallas de comunicación segura entre los más comunes. |
+| Cisco DNS/Network Security (2022) | Tráfico empresarial | ~20% de accesos corporativos pasan por redes no confiables al menos 1 vez/mes. |
+
+**Resumen global**
+- Redes abiertas o WEP siguen siendo ~50% del inventario público, facilitando sidejacking/SSL stripping.
+- Fallas en controles de comunicación segura son comunes en apps móviles (MASVS).
+- Uso frecuente de redes no confiables en escenarios corporativos/retail incrementa la exposición de tokens.
+
 ### Riesgos
 
 | Tipo | Impacto |
@@ -71,21 +84,39 @@
 | Observabilidad | Eventos `network.context` con tipo de red, cifrado y acción tomada; alertas si untrusted > umbral | Móvil/SRE, CI |
 
 ### 3.2 UX y operación
-- Mensaje claro en WiFi abierto: “Red no confiable, solo consulta habilitada; usa datos móviles o VPN para operar”.
-- CTA para habilitar VPN de la empresa o cambiar a red segura.
-- Revalidar riesgo al cambiar de red; limpiar tokens si cambia fingerprint de red.
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Mensajes | En WiFi abierto: “Red no confiable, solo consulta; usa datos móviles/VPN para operar” | Alinea expectativas y reduce soporte |
+| CTA | Botón para habilitar VPN o cambiar de red | Guía acción mitigadora |
+| Cambio de red | Revalidar riesgo y limpiar tokens si cambia fingerprint de red | Evita reuse fuera del contexto original |
 
 ### 3.3 Política de riesgo y límites
-- **Untrusted (abierta/WEP):** Solo consulta; operaciones sensibles bloqueadas; step-up para login.
-- **Trusted (WPA2/WPA3):** Operaciones permitidas; monitor de cambios rápidos de BSSID.
-- **VPN:** Considerar riesgo medio-bajo, pero revalidar al desconectarse.
+| Clasificación de red | Comportamiento | Nota |
+|:---------------------|:--------------|:-----|
+| Untrusted (abierta/WEP) | Solo consulta; bloquear operaciones sensibles; step-up para login | Minimiza exposición en redes inseguras |
+| Trusted (WPA2/WPA3) | Operaciones permitidas; monitorear cambios rápidos de BSSID | Detecta rogos/AP spoof |
+| VPN | Riesgo medio-bajo; revalidar al desconectarse | Mantiene sesión al mover red segura → insegura |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Tokens robados en WiFi público permiten ATO; warnings solos son ignorados. |
+| Opciones evaluadas | Solo HTTPS/pinning; warning sin acción; defensa en profundidad con detección de red, binding y step-up. |
+| Decisión | Defensa en profundidad: detección de red + session binding + step-up/bloqueo en untrusted + sugerencia de VPN. |
+| Consecuencias | Más lógica en cliente; potencial fricción en redes públicas; depende de exactitud de clasificación. |
+| Riesgos aceptados | Falsos positivos en algunas redes corporativas; limitaciones de APIs iOS para inspección. |
 
 ---
 
 ## 4. Impacto esperado
-- Reducción de sesiones secuestradas en redes públicas ≥ 70% por binding y step-up.
-- Alertas de redes no confiables en < 5 s; operaciones sensibles bloqueadas automáticamente.
-- Soporte: tickets por “wifi bloqueada” controlados (<10 por semana) con mensajes claros.
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Secuestro de sesión en redes públicas | Reducción ≥ 70% | Alerta si no mejora tras rollout | Fraude contenido |
+| Tiempo de alerta por red no confiable | < 5 s | Alerta si > 5 s | Respuesta rápida |
+| Operaciones bloqueadas en untrusted | 100% de operaciones sensibles | Alerta si se ejecutan en untrusted | Minimiza exposición |
+| Tickets “wifi bloqueada” | < 10/semana | Alerta si > 10 | Balance UX/seguridad controlado |
+| Revalidaciones por cambio de red | 100% al detectar cambio de fingerprint | Alerta si se omite | Evita reuse fuera de contexto |
 
 ---
 
@@ -111,6 +142,9 @@
 - [Android ConnectivityManager](https://developer.android.com/reference/android/net/ConnectivityManager)
 - [iOS NEHotspotHelper](https://developer.apple.com/documentation/networkextension/nehotspothelper)
 - [NIST Guidelines on Network Security](https://csrc.nist.gov/publications/detail/sp/800-153/final)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)
+- [Kaspersky WiFi Security Report 2023](https://securelist.com/over-a-quarter-of-wi-fi-hotspots-are-insecure/105195/)
+- [Cisco DNS/Network Security Report 2022](https://www.cisco.com/c/en/us/solutions/executive-perspectives/annual-cybersecurity-report.html)
 
 ---
 
