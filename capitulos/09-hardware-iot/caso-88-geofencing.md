@@ -16,16 +16,29 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- Sin ubicación ni reglas, transacciones inusuales pasan sin control.
+- Geofencing on-device sin backend genera falsos positivos y poca trazabilidad.
+- Sin consentimiento/privacidad, el uso de ubicación puede incumplir normativas.
+
 ### Escenario de Negocio
 
 > *"Como usuario, quiero que bloqueen transacciones fuera de mi zona habitual para evitar fraude."*
 
-Sin geofencing, transacciones en ubicaciones inusuales pueden pasar sin control.
+### Incidentes reportados
+- **Bancos/fintech:** Ubicaciones atípicas elevan probabilidad de fraude.
+- **Falsos positivos:** Ubicación imprecisa bloqueó transacciones legítimas.
 
-### Evidencia de Industria
+### Analítica y prevalencia (industria)
 
-- **Bancos/fintech:** Usan ubicación como señal de riesgo adicional.
-- **Fraude:** Transacciones desde ubicaciones atípicas elevan probabilidad de fraude.
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| Fraude por ubicación | Global | Ubicaciones inusuales son señal clave; se combinan con device/IP. |
+| Geofencing móvil | Global | Precisión variable; se requieren múltiples señales y backend. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; manejo de datos/ubicación es brecha común. |
+
+**Resumen global**
+- Ubicación como señal de riesgo requiere reglas en backend, consentimientos y step-up; on-device simple es insuficiente y ruidoso.
 
 ### Riesgos
 
@@ -43,7 +56,7 @@ Sin geofencing, transacciones en ubicaciones inusuales pueden pasar sin control.
 |:-----------------|:-----------------------|:----------------------------------|
 | **BAJA** | Sin ubicación ni reglas | **INADECUADO:** No detecta anomalías. |
 | **ACEPTABLE** | Geofencing simple on-device | **MEJORA:** Mejor, pero sin correlación con backend ni señales adicionales. |
-| **ENTERPRISE** | **Geofencing con riesgo:** reglas en backend, señal de ubicación + device binding, step-up/ bloqueo, privacidad y consentimientos | **ÓPTIMO:** Seguridad con control y menos falsos positivos. |
+| **ENTERPRISE** | **Geofencing con riesgo:** reglas en backend, señal de ubicación + device binding, step-up/bloqueo, privacidad y consentimientos | **ÓPTIMO:** Seguridad con control y menos falsos positivos. |
 
 ---
 
@@ -52,8 +65,49 @@ Sin geofencing, transacciones en ubicaciones inusuales pueden pasar sin control.
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
 | **Capacidades (SÍ permite)** | Obtener ubicación con consentimiento. Enviar hash/zonas al backend para scoring. Aplicar step-up (OTP/biometría) o bloqueo según riesgo. Manejar precisión y tiempo de captura. |
-| **Restricciones Duras (NO permite)** | **Privacidad:** Requiere consentimientos y minimización. **Precisión variable:** GPS puede ser impreciso en interiores; usar múltiples señales. **Batería:** Ubicación frecuente consume energía; usar triggers. |
-| **Criterio de Selección** | Reglas en backend; uso de ubicación como señal adicional; consentimiento y minimización de datos; step-up en casos de riesgo. |
+| **Restricciones Duras (NO permite)** | **Privacidad:** Requiere consentimientos y minimización. **Precisión variable:** GPS puede fallar en interiores; usar múltiples señales. **Batería:** Ubicación frecuente consume energía; usar triggers. |
+| **Criterio de Selección** | Reglas en backend; ubicación como señal adicional; consentimiento y minimización; step-up en riesgo. |
+
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Reglas | Scoring y decisiones (step-up/bloqueo) correctas | Backend/QA |
+| Precisión | Manejo de señales múltiples y thresholds | Móvil/QA |
+| Privacidad | Consentimiento y minimización de datos | Seguridad/Legal |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Consentimiento | Claro y revocable; mostrar uso de ubicación | Transparencia |
+| Step-up | Solicitar OTP/biometría según riesgo | UX/Seguridad |
+| Mensajes | Explicar bloqueos y cómo resolver | Soporte |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Frecuencia | Triggers de ubicación para ahorrar batería | Eficiencia |
+| Datos | Hash/zonas en vez de coordenadas exactas | Privacidad |
+| Observabilidad | Eventos `geo.risk.*` con decisión | Trazabilidad |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Transacciones fuera de zona sin control de riesgo. |
+| Opciones evaluadas | Sin ubicación; geofencing on-device simple; reglas en backend con scoring/step-up y privacidad. |
+| Decisión | Geofencing con reglas backend, señal de ubicación + device binding, step-up/bloqueo y privacidad. |
+| Consecuencias | Requiere consentimientos y tuning de precisión; coordinación backend-móvil. |
+| Riesgos aceptados | Falsos positivos si señal es mala; consumo de batería si se abusa. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Fraude por ubicación | ↓ vs baseline | Crítico si no baja | Seguridad |
+| Falsos positivos | Controlados | Warning si suben | UX |
+| Consentimientos activos | 100% usuarios con geofence | Alerta si faltan | Cumplimiento |
+| Consumo de batería | Dentro de budget | Alerta si sube | Experiencia |
 
 ---
 
@@ -75,3 +129,4 @@ Sin geofencing, transacciones en ubicaciones inusuales pueden pasar sin control.
 
 - [Android Geofencing](https://developer.android.com/training/location/geofencing)
 - [iOS Region Monitoring](https://developer.apple.com/documentation/corelocation/monitoring_the_user_s_proximity_to_geographic_regions)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)

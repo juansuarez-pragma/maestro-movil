@@ -16,16 +16,29 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- Sensores defectuosos o dedos no reconocidos bloquean al usuario.
+- Fallback débil (PIN simple/OTP sin límites) abre vectores de ataque.
+- Sin logging de fallos, no se detectan patrones de fraude o UX mala.
+
 ### Escenario de Negocio
 
 > *"Como usuario, si la huella falla, necesito otra opción segura para no quedar bloqueado."*
 
-Sensores defectuosos o dedos no reconocidos pueden bloquear usuarios y generar soporte.
+### Incidentes reportados
+- **Apps bancarias:** Requieren fallback a PIN/OTP con controles; usuarios bloqueados aumentan churn.
+- **Accesibilidad:** Algunos usuarios no pueden usar biometría; sin fallback se pierden.
 
-### Evidencia de Industria
+### Analítica y prevalencia (industria)
 
-- **Apps bancarias:** Ofrecen fallback a PIN/OTP con límites y controles.
-- **Accesibilidad:** Algunos usuarios no pueden usar huella/rostro.
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| OWASP MASVS | Global | Fallback seguro es requisito para autenticación robusta. |
+| Casos de soporte | Varios | Bloqueos por biometría fallida elevan tickets. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; autenticación/fallback mal gestionado es común. |
+
+**Resumen global**
+- Fallback gobernado con límites y step-up equilibra seguridad/UX; solo biometría o fallback débil genera bloqueos y riesgo.
 
 ### Riesgos
 
@@ -51,9 +64,50 @@ Sensores defectuosos o dedos no reconocidos pueden bloquear usuarios y generar s
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Detectar fallos de biometría y ofrecer PIN/OTP. Limitar intentos y aplicar step-up. Registrar fallos para detección de fraude. Permitir desactivar biometría en dispositivos problemáticos. |
-| **Restricciones Duras (NO permite)** | **Biometría obligatoria por política:** Si regulatorio exige, fallback puede ser limitado. **Riesgo de PIN débil:** Requiere políticas de longitud/complexidad. **Accesibilidad:** Debe cumplir A11y en prompts. |
-| **Criterio de Selección** | Fallback seguro (PIN/OTP) con límites y logging; biometría opcional pero recomendada; mensajes claros al usuario. |
+| **Capacidades (SÍ permite)** | Detectar fallos de biometría y ofrecer PIN/OTP. Limitar intentos y aplicar step-up. Registrar fallos para fraude/UX. Permitir desactivar biometría en dispositivos problemáticos. |
+| **Restricciones Duras (NO permite)** | **Biometría obligatoria:** Si regulación exige, fallback puede ser limitado. **PIN débil:** Requiere políticas de longitud/complexidad. **A11y:** Prompts deben ser accesibles. |
+| **Criterio de Selección** | Fallback seguro (PIN/OTP) con límites, logging, y step-up; biometría opcional pero recomendada; mensajes claros. |
+
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Seguridad | Políticas de PIN/OTP, límites de intentos | Seguridad/QA |
+| UX | Flujo accesible y claro tras fallar biometría | QA/A11y |
+| Observabilidad | Eventos `auth.fallback.*` con razón | Móvil/SRE |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Mensajes | Explicar por qué falló biometría y opciones | Transparencia |
+| Step-up | OTP adicional en contextos de riesgo | Seguridad |
+| Desactivación | Permitir desactivar bio en dispositivos problemáticos | Flexibilidad |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Intentos | Bloqueo tras N fallos; cooldown | Previene abuso |
+| Auditoría | Log de fallos y cambio de método | Trazabilidad |
+| Cumplimiento | Respetar políticas regulatorias/locales | Conformidad |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Bloqueos por biometría y riesgo de fallback débil. |
+| Opciones evaluadas | Solo biometría; fallback simple; fallback gobernado con límites/step-up/logging. |
+| Decisión | Fallback gobernado con límites, step-up según riesgo y auditoría. |
+| Consecuencias | Requiere políticas claras y UX accesible; manejo de soporte. |
+| Riesgos aceptados | Posible fricción por límites; regulación puede restringir fallback. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Usuarios bloqueados por bio | ↓ vs baseline | Crítico si sube | UX |
+| Intentos fallidos | Controlados con límites | Warning si crecen | Seguridad |
+| Tickets de soporte | Tendencia a la baja | Alerta si suben | Operación |
+| Incidentes por fallback débil | 0 | Crítico si >0 | Riesgo |
 
 ---
 
@@ -75,3 +129,4 @@ Sensores defectuosos o dedos no reconocidos pueden bloquear usuarios y generar s
 
 - [local_auth](https://pub.dev/packages/local_auth)
 - [OWASP Mobile Auth](https://owasp.org/www-project-mobile-security-testing-guide/)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)

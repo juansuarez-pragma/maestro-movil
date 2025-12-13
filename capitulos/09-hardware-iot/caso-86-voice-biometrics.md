@@ -16,16 +16,29 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- Voiceprint estático sin liveness permite replay/deepfake.
+- Frase fija puede ser grabada y reutilizada.
+- Sin consentimiento y cifrado, los datos biométricos violan privacidad/regulación.
+
 ### Escenario de Negocio
 
 > *"Como usuario, quiero autenticarme por voz en canales telefónicos sin ser suplantado."*
 
-Biometría de voz es vulnerable a replay y deepfakes si no se implementa con liveness y desafíos dinámicos.
+### Incidentes reportados
+- **Fraude de voz:** Deepfakes y grabaciones han burlado autenticaciones estáticas.
+- **Auditorías:** Falta de consentimiento/borrado de biometría generó hallazgos.
 
-### Evidencia de Industria
+### Analítica y prevalencia (industria)
 
-- **Contact centers:** Adoptan biometría de voz con detección de spoofing.
-- **Fraudes de voz:** Deepfakes de voz aumentan; requieren contramedidas.
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| Contact centers | Global | Biometría de voz con anti-spoofing y challenge dinámico adopción creciente. |
+| ASVspoof benchmarks | Global | Deepfakes requieren detección avanzada de spoof. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; manejo de datos sensibles es brecha común. |
+
+**Resumen global**
+- Biometría de voz segura requiere anti-spoof, challenge dinámico y templates cifrados; enfoques estáticos son vulnerables a replay/deepfake.
 
 ### Riesgos
 
@@ -51,9 +64,50 @@ Biometría de voz es vulnerable a replay y deepfakes si no se implementa con liv
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Enrollment de voiceprint con consentimiento. Verificación con challenge aleatorio. Detección de spoof (replay/deepfake). Almacenamiento cifrado de templates. Ajuste de umbrales y re-entrenamiento. |
-| **Restricciones Duras (NO permite)** | **Ruido ambiental:** Afecta precisión. **Consentimiento/privacidad:** Datos biométricos requieren cumplimiento legal. **Compatibilidad:** Depende de calidad de micrófono. |
-| **Criterio de Selección** | SDK con anti-spoof; challenge dinámico; templates cifrados; políticas de consentimiento y borrado; métricas de FAR/FRR. |
+| **Capacidades (SÍ permite)** | Enrollment con consentimiento. Verificación con challenge aleatorio. Detección de spoof (replay/deepfake). Templates cifrados. Ajuste de umbrales y re-entrenamiento. |
+| **Restricciones Duras (NO permite)** | **Ruido:** Afecta precisión. **Privacidad:** Datos biométricos regulados. **Hardware:** Calidad de micrófono impacta FAR/FRR. |
+| **Criterio de Selección** | SDK con anti-spoof, challenge dinámico, templates cifrados; políticas de consentimiento/borrado; métricas FAR/FRR. |
+
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Anti-spoof | Bloqueo de replay/deepfake | Seguridad/QA |
+| UX/ruido | Tasa de rechazo/aceptación en ambientes ruidosos | QA/Móvil |
+| Privacidad | Consentimiento y cifrado de templates | Legal/Seguridad |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Frases | Challenge aleatorio; evitar frases fijas | Seguridad |
+| Feedback | Mensajes claros en rechazo y reintentos limitados | UX |
+| Consentimiento | Opt-in y borrado a solicitud | Cumplimiento |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Almacenamiento | Templates cifrados, control de acceso | Seguridad |
+| Métricas | FAR/FRR monitorizados; tuning continuo | Calidad |
+| Observabilidad | Eventos `voice.auth.*` con resultado/razón | Trazabilidad |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Suplantación por replay/deepfake en biometría de voz. |
+| Opciones evaluadas | Voiceprint estático; liveness básico; anti-spoof + challenge dinámico + templates cifrados. |
+| Decisión | Anti-spoof, challenge dinámico, templates cifrados y políticas de consentimiento. |
+| Consecuencias | Requiere UX clara y pruebas en ambientes ruidosos; gestión de datos biométricos. |
+| Riesgos aceptados | Falsos rechazos en ruido; dependencia de calidad de micrófono. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| FAR (False Accept Rate) | Bajo y monitoreado | Crítico si sube | Seguridad |
+| FRR (False Reject Rate) | Controlado | Warning si sube | UX |
+| Incidentes de spoof | 0 | Crítico si >0 | Protección |
+| Consentimientos registrados | 100% enrolados | Alerta si faltan | Cumplimiento |
 
 ---
 
@@ -75,3 +129,4 @@ Biometría de voz es vulnerable a replay y deepfakes si no se implementa con liv
 
 - [Voice Biometrics Standards](https://pages.nist.gov)
 - [Anti-spoofing Research](https://www.asvspoof.org/)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)

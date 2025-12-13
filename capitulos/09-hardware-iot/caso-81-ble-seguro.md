@@ -16,16 +16,29 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- Pairing débil o sin cifrado permite sniffing/spoofing de datos sensibles.
+- Sin whitelist ni validación de servicios, se aceptan dispositivos falsos.
+- Falta de cifrado app-layer expone datos aunque el canal BLE se rompa.
+
 ### Escenario de Negocio
 
 > *"Como usuario, quiero sincronizar mi wearable sin riesgo de interceptar mis datos de salud/finanzas."*
 
-BLE sin seguridad permite sniffing, spoofing y modificación de datos.
+### Incidentes reportados
+- **IoT/health:** Datos de salud filtrados por pairing débil.
+- **OWASP MASVS:** Exige cifrado y autenticación en BLE; fallas comunes en apps móviles.
 
-### Evidencia de Industria
+### Analítica y prevalencia (industria)
 
-- **OWASP MASVS:** Requiere cifrado y autenticación en BLE.
-- **Incidentes IoT:** Datos de salud filtrados por pairing débil.
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| Incidentes BLE/IoT | Global | Sniffing/spoofing comunes con pairing débil. |
+| MASVS testing | Global | Cifrado y autenticación en BLE fallan con frecuencia. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; comunicaciones inseguras son recurrentes. |
+
+**Resumen global**
+- BLE sin pairing fuerte ni cifrado app-layer expone datos; se requieren pairing autenticado, whitelist y cifrado adicional.
 
 ### Riesgos
 
@@ -55,6 +68,47 @@ BLE sin seguridad permite sniffing, spoofing y modificación de datos.
 | **Restricciones Duras (NO permite)** | **Hardware limitado:** Algunos wearables no soportan pairing fuerte. **Canales inseguros:** BLE puede ser jammeado. **UX:** Pairing demasiado estricto puede frustrar usuarios. |
 | **Criterio de Selección** | Pairing autenticado, cifrado app-layer, validación de servicios GATT, rotación de claves; Riverpod para estado de conexión. |
 
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Seguridad | Pairing fuerte y cifrado app-layer | Seguridad/QA |
+| Integration (CI) | Whitelist y validación de servicios GATT | Móvil/QA |
+| Observabilidad | Eventos `ble.*` (conexión, pairing, errores) | Móvil/SRE |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Pairing | UI clara para Passkey/Numeric Comparison | Menos fricción |
+| Reconexión | Manejo de reintentos con backoff | Estabilidad |
+| Mensajes | Alertas ante dispositivos no autorizados | Seguridad percibida |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Rotación de claves | Periódica y atada a pairing | Defensa |
+| Compatibilidad | Matriz de wearables y soporte de pairing fuerte | Planeación |
+| Privacidad | No enviar PII en claro ni en logs | Cumplimiento |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Sincronizar BLE sin exponer datos sensibles. |
+| Opciones evaluadas | BLE sin pairing; pairing estándar; pairing autenticado + cifrado app-layer + whitelist. |
+| Decisión | Pairing autenticado, cifrado app-layer, whitelist/validación de servicios y rotación de claves. |
+| Consecuencias | Requiere UX de pairing y compatibilidad de hardware; mayor complejidad. |
+| Riesgos aceptados | Jam y limitaciones de dispositivos; posibles fricciones de UX. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Incidentes de sniffing/spoofing | 0 | Crítico si >0 | Seguridad |
+| Tasa de pairing exitoso | > 95% | Warning si baja | UX |
+| Errores de conexión | Tendencia a la baja | Alerta si sube | Estabilidad |
+| Alertas de dispositivos no autorizados | Registradas y bloqueadas | Crítico si pasan | Protección |
+
 ---
 
 ## Glosario de Términos Clave
@@ -75,3 +129,4 @@ BLE sin seguridad permite sniffing, spoofing y modificación de datos.
 
 - [OWASP MASVS - Device Communication](https://owasp.org/www-project-mobile-security-testing-guide/)
 - [Bluetooth SIG Security](https://www.bluetooth.com/learn-about-bluetooth/bluetooth-technology/bluetooth-security/)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)

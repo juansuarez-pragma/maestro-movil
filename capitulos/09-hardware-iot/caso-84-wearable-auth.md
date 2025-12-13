@@ -16,16 +16,29 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- Notificaciones simples sin binding permiten approvals en relojes no autorizados.
+- Sin payload firmado, se puede spoofear la transacción.
+- Dependencia de conectividad con el teléfono rompe la UX si no se gestiona.
+
 ### Escenario de Negocio
 
 > *"Como usuario, quiero aprobar operaciones desde mi reloj sin sacar el teléfono."*
 
-Usar wearables como segundo factor reduce fricción, pero debe ser seguro y vinculado al dispositivo correcto.
+### Incidentes reportados
+- **MFA en wearables:** Implementaciones sin binding permitieron aprobaciones no autorizadas.
+- **Payload inseguro:** Mensajes sin firma fueron interceptados/spoofeados.
 
-### Evidencia de Industria
+### Analítica y prevalencia (industria)
 
-- **MFA en wearables:** Bancos y apps de pago ofrecen aprobaciones desde el reloj.
-- **Riesgos:** Notificaciones inseguras o sin binding permiten spoofing.
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| MFA en banca | Global | Relojes usados como segundo factor con binding y firma. |
+| Seguridad en notificaciones | Global | Payload sin firma expone a spoofing. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; controles de autenticación son críticos. |
+
+**Resumen global**
+- MFA en wearables exige binding fuerte, payload firmado y revocación; sin ello, spoofing y approvals indebidos son probables.
 
 ### Riesgos
 
@@ -55,6 +68,47 @@ Usar wearables como segundo factor reduce fricción, pero debe ser seguro y vinc
 | **Restricciones Duras (NO permite)** | **Dependencia de teléfono:** Muchas acciones requieren el teléfono cerca. **Compatibilidad:** APIs varían (WatchOS vs WearOS). **Seguridad física:** Reloj desbloqueado puede aprobar si no se exige bio. |
 | **Criterio de Selección** | Binding fuerte, firmas en payload, biometría/lock del reloj, revocación y sync consistente. |
 
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Seguridad | Binding y firma de payload | Seguridad/QA |
+| Integration (WatchOS/WearOS) | Flujos de aprobación y revocación | Móvil/QA |
+| Observabilidad | Eventos `wearable.auth.*` con resultado y dispositivo | Móvil/SRE |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Mensajes | Mostrar datos de la operación y expiración | Claridad |
+| Conectividad | Manejo offline/reenvío desde teléfono | Continuidad |
+| Revocación | Opción clara para desvincular reloj | Control usuario |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Binding | Asociar a cuenta y device ID, no reutilizar | Seguridad |
+| Biométrico | Usar passcode/bio del reloj si existe | Protección |
+| Cumplimiento | SCA/PSD2 donde aplique | Regulación |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Aprobar operaciones desde reloj sin spoofing ni uso indebido. |
+| Opciones evaluadas | Notificaciones simples; app companion sin binding fuerte; MFA con binding, payload firmado y biometría. |
+| Decisión | MFA con binding fuerte, payload firmado, biometría y revocación remota. |
+| Consecuencias | Requiere coordinación con companion app y backends de firma. |
+| Riesgos aceptados | Dependencia de conectividad; variabilidad de APIs de reloj. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Aprobaciones indebidas | 0 | Crítico si >0 | Seguridad |
+| Éxito de aprobación en reloj | > 98% | Warning si baja | UX |
+| Tiempos de aprobación | Estables | Alerta si suben | Experiencia |
+| Revocaciones ejecutadas | Rápidas y auditadas | Crítico si fallan | Control |
+
 ---
 
 ## Glosario de Términos Clave
@@ -75,3 +129,4 @@ Usar wearables como segundo factor reduce fricción, pero debe ser seguro y vinc
 
 - [Apple Watch Connectivity](https://developer.apple.com/documentation/watchconnectivity)
 - [WearOS Complications/Connectivity](https://developer.android.com/training/wearables/apps)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)

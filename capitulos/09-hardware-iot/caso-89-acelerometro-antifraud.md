@@ -16,16 +16,29 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- Sin señales de sensores, bots/automatizaciones no se distinguen de usuarios.
+- Colecta sin control puede violar privacidad o drenar batería.
+- Sin modelos/umbrales, los falsos positivos disparan bloqueos injustos.
+
 ### Escenario de Negocio
 
 > *"Como app, quiero detectar bots o automatizaciones usando patrones de movimiento/dispositivo."*
 
-Bots pueden emular taps, pero carecen de micro-movimientos humanos capturables por sensores.
+### Incidentes reportados
+- **Fraude móvil:** Bots emulan taps; señales de sensores ayudan a detectar patrones no humanos.
+- **Privacidad/batería:** Colectas agresivas generaron quejas y desinstalaciones.
 
-### Evidencia de Industria
+### Analítica y prevalencia (industria)
 
-- **Behavioral biometrics:** Usan acelerómetro/giroscopio para detectar bots.
-- **Fraude móvil:** Herramientas anti-bot incorporan señales de sensores.
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| Behavioral biometrics | Global | Acelerómetro/giroscopio se usan para señales anti-bot. |
+| Investigación anti-fraude | Global | Modelos requieren datos limpios y minimizados para reducir falsos positivos. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; manejo de datos/sensores es brecha común. |
+
+**Resumen global**
+- Señales de sensores con features y scoring controlado ayudan a detectar bots; se necesitan consentimiento, minimización y límites de batería para evitar efectos negativos.
 
 ### Riesgos
 
@@ -55,6 +68,47 @@ Bots pueden emular taps, pero carecen de micro-movimientos humanos capturables p
 | **Restricciones Duras (NO permite)** | **Privacidad:** Requiere consentimiento y minimización. **Costo battery:** Sampling debe ser limitado. **Modelos:** Necesita entrenamiento y actualización; riesgo de falsos positivos. |
 | **Criterio de Selección** | Recolección mínima necesaria, features calculadas localmente, consentimientos claros, sampling y límites de battery, backend de scoring. |
 
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Datos | Consentimiento y minimización de sensores | Seguridad/Legal |
+| Modelo | Tasa de falsos positivos/negativos | Data/QA |
+| Batería | Consumo dentro de budget | QA/Perf |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Transparencia | Explicar uso de sensores y permitir opt-out | Confianza |
+| Sampling | Solo en eventos críticos; limitar duración | Batería |
+| Step-up | OTP/bio si score alto | Riesgo controlado |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Retención | Guardar features anonimizadas por tiempo limitado | Privacidad |
+| Observabilidad | Eventos `sensor.fraud.*` con score/acción | Trazabilidad |
+| Modelo | Retrain periódico con datos limpios | Precisión |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Bots no detectados por falta de señales de sensores. |
+| Opciones evaluadas | Sin sensores; colecta básica; features locales + scoring backend con privacidad/sampling. |
+| Decisión | Colecta mínima con features locales, scoring backend y privacidad/sampling. |
+| Consecuencias | Requiere modelo y gobernanza de datos; tuning de batería/privacidad. |
+| Riesgos aceptados | Falsos positivos iniciales; impacto de batería si mal configurado. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Detección de bots | ↑ detección con baja tasa FP | Warning si FP sube | Seguridad |
+| Consentimiento opt-in | 100% donde aplique | Alerta si falta | Cumplimiento |
+| Consumo batería | Dentro de budget | Alerta si sube | UX |
+| Incidentes de fraude | ↓ vs baseline | Crítico si no baja | Protección |
+
 ---
 
 ## Glosario de Términos Clave
@@ -75,3 +129,4 @@ Bots pueden emular taps, pero carecen de micro-movimientos humanos capturables p
 
 - [Mobile Sensor Fraud Detection Research](https://scholar.google.com/)
 - [Behavioral Biometrics Overview](https://www.nist.gov/)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)
