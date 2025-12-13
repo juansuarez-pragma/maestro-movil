@@ -19,7 +19,7 @@
 ### Problema detectado (técnico)
 - Teclados de terceros pueden exfiltrar PIN; `TextField` con teclado del sistema no controla data exfiltration.
 - Malware con accesibilidad lee eventos de entrada; sin randomización del keypad, el video/screen recording permite inferir PIN.
-- Sin [FLAG_SECURE](#term-flag-secure) ni detección de overlays, el PIN se filtra por screen capture o tapjacking.
+- Sin [FLAG_SECURE](#term-flag-secure "Flag de Android que bloquea screenshots/recordings.") ni detección de overlays, el PIN se filtra por screen capture o tapjacking.
 
 ### Escenario de Negocio
 
@@ -71,9 +71,9 @@
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Evitar teclados de terceros. Aleatorizar posición de dígitos en cada aparición ([Randomized Keypad](#term-random-keypad)). Prevenir screenshots/recording con [FLAG_SECURE](#term-flag-secure). Detectar overlays maliciosos. Timeout automático. Transmitir PIN hasheado. |
+| **Capacidades (SÍ permite)** | Evitar teclados de terceros. Aleatorizar posición de dígitos en cada aparición ([Randomized Keypad](#term-random-keypad "Distribución aleatoria de dígitos para mitigar shoulder surfing y patrones.")). Prevenir screenshots/recording con [FLAG_SECURE](#term-flag-secure "Flag de Android que bloquea screenshots/recordings."). Detectar overlays maliciosos. Timeout automático. Transmitir PIN hasheado. |
 | **Restricciones Duras (NO permite)** | **Accesibilidad maliciosa:** Con permiso `BIND_ACCESSIBILITY_SERVICE` malware puede observar texto. **Root/Jailbreak:** Atacante puede hookear cualquier función. **FLAG_SECURE bypass:** En algunas ROMs custom no funciona. **iOS:** No hay equivalente 1:1 de FLAG_SECURE. |
-| **Criterio de Selección** | Se usa **[Provider](#term-provider)** porque la lógica es mínima (acumular dígitos, validar longitud) y requiere simplicidad. Custom Widget es necesario porque ningún package existente combina todas las características de seguridad. |
+| **Criterio de Selección** | Se usa **[Provider](#term-provider "Patrón de estado simple usado para la lógica mínima del PIN.")** porque la lógica es mínima (acumular dígitos, validar longitud) y requiere simplicidad. Custom Widget es necesario porque ningún package existente combina todas las características de seguridad. |
 
 ### 3.1 Plan de verificación (V&V)
 | Tipo de verificación | Qué valida | Responsable/Entorno |

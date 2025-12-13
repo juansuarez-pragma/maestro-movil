@@ -8,7 +8,7 @@
 | Campo | Valor |
 |:------|:------|
 | **Palabras Clave de Negocio** | analytics, eventos, duplicados, medición |
-| **Patrón Técnico** | Event Taxonomy, Single Event Pipeline, De-duplication |
+| **Patrón Técnico** | <a href="#glosario-de-terminos-clave" title="Esquema estándar de nombres y propiedades.">[Taxonomía de eventos](#term-taxonomia-de-eventos "Esquema estándar de nombres y propiedades.")</a>, <a href="#glosario-de-terminos-clave" title="Un solo flujo de envío y procesamiento para consistencia.">[Pipeline único](#term-pipeline-unico "Un solo flujo de envío y procesamiento para consistencia.")</a>, <a href="#glosario-de-terminos-clave" title="Evitar contar varias veces el mismo evento.">[Deduplicación](#term-deduplicacion "Evitar contar varias veces el mismo evento.")</a> |
 | **Stack Seleccionado** | Flutter + SDK analytics (GA4/Segment/Amplitude) + event taxonomy + Riverpod para tracking context |
 | **Nivel de Criticidad** | Alto |
 
@@ -64,9 +64,9 @@
 
 | Dimensión | Detalle Técnico |
 |:----------|:----------------|
-| **Capacidades (SÍ permite)** | Definir esquema de eventos (nombres, props). Adjuntar contextos comunes (user/device/version). Deduplicar eventos con IDs/hashes. Controlar sampling. Monitorear tasa de eventos y errores de envío. |
+| **Capacidades (SÍ permite)** | Definir <a href="#glosario-de-terminos-clave" title="Esquema estándar de nombres y propiedades.">[taxonomía de eventos](#term-taxonomia-de-eventos "Esquema estándar de nombres y propiedades.")</a> (nombres, props). Adjuntar <a href="#glosario-de-terminos-clave" title="Datos compartidos (app_version, device, user_id anon) en todos los eventos.">[contexto común](#term-contexto-comun "Datos compartidos (app_version, device, user_id anon) en todos los eventos.")</a> (user/device/version). Aplicar <a href="#glosario-de-terminos-clave" title="Evitar contar varias veces el mismo evento.">[deduplicación](#term-deduplicacion "Evitar contar varias veces el mismo evento.")</a> con IDs/hashes. Controlar <a href="#glosario-de-terminos-clave" title="Enviar solo un porcentaje de eventos para reducir carga.">[sampling](#term-sampling-de-eventos "Enviar solo un porcentaje de eventos para reducir carga.")</a>. Monitorear tasa de eventos y errores de envío. |
 | **Restricciones Duras (NO permite)** | **PII:** No incluir datos sensibles. **SDK limitaciones:** Algunos SDKs no soportan dedup nativo; puede requerir backend. **Sobrecarga:** Contexto excesivo aumenta payload. |
-| **Criterio de Selección** | Taxonomía clara, pipeline único, dedup, sampling donde aplique, governance de eventos. |
+| **Criterio de Selección** | Taxonomía clara + <a href="#glosario-de-terminos-clave" title="Un solo flujo de envío y procesamiento para consistencia.">[pipeline único](#term-pipeline-unico "Un solo flujo de envío y procesamiento para consistencia.")</a> + dedup + sampling donde aplique, con governance de eventos. |
 
 ### 3.1 Plan de verificación (V&V)
 | Tipo de verificación | Qué valida | Responsable/Entorno |

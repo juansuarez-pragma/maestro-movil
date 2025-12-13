@@ -2,9 +2,9 @@
 
 ## 1) Resumen Ejecutivo
 
-Este repositorio es una base documental sólida para apoyar decisiones de arquitectura móvil en Flutter y alimentar un RAG, gracias a su **estructura repetible**, enfoque **agnóstico (sin código)**, uso de **tablas/heurísticas**, y referencias externas. Aun así, presenta brechas cuantificables (consistencia de anclas de glosario y variación de algunos encabezados) que reducen la “precisión operacional” para agentes de IA.
+Este repositorio es una base documental sólida para apoyar decisiones de arquitectura móvil en Flutter y alimentar un RAG, gracias a su **estructura repetible**, enfoque **agnóstico (sin código)**, uso de **tablas/heurísticas**, glosario enlazado y **referencias externas**. En su estado actual, el material es consistente para extracción semántica y también para reglas simples (headings estables), lo que habilita RAG híbrido (vector + estructura).
 
-**Veredicto:** Apto para RAG en escenarios de arquitectura y operación móvil, con mejoras puntuales recomendadas (normalización de headings y controles editoriales).
+**Veredicto:** Apto para RAG en escenarios de arquitectura y operación móvil. El siguiente paso es mejorar la experiencia de lectura humana (navegación y módulos opcionales por capítulo) y mantener controles editoriales para evitar regresiones.
 
 ---
 
@@ -36,16 +36,19 @@ Este repositorio es una base documental sólida para apoyar decisiones de arquit
 - Casos con tabla de analítica (encabezado `| Fuente |`): **100/100**
 - Casos con tabla de KPIs (encabezado `| KPI |`): **100/100**
 - Casos con anclas de glosario `id="term-*"`: **100/100**
+- Casos con enlaces del cuerpo a `#term-*`: **100/100**
+- Casos con tooltips en términos (título de link Markdown/HTML): **100/100**
 
 ### Señales de “RAG readiness”
 - Total de links externos (HTTP/HTTPS) en casos: **367**
 - Links por caso: **promedio 3.67**, mínimo **3**, máximo **11**
 - Casos con referencia a NowSecure: **165 menciones** (señal fuerte de refuerzo de seguridad móvil)
 - Tamaño documental: **~13,587 líneas** en casos; **~136 líneas promedio** por caso (típicamente “consumible” por chunking)
+- Navegación de lectura (Anterior/Siguiente) presente: **8/100** (valor para lectura; opcional para RAG)
 
 ### Brechas detectadas (impacto directo en RAG)
 - Referencias mínimas: estandarizadas a **≥3 links** por caso (mejora de grounding).
-- Tooltips por “hover” dependen del renderer Markdown; se implementan con atributo `title` en enlaces (sin JS).
+- Tooltips por “hover” dependen del renderer Markdown; se implementan con título de link Markdown/HTML (sin JS).
 
 ---
 
@@ -57,7 +60,7 @@ Este repositorio es una base documental sólida para apoyar decisiones de arquit
 
 ### Estado, rendimiento y offline (cap. 2–4)
 - Alineación: patrones estándar (state management, caching, sync, conflictos, idempotencia).
-- Brecha: algunos casos con pocas referencias; recomendable elevar a 3–5 fuentes por caso para sostener decisiones.
+- Observación: el baseline de referencias está cubierto (≥3 por caso). Para casos de alta criticidad, es recomendable subir a **5+** fuentes (papers/estándares) para reforzar decisiones.
 
 ### Networking, modularidad y nativo (cap. 5–7)
 - Alineación: resiliencia, versionado, gRPC/WebSockets, DI, monorepo, platform channels, passkeys y biometría.
@@ -88,7 +91,9 @@ El template (0–4 + glosario + referencias) se aproxima a prácticas industrial
 - **Referencias externas** → grounding y trazabilidad (reduce alucinación del agente).
 
 ### Limitantes actuales (que bajan eficacia)
-- **Variación de subtítulos en algunos casos**: complica extracción por reglas (cuando se desea RAG híbrido: semántico + reglas).
+- **Navegación humana incompleta (Anterior/Siguiente):** dificulta recorridos secuenciales por capítulo para lectores.
+- **Módulos avanzados no tipificados:** algunos casos “ENTERPRISE” agregan secciones extra (p. ej., UX/offline, claves/pinning) sin un “catálogo” por capítulo.
+- **Verificación de enlaces no automatizada:** hoy la calidad se sostiene por convención/checklist; falta un chequeo sistemático (al menos de enlaces internos).
 
 ---
 
@@ -101,5 +106,7 @@ El template (0–4 + glosario + referencias) se aproxima a prácticas industrial
 - **Navegación/entidades (glosario):** Alto (anclas `id="term-*"` y links internos estandarizados)
 
 ### Recomendaciones (alto impacto / bajo costo)
-1. Normalizar subtítulos (ej. “3.1 Plan de verificación”, “3.4 Mini-ADR”) para extracción determinista.
-2. Mantener checklist editorial (pre-merge) para evitar regresiones de headings, enlaces y referencias.
+1. Mantener checklist editorial (pre-merge) para evitar regresiones (`CHECKLIST_RAG.md`).
+2. Estandarizar navegación “Anterior/Siguiente” por capítulo (derivada de `TABLA_DE_CONTENIDOS.md`) para mejorar UX de lectura.
+3. Definir “módulos opcionales” por capítulo (ej. seguridad: claves/pinning, SOC/observabilidad, UX/offline) y marcarlos como opcionales.
+4. Añadir verificación de enlaces internos y headings estables como paso de validación documental (sin agregar código de producto).
