@@ -16,16 +16,30 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- Estado global monolítico dispara rebuilds masivos y jank; estado excesivamente local provoca saldos inconsistentes entre pantallas.
+- Sin stream cache/TTL, cada pantalla refresca saldo → tormenta de requests y lag.
+- Sin deduplicar refresh y sin selectors, se desperdicia CPU/red y se generan glitches visuales.
+
 ### Escenario de Negocio
 
 > *"Como usuario, quiero ver mi saldo actualizado en toda la app sin que se congele la UI."*
 
-Un estado global mal diseñado dispara rebuilds masivos y jank; un estado demasiado local produce datos inconsistentes (saldos distintos por pantalla).
+### Incidentes reportados
+- Apps bancarias (2022): saldos desincronizados generaron cientos de tickets y pérdida de confianza.
+- Guías Flutter perf: recomiendan granularidad fina y selectors para minimizar rebuilds.
 
-### Evidencia de Industria
+### Analítica y prevalencia (industria)
 
-- **Casos en banca 2022:** Apps con saldos desincronizados generaron cientos de tickets y desconfianza.
-- **Flutter perf guides:** Recomiendan granularidad fina y selectors para minimizar rebuilds.
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| Reportes de soporte bancario (2022) | Apps retail | Saldos distintos en diferentes pantallas → tickets y churn. |
+| Estudios de rendimiento Flutter | Global | Rebuilds masivos por estado global; selectors reducen trabajo de UI. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; estado inconsistente causa bugs UX. |
+
+**Resumen global**
+- Inconsistencias de saldo erosionan confianza y aumentan soporte.
+- Rebuilds masivos y refresh redundante degradan UX; partición + selectors son prácticas recomendadas.
 
 ### Riesgos
 
@@ -55,6 +69,49 @@ Un estado global mal diseñado dispara rebuilds masivos y jank; un estado demasi
 | **Restricciones Duras (NO permite)** | **Sin cache compartida:** Cada pantalla refrescando saldo saturará red. **Race de refresh:** Necesita deduplicación para evitar múltiples fetch simultáneos. **Consistencia fuerte:** En presencia de múltiples dispositivos, puede haber lag hasta converger. |
 | **Criterio de Selección** | Riverpod por selectores y scopes; stream caching para evitar N requests; separar Domain state (saldo) de View state (filtros, toggles). |
 
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Unit (CI) | Selectors solo notifican cuando cambia la porción de estado | Equipo móvil, CI |
+| Integration (CI) | Un solo refresh compartido alimenta múltiples pantallas (dedup) | Móvil/Backend, CI |
+| Performance | Rebuilds se mantienen bajos; medir FPS/jank | QA/Perf, dispositivos reales |
+| Observabilidad | Eventos `balance.refresh` con TTL, dedup y latencia | Móvil/SRE |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Indicador de frescura | Mostrar timestamp/estado de sync del saldo | Transparencia al usuario |
+| TTL y backoff | TTL corto (p.ej. 30-60s) + backoff ante errores | Evita tormenta de requests |
+| Offline | Cachear último saldo y marcarlo como “posiblemente desactualizado” | Control de expectativas |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Deduplicación | Evitar múltiples fetch simultáneos; compartir stream cache | Reduce carga |
+| Consistencia multi-dispositivo | Validar saldo contra backend en acciones críticas | Minimiza discrepancias |
+| Observabilidad | Métricas de jank, latencia de refresh y divergencia | Control continuo |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Saldos inconsistentes y jank por estado global/local mal particionado. |
+| Opciones evaluadas | Singleton global; estado local por pantalla; partición global/local con selectors y cache. |
+| Decisión | Partición: saldo global + selectors + cache/TTL; estado local solo para UI. |
+| Consecuencias | Necesita disciplina en scopes/providers; monitoreo de rebuilds. |
+| Riesgos aceptados | Consistencia eventual; dependencia de backend para verdad absoluta. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Divergencia de saldo entre pantallas | < 0.1% de sesiones | Alerta si ≥ 0.1% | Confianza del usuario |
+| Rebuilds innecesarios | Reducción medible vs baseline | Alerta si sube | UX más fluida |
+| Latencia de refresh saldo | p95 < 1 s | Warning si se acerca | Datos frescos percibidos |
+| Tickets por saldo incorrecto | ↓ vs baseline | Alerta si no baja | Menos soporte |
+| Uso de red por refresh | Controlado (dedup + TTL) | Alerta si sube | Costos y perf |
+
 ---
 
 ## Glosario de Términos Clave
@@ -68,6 +125,7 @@ Un estado global mal diseñado dispara rebuilds masivos y jank; un estado demasi
 | Selector | Función que deriva una porción del estado minimizando rebuilds. |
 | TTL | Tiempo máximo que un dato permanece válido antes de refrescar. |
 | Stream cache | Almacenar última emisión de un stream para nuevos suscriptores. |
+| Deduplicación | Evitar múltiples fetch simultáneos para la misma fuente de datos. |
 
 ---
 
@@ -76,3 +134,4 @@ Un estado global mal diseñado dispara rebuilds masivos y jank; un estado demasi
 - [Flutter Performance Best Practices](https://docs.flutter.dev/perf/best-practices)
 - [Riverpod Selectors](https://riverpod.dev/docs/concepts/providers/#select)
 - [Nielsen Norman - Data Freshness UX](https://www.nngroup.com/articles/data-freshness/)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)
