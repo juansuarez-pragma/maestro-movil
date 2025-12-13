@@ -16,16 +16,29 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- iOS limita fuertemente el trabajo en background; polling constante es bloqueado y consume batería.
+- Background App Refresh no es garantizado; tareas pueden ser diferidas o canceladas si se excede la ventana.
+- Sin push-to-sync y batching, los syncs críticos fallan o llegan tarde.
+
 ### Escenario de Negocio
 
 > *"Como usuario, quiero que mis datos se sincronicen aunque iOS cierre la app, sin agotar batería."*
 
-iOS limita severamente el trabajo en background; los syncs confiables requieren triggers oportunistas y push.
-
-### Evidencia de Industria
-
+### Incidentes reportados
 - **Apps de productividad/banca:** Usan BGTaskScheduler + push para sync crítico.
-- **Apple docs:** Background App Refresh no es garantizado; tareas pueden ser diferidas.
+- **Apple docs:** Background App Refresh no es garantizado; tareas pueden diferirse.
+
+### Analítica y prevalencia (industria)
+
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| Apple docs/prácticas | Global | BGTask/Refresh no garantizan ejecución exacta; ventanas cortas. |
+| Apps productivas/banca | iOS | Push-to-sync + BGTask para mejorar fiabilidad. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; background/sync es punto crítico. |
+
+**Resumen global**
+- Sin push/batching y tareas cortas, los syncs en iOS son poco confiables y costosos en batería.
 
 ### Riesgos
 
@@ -54,6 +67,47 @@ iOS limita severamente el trabajo en background; los syncs confiables requieren 
 | **Capacidades (SÍ permite)** | Registrar tareas BG con identificadores claros. Usar push silencioso para disparar sync breve. Batching de operaciones. Cancelar/posponer si batería baja o sin conectividad. |
 | **Restricciones Duras (NO permite)** | **Garantía absoluta:** iOS puede omitir tareas. **Ventanas cortas:** Trabajo debe ser rápido (<30s). **Permisos:** Necesita entitlement y justificación. |
 | **Criterio de Selección** | Push-to-sync para eventos críticos; BGTaskScheduler para sync periódico ligero; minimizar trabajo y medir consumo. |
+
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Integration (CI) | Registro de BGTask y ejecución dentro de ventana | Móvil/QA, staging iOS |
+| Consumo | Medir impacto energético en dispositivos reales | QA/Perf |
+| Observabilidad | Eventos `bg.sync` con duración/resultado; rate de ejecución | Móvil/SRE |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Push-to-sync | Usar notificación silenciosa para sync crítico | Minimiza polling |
+| Batching | Agrupar operaciones en la ventana BG | Eficiencia |
+| Fallback | Reintentar en foreground si BG falló | Confiabilidad percibida |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Ventana BG | Mantener trabajo < 30s y cancelable | Cumple políticas |
+| Entitlements | Declarar y justificar capacidades BG | Cumplimiento |
+| Restricciones SO | Manejar diferimientos/cancelaciones | Resiliencia |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | iOS limita BG; polling bloqueado, sync falla o consume batería. |
+| Opciones evaluadas | Polling; BGAppRefresh solo; push-to-sync + BGTask + batching. |
+| Decisión | Push silencioso + BGTaskScheduler con trabajo breve y batch; fallback en foreground. |
+| Consecuencias | Configuración de entitlements y monitoreo energético. |
+| Riesgos aceptados | Ejecución no garantizada; variabilidad por políticas iOS. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Éxito de sync BG | Alto, dentro de ventana | Alerta si baja | Datos frescos |
+| Duración de BGTask | < 30s | Alerta si supera | Cumple políticas |
+| Consumo batería | Controlado | Alerta si sube | Mejora NPS |
+| Tickets “no sincroniza” | ↓ vs baseline | Alerta si no baja | Confianza |
 
 ---
 
