@@ -16,16 +16,29 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- El cliente móvil orquesta 7 microservicios: latencia alta, errores parciales y lógica duplicada.
+- Cambios en contratos de dominio rompen el cliente; sin BFF, el mobile debe versionar cada servicio.
+- Falta de cache/response shaping aumenta payload y roundtrips.
+
 ### Escenario de Negocio
 
 > *"Como usuario móvil, quiero ver mi dashboard sin esperar a 7 llamadas secuenciales."*
 
-El frontend móvil sufre latencia y complejidad al hablar con múltiples servicios; el BFF reduce roundtrips y adapta payloads.
+### Incidentes reportados
+- **Netflix/Shopify:** BFFs móviles reducen latencia/payload en dispositivos limitados.
+- **Banca:** Dashboards con múltiples agregaciones requieren capa dedicada.
 
-### Evidencia de Industria
+### Analítica y prevalencia (industria)
 
-- **Netflix/Shopify:** BFFs móviles reducen latencia y payloads para dispositivos limitados.
-- **Banca:** Dashboards con múltiples agregaciones requieren una capa dedicada.
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| Netflix/Shopify tech blogs | Global | BFF reduce roundtrips y payload; contratos por cliente. |
+| Equipos banca | LATAM/EU | Dashboards multi-servicio generan latencia/errores sin BFF. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; payload/latencia es hallazgo común. |
+
+**Resumen global**
+- Sin BFF, la latencia y la fragilidad de contratos escalan; BFF reduce roundtrips, versiona contratos y cachea.
 
 ### Riesgos
 
@@ -55,6 +68,48 @@ El frontend móvil sufre latencia y complejidad al hablar con múltiples servici
 | **Restricciones Duras (NO permite)** | **Sin BFF evolutivo:** Cambios de dominio requieren actualizar BFF. **Escalabilidad:** BFF puede ser cuello de botella sin autoscaling. **Consistencia:** Datos pueden estar stale si cache no se invalida bien. |
 | **Criterio de Selección** | BFF para reducir latencia y acoplamiento; GraphQL opcional para response shaping; Riverpod para cache local y estados claros. |
 
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Integration (CI) | Dashboard usa 1 llamada al BFF; errores parciales manejados | Móvil/Backend, CI |
+| Performance | Latencia y tamaño de payload vs baseline | QA/Perf |
+| Observabilidad | Eventos `bff.*` con latencia, cache hit/miss | Móvil/SRE |
+| Contratos | Versiones coexistentes; adapters funcionan | Móvil/QA |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Loading parcial | Placeholder por sección; degradar si faltan datos | UX estable |
+| Cache server-side | E-Tag/stale-while-revalidate donde aplique | Menos latencia |
+| Versionado | Headers de versión; flags para activar nuevos contratos | Migraciones seguras |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Escalabilidad | Autoscaling del BFF; circuit breaker hacia downstream | Resiliencia |
+| Observabilidad | Trazas por agregación; detectar servicios lentos | MTTR menor |
+| Caducidad | Invalidation dirigida tras mutaciones | Consistencia |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Latencia/fragilidad por orquestar 7 servicios desde el cliente. |
+| Opciones evaluadas | Cliente orquesta; proxy simple; BFF con agregación/cache/versionado. |
+| Decisión | BFF completo con contratos por pantalla, cache, versionado y observabilidad. |
+| Consecuencias | Operar y escalar el BFF; mayor responsabilidad de backend. |
+| Riesgos aceptados | Stale si cache mal invalidado; BFF como punto único crítico. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Latencia de dashboard | p95 reducida vs baseline | Warning si no mejora | UX rápida |
+| Roundtrips | 1 llamada por pantalla principal | Alerta si sube | Menos fallos |
+| Tamaño de payload | ↓ con response shaping/cache | Alerta si crece | Costos/red |
+| Errores parciales | Manejados con degradación | Crítico si rompen UI | Estabilidad |
+
 ---
 
 ## Glosario de Términos Clave
@@ -75,3 +130,4 @@ El frontend móvil sufre latencia y complejidad al hablar con múltiples servici
 
 - [Pattern: Backend for Frontend](https://samnewman.io/patterns/architectural/bff/)
 - [Netflix BFF Lessons](https://netflixtechblog.com/)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)

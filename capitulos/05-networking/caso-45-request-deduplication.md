@@ -16,16 +16,29 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- Doble tap o reintentos simultáneos generan requests duplicados → doble cobro si no hay dedup/idempotencia.
+- Solo deshabilitar UI no cubre duplicados programáticos ni multi-hilos.
+- Sin mapa de in-flight y hash de payload, se saturan backend y hay respuestas inconsistentes.
+
 ### Escenario de Negocio
 
 > *"Como usuario, un doble tap no debe generar dos cobros."*
 
-Sin deduplicación, taps repetidos o reintentos simultáneos causan cobros duplicados y errores de UX.
+### Incidentes reportados
+- **Pagos móviles:** Doble tap = doble cobro sin idempotencia.
+- **PSPs:** Recomiendan Idempotency-Key y dedup cliente/servidor.
 
-### Evidencia de Industria
+### Analítica y prevalencia (industria)
 
-- **Casos de pagos móviles:** Doble tap = doble cobro sin protección de idempotencia.
-- **Guidelines de PSPs:** Recomiendan Idempotency-Key y dedup cliente/servidor.
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| PSPs | Global | Idempotencia/dedup obligatoria en pagos. |
+| Casos móviles | Retail/finanzas | Duplicados por taps/retries sin dedup. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; manejo de requests es fuente de bugs. |
+
+**Resumen global**
+- Dedup + Idempotency-Key reducen duplicados y carga; UI sola no basta.
 
 ### Riesgos
 
@@ -54,6 +67,46 @@ Sin deduplicación, taps repetidos o reintentos simultáneos causan cobros dupli
 | **Capacidades (SÍ permite)** | Identificar requests equivalentes por endpoint/payload. Reusar la misma future/respuesta para duplicados. Adjuntar Idempotency-Key para pagos. Cancelar duplicados opcionales. |
 | **Restricciones Duras (NO permite)** | **Mutaciones no idempotentes:** Backend debe soportar. **Bindeo excesivo:** Dedup agresivo puede bloquear solicitudes legítimas si el payload difiere. **Estado compartido:** Dedup es local al cliente; múltiples dispositivos aún requieren idempotencia server-side. |
 | **Criterio de Selección** | Interceptor central para dedup; claves basadas en método+path+payload hash; Idempotency-Key en pagos; UI también deshabilita acciones críticas. |
+
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Unit (CI) | Mapa de in-flight reusa future/respuesta | Equipo móvil, CI |
+| Integration (CI) | Doble tap/reintento produce un solo efecto | Móvil/Backend, CI |
+| Observabilidad | Eventos `request.dedup` con hash/key, duplicados evitados | Móvil/SRE |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| UI | Deshabilitar acciones críticas mientras hay request | Menos taps duplicados |
+| Feedback | Mostrar estado “procesando” y resultado claro | UX consistente |
+| Errores | Mensajes coherentes al bloquear duplicados | Claridad |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Hash de payload | Incluir método+path+payload; considerar headers relevantes | Evita falsos duplicados |
+| Idempotencia server | Requerida para pagos/órdenes | Defensa en profundidad |
+| Alcance | Dedup local; multi-dispositivo depende del backend | Cobertura |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Requests duplicados por taps/reintentos causan doble cobro. |
+| Opciones evaluadas | Solo UI throttle; dedup parcial; dedup + Idempotency-Key. |
+| Decisión | Interceptor de dedup in-flight + Idempotency-Key en mutaciones críticas + UI deshabilitada. |
+| Consecuencias | Complejidad de hashing/almacenamiento de in-flight; requiere soporte backend. |
+| Riesgos aceptados | Falsos positivos si hash mal definido; cobertura local. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Cobros/pedidos duplicados | 0 | Crítico si > 0 | Confianza |
+| Requests duplicados evitados | Alto ratio de dedup | Alerta si baja | Carga reducida |
+| Tickets por doble tap | ↓ vs baseline | Alerta si no baja | Soporte controlado |
 
 ---
 

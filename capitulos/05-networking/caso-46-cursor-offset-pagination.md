@@ -16,16 +16,29 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- Offset con datos mutables causa duplicados/perdidos; depende de reloj/orden inestable.
+- Sin cursor/orden estable, el scroll salta y la UX se degrada.
+- Reintentos sin idempotencia de página pueden mezclar datos o repetir requests.
+
 ### Escenario de Negocio
 
 > *"Como usuario, quiero explorar millones de productos sin saltos ni repetidos."*
 
-La paginación por offset se rompe con inserciones/borrados; cursor es más estable, pero requiere backend compatible.
+### Incidentes reportados
+- **APIs modernas:** Prefieren cursor para estabilidad/performance.
+- **Retail:** Offset genera duplicados/perdidos con datos cambiantes.
 
-### Evidencia de Industria
+### Analítica y prevalencia (industria)
 
-- **APIs modernas:** Prefieren cursor para estabilidad y performance.
-- **Retail:** Listas grandes con offset generan duplicados/perdidos con datos cambiantes.
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| APIs modernas (Twitter/FB) | Global | Cursor reduce inconsistencias y carga. |
+| Retail | Catálogos grandes | Offset produce saltos cuando hay inserciones/borrados. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; paginación/cache es área recurrente. |
+
+**Resumen global**
+- Cursor con orden estable mejora UX y reduce carga; offset es frágil con datos dinámicos.
 
 ### Riesgos
 
@@ -54,6 +67,47 @@ La paginación por offset se rompe con inserciones/borrados; cursor es más esta
 | **Capacidades (SÍ permite)** | Scroll estable usando cursor (next/prev). Reducir carga al pedir solo siguientes elementos. Combinar con cache local para offline breve. Reintentos seguros con misma clave de página. |
 | **Restricciones Duras (NO permite)** | **Backend sin cursor:** Solo offset disponible. **Orden no estable:** Cambios en datos aún pueden reordenar; requiere campo de orden fijo. **Saltos de pagina:** Cursor no permite salto arbitrario fácilmente. |
 | **Criterio de Selección** | Preferir cursor para listas dinámicas; offset solo si el backend no soporta cursor; ordenar por campo estable (fecha/id). |
+
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Integration (CI) | Cursor mantiene orden y evita duplicados/perdidos | Móvil/Backend, CI |
+| Performance | Latencia y peso de página vs offset | QA/Perf |
+| Observabilidad | Eventos `pagination.*` con cursor/offset, errores | Móvil/SRE |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Orden estable | Usar campo fijo (fecha/id) | Scroll predecible |
+| Reintentos | Misma clave de página en retry | Idempotencia |
+| Cache local | Reusar páginas para back/forward | UX suave |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Backend | Implementar cursor y next/prev tokens | Requiere soporte |
+| Offset fallback | Solo si cursor no existe; ajustar UX | Contingencia |
+| Saltos | Para saltar, usar índices server-side o search | Limitación |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Offset causa duplicados/saltos en datos dinámicos. |
+| Opciones evaluadas | Offset simple; offset con orden fijo; cursor con orden estable. |
+| Decisión | Cursor-based con orden estable y cache; offset solo si no hay cursor. |
+| Consecuencias | Requiere cambios backend; UX de saltos limitada. |
+| Riesgos aceptados | Backend sin cursor limita beneficio; datos muy dinámicos aún pueden mover items. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Duplicados/perdidos | 0 | Crítico si > 0 | UX consistente |
+| Latencia de página | p95 competitiva | Warning si sube | Rendimiento |
+| Consumo de datos | Menor vs offset | Alerta si no baja | Costos |
+| Tickets por scroll errático | ↓ vs baseline | Alerta si no baja | Soporte |
 
 ---
 
