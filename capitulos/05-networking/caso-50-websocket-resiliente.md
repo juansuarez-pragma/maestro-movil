@@ -16,16 +16,29 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- WebSockets en móvil se cortan (cambio de radio, suspensión); sin reconexión + buffer se pierden mensajes.
+- Sin backoff/jitter, la reconexión crea thundering herd; sin dedup/IDs hay duplicados.
+- Sin re-sync desde último ID, el chat queda incompleto tras reconectar.
+
 ### Escenario de Negocio
 
 > *"Como usuario, no quiero perder mensajes en el chat si se corta la conexión."*
 
-WebSockets en móviles sufren cortes de red, cambios de radio y suspensiones de app; se necesita reconexión y buffer.
-
-### Evidencia de Industria
-
+### Incidentes reportados
 - **Chats/soporte:** Requieren reconexión con re-sync para no perder mensajes.
 - **Red móvil:** Variabilidad causa desconexiones frecuentes.
+
+### Analítica y prevalencia (industria)
+
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| Chats en móvil | Global | Cortes frecuentes; sin buffer/dedup se pierden/duplican mensajes. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; tiempo real/chat es fuente de bugs. |
+| WebSocket best practices | Global | Backoff, heartbeats y re-sync recomendados. |
+
+**Resumen global**
+- Requiere reconexión con backoff/heartbeat, buffer y re-sync para confiabilidad.
 
 ### Riesgos
 
@@ -54,6 +67,47 @@ WebSockets en móviles sufren cortes de red, cambios de radio y suspensiones de 
 | **Capacidades (SÍ permite)** | Detectar desconexión y reconectar con backoff+jitter. Heartbeat/ping-pong para salud. Buffer de mensajes salientes y re-envío tras reconectar. Re-sync de históricos desde último ID. Deduplicación por message ID. |
 | **Restricciones Duras (NO permite)** | **Red sin estabilidad:** No garantiza entrega sin soporte backend (acks). **Batería:** Heartbeats frecuentes consumen energía. **Background:** iOS/Android pueden suspender; requiere estrategias de foreground. |
 | **Criterio de Selección** | Backoff + jitter; heartbeats ajustados; cola persistente opcional; IDs para dedup; re-sync al reconectar. |
+
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Integration (CI) | Reconexión con backoff y re-sync desde último ID | Móvil/Backend, CI |
+| Observabilidad | Métricas `ws.*` (retries, drop, buffer size) | Móvil/SRE |
+| Seguridad/consistencia | Dedup y buffer no duplican ni pierden mensajes | QA/Seguridad |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Estado de conexión | Mostrar conectado/reconectando y fallback a histórico cache | Transparencia |
+| Buffer | Cola de mensajes salientes con reenvío tras reconectar | Evita pérdida |
+| Heartbeats | Ajustar intervalos según energía/red | Balance |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Backoff/jitter | Evita reconexión agresiva | Estabilidad |
+| Re-sync | Obtener mensajes faltantes con last_id | Consistencia |
+| Batería | Limitar heartbeats; pausar en background según plataforma | Eficiencia |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Pérdida/duplicado de mensajes por reconexión deficiente. |
+| Opciones evaluadas | Reconexión simple; polling; WebSocket con backoff+buffer+dedup+re-sync. |
+| Decisión | Reconexión con backoff/jitter, heartbeats, buffer y re-sync con dedup por ID. |
+| Consecuencias | Complejidad de estado/buffer; impacto de batería si no se ajusta. |
+| Riesgos aceptados | Redes muy inestables; suspensión en background limita confiabilidad. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Mensajes perdidos/duplicados | 0 | Crítico si > 0 | Confiabilidad |
+| Reconexiones | Controladas con backoff/jitter | Alerta si explotan | Estabilidad |
+| Buffer | Tamaño controlado; sin overflow | Alerta si crece | Recursos |
+| Tickets por chat caído | ↓ vs baseline | Alerta si no baja | Soporte |
 
 ---
 

@@ -16,16 +16,29 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- Ignorar 429 y reintentar genera thundering herd, prolonga el bloqueo y empeora UX.
+- Sin leer `Retry-After` ni pausar colas, se consumen cuotas rápidamente.
+- Falta de degradación clara confunde al usuario y dispara tickets.
+
 ### Escenario de Negocio
 
 > *"Como usuario, si la API me limita, quiero ver una degradación clara y no errores inesperados."*
 
-Al alcanzar límites, muchos clientes siguen reintentando y empeoran el bloqueo; sin manejo, la UX se rompe.
-
-### Evidencia de Industria
-
+### Incidentes reportados
 - **APIs públicas/financieras:** Códigos 429 frecuentes; manejo adecuado reduce churn.
 - **SRE practices:** Evitar thundering herd ante rate limits.
+
+### Analítica y prevalencia (industria)
+
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| APIs públicas/fintech | Global | 429 comunes; manejo deficiente prolonga bloqueo. |
+| SRE practices | Global | Backoff y respeto a `Retry-After` reducen thundering herd. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; manejo de límites/errores es hallazgo común. |
+
+**Resumen global**
+- Rate limiting sin manejo degrade UX y alarga bloqueos; awareness (`Retry-After`, pausas, degradación) es clave.
 
 ### Riesgos
 
@@ -54,6 +67,47 @@ Al alcanzar límites, muchos clientes siguen reintentando y empeoran el bloqueo;
 | **Capacidades (SÍ permite)** | Leer headers de cuota/Retry-After. Pausar colas de requests. Mostrar countdown en UI. Degradar funciones no críticas. Telemetría de 429 y tiempos de espera. |
 | **Restricciones Duras (NO permite)** | **Sin headers:** Algunos backends no envían Retry-After; requiere defaults. **Límites globales:** Cliente no controla cuota de otros clientes. **Operaciones críticas:** Algunas no deben reintentarse automáticamente. |
 | **Criterio de Selección** | Interceptor para manejar 429; Riverpod para estado de cuota/pausas; UX clara para espera/degradación. |
+
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Unit (CI) | Respeto de `Retry-After` y pausa de colas | Equipo móvil, CI |
+| Integration (CI) | Degradación/pausa se aplican en 429 simulados | Móvil/QA |
+| Observabilidad | Eventos `ratelimit.*` con tiempos de espera y funciones degradadas | Móvil/SRE |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Mensajes claros | Mostrar countdown/tiempo de espera | Reduce frustración |
+| Degradación | Desactivar/limitar funciones no críticas durante bloqueo | Protege UX |
+| Reintentos | Backoff y pausa de colas | Evita thundering herd |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Defaults | Si no hay `Retry-After`, usar valores seguros | Robustez |
+| Críticos | No reintentar operaciones no seguras | Consistencia |
+| Monitoreo | Alertar en picos de 429 | Ajustar políticas |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Reintentos ciegos bajo rate limit provocan bloqueo prolongado y mala UX. |
+| Opciones evaluadas | Ignorar 429; error genérico; rate-limit aware con pausa/degradación. |
+| Decisión | Manejo de 429 con `Retry-After`, pausa de colas, backoff y degradación controlada. |
+| Consecuencias | Requiere telemetría y lógica de estado de cuota; UX específica. |
+| Riesgos aceptados | Backends sin headers; posibles falsos positivos en entornos de prueba. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Eventos 429 | ↓ vs baseline | Alerta si sube | Menor bloqueo |
+| Tiempo en bloqueo | Reducido con pausas/backoff | Alerta si prolongado | UX protegida |
+| Reintentos durante límite | Controlados | Crítico si indiscriminados | Evita herd |
+| Tickets por límite | ↓ vs baseline | Alerta si no baja | Soporte controlado |
 
 ---
 

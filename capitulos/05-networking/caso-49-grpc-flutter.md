@@ -16,16 +16,29 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- REST para streams genera overhead y mayor latencia; contratos menos estrictos.
+- Sin reconexión/backoff/heartbeats, gRPC se desconecta y la UI no se entera.
+- TLS/mTLS mal configurado o proxies HTTP/2 bloqueados afectan disponibilidad.
+
 ### Escenario de Negocio
 
 > *"Como app financiera, necesito streams de baja latencia y contratos tipados."*
 
-REST puede ser pesado para streams; gRPC reduce overhead y provee contratos fuertes.
-
-### Evidencia de Industria
-
+### Incidentes reportados
 - **Fintech/trading:** gRPC usado para streaming de mercado y operaciones rápidas.
 - **Benchmarks:** gRPC supera REST en latencia y tamaño de payload.
+
+### Analítica y prevalencia (industria)
+
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| Fintech/trading | Global | gRPC preferido para baja latencia y streams. |
+| Benchmarks HTTP/2/gRPC | Global | Menor latencia/payload que REST. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; redes/seguridad son críticas. |
+
+**Resumen global**
+- gRPC reduce overhead/latencia para streams, pero requiere manejo de reconexión/seguridad y compatibilidad de red.
 
 ### Riesgos
 
@@ -54,6 +67,47 @@ REST puede ser pesado para streams; gRPC reduce overhead y provee contratos fuer
 | **Capacidades (SÍ permite)** | Streaming bidi/unidireccional de mercado. Contratos proto tipados. Interceptores para auth/tracing. Heartbeats y reconexión. mTLS para seguridad. |
 | **Restricciones Duras (NO permite)** | **Compatibilidad proxies/redes:** Algunos entornos bloquean HTTP/2. **Payloads binarios:** Debug más difícil. **Generación de código:** Requiere build_runner/protoc. |
 | **Criterio de Selección** | gRPC para casos de baja latencia/streaming; REST para compatibilidad amplia. Configurar seguridad y reconexión desde el inicio. |
+
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Integration (CI) | Reconexión/backoff/heartbeat operan; streams continúan | Móvil/Backend, CI |
+| Seguridad | TLS/mTLS configurado correctamente | QA/Seguridad |
+| Observabilidad | Métricas `grpc.*` (latencia, retries, disconnects) | Móvil/SRE |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Fallback | Detectar bloqueo HTTP/2 → fallback a REST cuando aplique | Disponibilidad |
+| Heartbeats | Ajustar frecuencia para balance perf/batería | Estabilidad |
+| Errores | Mensajes claros en desconexión y reintento | UX transparente |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Generación de código | Automatizar con build_runner; revisar cambios de proto | Cohesión |
+| Compatibilidad | Probar en redes/proxies variados | Robustez |
+| Versionado | Contratos proto versionados y backward-compatible | Evita rupturas |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | REST/streams lentos; gRPC sin manejo de reconexión/seguridad es frágil. |
+| Opciones evaluadas | REST; gRPC básico; gRPC con reconexión, mTLS y fallback. |
+| Decisión | gRPC con reconexión/backoff/heartbeats, mTLS, interceptores; fallback a REST en bloqueo. |
+| Consecuencias | Mayor complejidad de red/seguridad; requiere tooling de proto. |
+| Riesgos aceptados | Entornos bloquean HTTP/2; binarios más difíciles de debug. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Latencia de streams | p95 menor que REST baseline | Warning si sube | UX ágil |
+| Disponibilidad en red adversa | Fallback correcto | Alerta si falla | Resiliencia |
+| Desconexiones/retries | Controlados con backoff | Alerta si explotan | Estabilidad |
+| Tickets “se cae el stream” | ↓ vs baseline | Alerta si no baja | Soporte |
 
 ---
 
