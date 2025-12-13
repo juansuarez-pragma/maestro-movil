@@ -16,16 +16,30 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- Estado solo en memoria o guardado manual provoca pérdida de progreso al cerrar la app o cambiar de dispositivo.
+- Sin FSM ni checkpoints, el usuario puede saltar pasos ilegales, generando datos incompletos o inválidos para KYC/hipoteca.
+- Sin autosave/background sync, se reprocesan pasos completos y sube el abandono.
+
 ### Escenario de Negocio
 
 > *"Como solicitante, quiero completar mi hipoteca en varios intentos sin perder mi progreso."*
 
-Wizards largos fallan si el usuario pierde conexión, cierra la app o recibe un error; reingresar datos causa abandono y llamadas a soporte.
+### Incidentes reportados
+- **Estudios hipotecarios:** Formularios >10 pasos tienen abandono > 40% sin guardado automático.
+- **Banca 2021:** 18% de solicitudes incompletas por pérdida de progreso al cambiar de dispositivo.
 
-### Evidencia de Industria
+### Analítica y prevalencia (industria)
 
-- **Estudios hipotecarios:** Formularios de más de 10 pasos tienen abandono > 40% sin guardado automático.
-- **Caso Banca 2021:** 18% de solicitudes incompletas por pérdida de progreso al cambiar de dispositivo.
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| Estudios hipotecarios | Apps de crédito | Abandono > 40% sin autosave/checkpoints en flujos largos. |
+| Banca 2021 | Solicitudes multi-dispositivo | 18% incompletas por pérdida de progreso. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; persistencia/estado es fuente de bugs UX. |
+
+**Resumen global**
+- Wizards largos sin autosave/checkpoints elevan abandono y soporte.
+- FSM con checkpoints mitiga saltos ilegales y pérdida de datos.
 
 ### Riesgos
 
@@ -55,6 +69,50 @@ Wizards largos fallan si el usuario pierde conexión, cierra la app o recibe un 
 | **Restricciones Duras (NO permite)** | **Conflictos multi-dispositivo:** Requiere merge/ultima edición o control de lock en backend. **Consistencia de reglas:** Cambios en reglas KYC pueden invalidar drafts antiguos. **Privacidad:** Debe cifrar drafts sensibles en reposo. |
 | **Criterio de Selección** | FSM para restricciones de flujo; Riverpod/StateNotifier por claridad y testeo; Hive/SQLite para almacenamiento ligero y cifrado opcional. |
 
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Unit (CI) | FSM impide saltos ilegales; autosave persiste borrador | Equipo móvil, CI |
+| Integration (CI) | Reanudar en paso exacto tras cerrar/app kill; sync en background funciona | Móvil/Backend, CI + staging |
+| Seguridad/consistencia | Draft cifrado; no se filtran datos en logs | Seguridad/QE |
+| Observabilidad | Eventos `wizard.*` con paso, checkpoint, estado de sync | Móvil/SRE |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Autosave | Guardar al salir de cada paso y en background | Minimiza pérdida |
+| Reanudación | Mostrar “continuar donde quedaste” con paso actual | Reduce abandono |
+| Validación | Validar por paso y cross-step en checkpoints | Calidad de datos |
+| Multi-dispositivo | Merge último cambio o bloquear edición simultánea | Consistencia |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| TTL de drafts | Expirar drafts tras X días; notificar al usuario | Control regulatorio |
+| Conflictos | Resolver por timestamp o solicitar elección al usuario | Minimiza pérdida |
+| Cambios de reglas | Invalidar/revalidar drafts al cambiar reglas KYC | Cumplimiento |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Pérdida de progreso y saltos ilegales en wizards largos. |
+| Opciones evaluadas | Estado en memoria; guardado manual; FSM + autosave + checkpoints. |
+| Decisión | FSM con checkpoints, autosave y sync en background. |
+| Consecuencias | Mayor complejidad de estado y almacenamiento; manejo de expiraciones. |
+| Riesgos aceptados | Conflictos multi-dispositivo; drafts expiran si no se reanudan. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Abandono de wizard | ↓ vs baseline | Alerta si no mejora | Conversión mejorada |
+| Pérdida de progreso | 0 incidentes por cierre/app kill | Crítico si > 0 | Menos soporte |
+| Reanudación exitosa | > 99% reanuda en paso correcto | Alerta si baja | Confianza del usuario |
+| Draft cifrado | 0 filtraciones en logs/storage | Crítico si > 0 | Cumplimiento y privacidad |
+| Tickets por reingreso de datos | ↓ ≥ 30% | Alerta si no baja | Soporte controlado |
+
 ---
 
 ## Glosario de Términos Clave
@@ -68,6 +126,7 @@ Wizards largos fallan si el usuario pierde conexión, cierra la app o recibe un 
 | Draft | Borrador persistente del progreso parcial del usuario. |
 | Checkpoint | Punto de guardado con validaciones parciales antes de avanzar. |
 | Autosave | Guardado automático tras cambios sin acción explícita del usuario. |
+| TTL de draft | Tiempo máximo que se conserva un borrador antes de expirar. |
 
 ---
 
@@ -76,3 +135,4 @@ Wizards largos fallan si el usuario pierde conexión, cierra la app o recibe un 
 - [State Machines and Wizards (Fowler)](https://martinfowler.com/articles/uiState.html)
 - [NNG - Long Forms UX](https://www.nngroup.com/articles/long-forms/)
 - [Flutter State Restoration](https://docs.flutter.dev/development/ui/interactive#state-restoration)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)
