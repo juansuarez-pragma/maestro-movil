@@ -16,16 +16,29 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- Platform Views mal configuradas provocan jank, z-order issues y fallos de teclado/gestos.
+- SDKs de pagos en WebView/nativo fallan en dispositivos viejos si no se elige composición correcta.
+- Sin pruebas de perf/A11y se rompen flujos de checkout y accesibilidad.
+
 ### Escenario de Negocio
 
 > *"Como app, necesito usar SDKs de pagos nativos con vistas embebidas sin jank ni bugs de layout."*
 
-Platform Views pueden causar problemas de performance y compatibilidad si no se configuran bien.
+### Incidentes reportados
+- **SDKs de pagos/KYC:** Glitches y bloqueos por hybrid composition en Android viejos; lag en scroll interrumpió checkouts.
+- **A11y/teclado:** Usuarios no pudieron completar formularios por focus y z-order incorrectos.
 
-### Evidencia de Industria
+### Analítica y prevalencia (industria)
 
-- **SDKs de pagos KYC:** Usan WebView/nativo; requieren integración cuidadosa.
-- **Flutter perf:** Hybrid composition tiene trade-offs en rendimiento/compatibilidad.
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| SDKs de pagos en móvil | Global | Requieren WebView/PlatformView con compatibilidad amplia. |
+| Flutter perf docs | Global | Hybrid vs virtual display con trade-offs de perf/compatibilidad. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; integración de vistas nativas es fuente de bugs. |
+
+**Resumen global**
+- Elegir composición por dispositivo y aislar vistas nativas con pruebas de perf/A11y evita jank y fallos en checkout.
 
 ### Riesgos
 
@@ -55,6 +68,47 @@ Platform Views pueden causar problemas de performance y compatibilidad si no se 
 | **Restricciones Duras (NO permite)** | **Android viejos:** Hybrid composition puede jankear. **Gestos superpuestos:** Requiere manejo de hit testing. **A11y:** Debe integrarse con Semantics. |
 | **Criterio de Selección** | Elegir composición según dispositivo/SO; encapsular vistas; pruebas en dispositivos representativos; fallback a WebView nativa si necesario. |
 
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Performance | FPS, jank y tiempos de render | QA/Perf |
+| Integration (Android/iOS) | Focus/teclado, gestos, z-order correctos | Móvil/QA |
+| A11y | Semantics y lector de pantalla operan | QA/Accesibilidad |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Aislamiento | Pantallas dedicadas para Platform Views críticas | Menos interferencia |
+| Fallback | Cambiar composición o WebView nativa en devices problemáticos | Disponibilidad |
+| Mensajes | Indicadores de carga y manejo de errores claros en checkout | Confianza |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Compatibilidad | Lista de dispositivos vetados o forzados a hybrid | Control de riesgo |
+| Observabilidad | Eventos `pv.*` con perf/errores | Trazabilidad |
+| Seguridad/compliance | Flujos completos del SDK de pagos sin cortes | Cumplimiento |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Embebido de SDKs de pagos con Platform Views provoca jank/bugs de layout. |
+| Opciones evaluadas | WebView simple; PlatformView por defecto; Platform Views optimizadas con composición por dispositivo y aislamientos. |
+| Decisión | Platform Views optimizadas (hybrid/virtual según device), aislamiento de pantalla, manejo de focus/A11y y fallback. |
+| Consecuencias | Matriz de compatibilidad y pruebas de perf; mantenimiento de políticas por device. |
+| Riesgos aceptados | Variabilidad en dispositivos; overhead de pruebas de perf. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Tiempos de render/FPS en checkout | p95 estable | Warning si jank > umbral | UX fluida |
+| Errores de focus/teclado | 0 | Crítico si >0 | Accesibilidad |
+| Abandono en checkout | ↓ vs baseline | Alerta si no baja | Conversión |
+| Incidentes por dispositivo | Tendencia a la baja | Crítico si sube | Compatibilidad |
+
 ---
 
 ## Glosario de Términos Clave
@@ -75,3 +129,4 @@ Platform Views pueden causar problemas de performance y compatibilidad si no se 
 
 - [Platform Views](https://docs.flutter.dev/development/platform-integration/platform-views)
 - [Hybrid Composition vs Virtual Display](https://docs.flutter.dev/development/platform-integration/android/platform-views#performance)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)

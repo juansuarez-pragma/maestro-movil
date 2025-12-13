@@ -16,16 +16,29 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- `local_auth` no cubre liveness avanzado ni SDKs certificados; riesgo de bypass.
+- Integraciones sin callbacks tipados rompen flujos (cámara/micrófono) y causan crashes.
+- Sin manejo de permisos y performance, la UX se degrada y el SDK pierde precisión.
+
 ### Escenario de Negocio
 
 > *"Como app, necesito combinar biometrías avanzadas (face/voice) con SDKs certificados sin romper Flutter."*
 
-Biometrías avanzadas requieren flujos nativos, liveness y callbacks complejos.
+### Incidentes reportados
+- **SDKs certificados (iBeta/NIST):** Integraciones incompletas fallaron en pruebas de liveness.
+- **Apps financieras:** Sin step-up adecuado, se aprobaron usuarios fraudulentos o se bloquearon legítimos.
 
-### Evidencia de Industria
+### Analítica y prevalencia (industria)
 
-- **SDKs certificados (iBeta/NIST):** Necesitan integración nativa controlada.
-- **Apps financieras:** Usan biometrías múltiples para step-up de riesgo.
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| iBeta/NIST PAD | Global | Exigen liveness robusto; integraciones deficientes fallan auditoría. |
+| Banca/fintech | Global | Uso de biometrías múltiples para riesgo; necesitan flujos nativos completos. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; biometría mal integrada es hallazgo común. |
+
+**Resumen global**
+- Biometría avanzada requiere wrappers nativos tipados, manejo de permisos/performance y pruebas por plataforma; soluciones genéricas dejan huecos de seguridad y UX.
 
 ### Riesgos
 
@@ -55,6 +68,47 @@ Biometrías avanzadas requieren flujos nativos, liveness y callbacks complejos.
 | **Restricciones Duras (NO permite)** | **Dependencia del SDK:** APIs y licencias específicas. **Performance:** Procesamiento pesado puede requerir optimizaciones. **Compatibilidad:** No todos los dispositivos soportan sensores avanzados. |
 | **Criterio de Selección** | Wrapper por factor, contratos claros, pruebas E2E nativas, manejo de errores y permisos explícitos. |
 
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Integration (Android/iOS) | Flujos de face/voice con callbacks tipados y permisos | Móvil/QA |
+| Seguridad | Liveness y resistencia a spoof | Seguridad |
+| Performance | Latencia y uso de CPU/GPU en dispositivos target | QA/Perf |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Guías UI | Instrucciones claras para cámara/micrófono | Reduce abandono |
+| Fallback | Step-up alternativo si sensor falla | Disponibilidad |
+| Permisos | Solicitar en contexto y justificar | Confianza |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Licencias | Validar licencias por SDK y rotación | Cumplimiento |
+| Telemetría | Eventos `bio.*` con factor/resultado/latencia | Observabilidad |
+| Compatibilidad | Matriz de dispositivos soportados y exclusiones | Previene crashes |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Biometría avanzada sin liveness robusto ni estabilidad en Flutter. |
+| Opciones evaluadas | `local_auth`; wrapper básico; wrapper tipado con liveness, permisos y pruebas por plataforma. |
+| Decisión | Wrapper robusto por factor con canales tipados, liveness y telemetría. |
+| Consecuencias | Mayor complejidad nativa y pruebas específicas; manejo de licencias. |
+| Riesgos aceptados | Dependencia de SDKs y restricciones de dispositivos. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Tasa de éxito biométrico | > 98% en dispositivos soportados | Warning si baja | UX |
+| Falsos positivos/negativos | Bajo según SDK | Crítico si sube | Seguridad |
+| Crash rate en flujos bio | Tendencia a la baja | Crítico si sube | Estabilidad |
+| Abandono en flujo bio | ↓ vs baseline | Warning si no baja | Conversión |
+
 ---
 
 ## Glosario de Términos Clave
@@ -75,3 +129,4 @@ Biometrías avanzadas requieren flujos nativos, liveness y callbacks complejos.
 
 - [local_auth](https://pub.dev/packages/local_auth)
 - [iBeta PAD](https://www.ibeta.com/pad-testing/)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)
