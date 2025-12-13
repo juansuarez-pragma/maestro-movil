@@ -16,16 +16,29 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- LWW/snapshots sin contexto pierden cambios concurrentes y dependen de reloj; carritos se corrompen al merge offline→online.
+- Sin OR-Set/G-Counter, remover/añadir items puede “resucitar” o duplicar productos.
+- Sin log de eventos ni compactación, el historial crece y dificulta auditoría/perf.
+
 ### Escenario de Negocio
 
 > *"Como usuario offline, quiero agregar/eliminar productos y que al sincronizar no se pierdan mis cambios ni se dupliquen."*
 
-Sin un mecanismo de merge determinista, los carritos se corrompen al unir cambios de múltiples nodos offline.
-
-### Evidencia de Industria
-
+### Incidentes reportados
 - **Herramientas colaborativas:** CRDT evita conflictos sin servidor central resolviendo merges conmutativos.
 - **Retail omnicanal:** Carritos multi-dispositivo sufren duplicados y pérdidas sin merge robusto.
+
+### Analítica y prevalencia (industria)
+
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| CRDT en colab retail | Global | Merges deterministas reducen pérdidas de cambios. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; sync/merge es foco de bugs. |
+| Estudios omnicanal | Ecommerce | Duplicados/pérdidas en carritos sin merge sólido. |
+
+**Resumen global**
+- CRDT/merge determinista minimiza pérdidas/duplicados; logs requieren compactación para perf.
 
 ### Riesgos
 
@@ -54,6 +67,47 @@ Sin un mecanismo de merge determinista, los carritos se corrompen al unir cambio
 | **Capacidades (SÍ permite)** | Merge determinista entre nodos sin coordinación. Idempotencia por IDs de eventos. Replay de log para reconstruir estado. Manejo de add/remove con OR-Set para evitar resurrección. |
 | **Restricciones Duras (NO permite)** | **Stock global:** El cliente no valida stock definitivo; requiere backend. **Crecimiento de log:** Necesita compactación y snapshots. **Reordenamientos semánticos:** CRDT no resuelve reglas de negocio complejas (promos). |
 | **Criterio de Selección** | OR-Set/G-Counter para items/cantidades; log en SQLite/Isar; Riverpod para exponer estado derivado. |
+
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| Unit (CI) | OR-Set/G-Counter mergea determinísticamente; add/remove sin resurrección | Equipo móvil, CI |
+| Integration (CI) | Merge multi-dispositivo/offline converge; log compacta con snapshot | Móvil/Backend, CI |
+| Observabilidad | Eventos `cart.merge` con actor/timestamp lógico; tamaño de log | Móvil/SRE |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Conflictos visibles | Mostrar si backend ajusta stock/precio | Transparencia |
+| Offline | Permitir edición; sync mostrar progreso y ajustes | UX consistente |
+| Compactación | Snapshots periódicos para startup rápido | Rendimiento |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Tombstones | Mantener para deletes; GC con TTL | Consistencia |
+| Stock | Validar stock en backend en checkout | Cliente no es verdad absoluta |
+| Crecimiento de log | Compactar; límites de tamaño | Control perf |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Pérdida/duplicación de items en carritos multi-dispositivo/offline. |
+| Opciones evaluadas | LWW/snapshot; merge manual; CRDT (OR-Set/G-Counter) + log + compactación. |
+| Decisión | CRDT OR-Set/G-Counter + log de eventos + compactación/snapshots. |
+| Consecuencias | Complejidad de modelado y almacenamiento; requiere compactación. |
+| Riesgos aceptados | Tamaño de log; reglas de negocio (promos) requieren validación backend. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Pérdida/duplicado de items | 0 incidentes | Crítico si > 0 | Carrito confiable |
+| Convergencia de estado | 100% nodos convergen | Alerta si divergen | Consistencia |
+| Tamaño de log | Controlado (compactación) | Alerta si crece | Rendimiento |
+| Tickets por carrito inconsistente | ↓ vs baseline | Alerta si no baja | Menos soporte |
 
 ---
 
