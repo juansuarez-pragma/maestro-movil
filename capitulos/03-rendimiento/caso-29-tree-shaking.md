@@ -16,16 +16,29 @@
 
 ## 1. Planteamiento del Problema (El "Trigger")
 
+### Problema detectado (técnico)
+- Bundle grande (código + assets) aumenta abandono en descarga y empeora cold start.
+- Sin tree shaking/deferred/loading condicional, se incluye código/recursos no usados.
+- Falta de split per ABI y keep rules correctas desperdicia espacio y puede romper reflexión.
+
 ### Escenario de Negocio
 
 > *"Como usuario, quiero que la app se instale rápido y no ocupe espacio excesivo."*
 
-Bundles grandes aumentan abandono en descargas, afectan cold start y consumen almacenamiento, crucial en mercados con dispositivos de gama media/baja.
+### Incidentes reportados
+- **Mercados emergentes:** Abandono crece con apps pesadas; apps livianas mejoran adopción.
+- **Flutter perf:** Tree shaking y deferred loading reducen tamaño y mejoran arranque.
 
-### Evidencia de Industria
+### Analítica y prevalencia (industria)
 
-- **Mercados emergentes:** Tasa de abandono crece con apps pesadas; apps livianas mejoran adopción.
-- **Flutter perf:** Tree shaking y deferred loading reducen tamaño efectivo.
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| Mercado emergente (reportes varios) | LATAM/APAC | Apps pesadas incrementan abandono de instalación. |
+| Flutter app size studies | Global | Tree shaking/deferred reduce tamaño efectivo y cold start. |
+| NowSecure 2024 | 1,000+ apps móviles | 85% fallan ≥1 control MASVS; tamaño/arranque son hallazgos frecuentes. |
+
+**Resumen global**
+- Reducir bundle mejora adopción y arranque; tree shaking/deferred/split ABI son prácticas clave.
 
 ### Riesgos
 
@@ -55,6 +68,48 @@ Bundles grandes aumentan abandono en descargas, afectan cold start y consumen al
 | **Restricciones Duras (NO permite)** | **Code splitting limitado:** Flutter tiene soporte parcial; cuidado con UX en cargas diferidas. **Recursos obligatorios:** Algunas libs llevan nativo inevitable. **Riesgo de romper reflexión:** Tree shaking puede eliminar clases usadas por reflexión si no se configuran keep rules. |
 | **Criterio de Selección** | Deferred para módulos no críticos, AOT con split per ABI, assets optimizados, keep rules cuidadosas para reflexión. |
 
+### 3.1 Plan de verificación (V&V)
+| Tipo de verificación | Qué valida | Responsable/Entorno |
+|:---------------------|:-----------|:--------------------|
+| App size report | Reducción del bundle/base APK y por ABI | Equipo móvil |
+| Startup perf | Mejora en TTFF/TTI tras optimizaciones | QA/Perf |
+| Integration (CI) | Módulos deferred cargan on-demand sin romper flujo | Móvil/QA |
+| Seguridad | Keep rules no exponen/reflejan más de lo necesario | Seguridad |
+
+### 3.2 UX y operación
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Carga diferida | Módulos pesados cargados on-demand con feedback | UX consistente |
+| Assets | WebP/AVIF, fonts subset, sprites | Menos peso |
+| Split per ABI | Distribuir por arquitectura | Descarga menor |
+
+### 3.3 Operación y riesgo
+| Tema | Política | Nota |
+|:-----|:--------|:-----|
+| Dependencias | Auditar libs pesadas; remover no usadas | Tamaño controlado |
+| Reflexión | Configurar keep rules para frameworks con reflexión | Evita crashes |
+| Monitoreo | Vigilar tamaño en cada release | Previene regresiones |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Bundle grande reduce adopción y arranque. |
+| Opciones evaluadas | Sin optimizar; minificar assets; tree shaking + deferred + split ABI. |
+| Decisión | Tree shaking + deferred imports + assets optimizados + split ABI + keep rules. |
+| Consecuencias | Más pasos de build/release; riesgo de romper reflexión si se omiten keep rules. |
+| Riesgos aceptados | Soporte limitado de code splitting; UX de carga diferida debe ser clara. |
+
+---
+
+## 4. Impacto esperado (vista rápida)
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Tamaño de app/base APK | Reducción ≥ objetivo (p.ej., -20-40%) | Alerta si crece | Mejor adopción |
+| TTFF/TTI | Mejora tras reducción de bundle | Warning si no mejora | Arranque más rápido |
+| Tamaño por ABI | Distribución separada (split) | Alerta si se entrega universal pesada | Menor descarga |
+| Cargas diferidas | Sin bloqueos; feedback visible | Alerta si causa UX mala | Flujo estable |
+
 ---
 
 ## Glosario de Términos Clave
@@ -68,6 +123,7 @@ Bundles grandes aumentan abandono en descargas, afectan cold start y consumen al
 | Split per ABI | Generar APKs/artefactos por arquitectura para reducir tamaño. |
 | R8/ProGuard | Herramientas de minificación/obfuscación para código nativo. |
 | Asset Optimization | Reducir tamaño y formatos de recursos (imágenes, fuentes). |
+| Keep Rules | Configuración para preservar clases/métodos usados por reflexión. |
 
 ---
 
@@ -76,3 +132,4 @@ Bundles grandes aumentan abandono en descargas, afectan cold start y consumen al
 - [Flutter App Size Reduction](https://docs.flutter.dev/perf/app-size)
 - [Deferred Loading in Dart](https://dart.dev/guides/libraries/deferred-loading)
 - [R8/ProGuard Rules](https://developer.android.com/studio/build/shrink-code)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)
