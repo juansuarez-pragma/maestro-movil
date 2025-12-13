@@ -34,6 +34,19 @@
 - **EventBot (2020):** Troyano Android que abusó accesibilidad para capturar credenciales/PIN de 200+ apps bancarias en Europa/América.
 - **Kaspersky (2023):** 29% del malware bancario móvil usa keylogging o screen capture como vector principal.
 
+### Analítica y prevalencia (industria)
+
+| Fuente | Muestra / Región | Hallazgos relevantes |
+|:-------|:-----------------|:---------------------|
+| NowSecure State of Mobile App Security (2024) | 1,000+ apps móviles (US/EU) | 85% fallan ≥1 control MASVS; entrada segura/anti-captura es un fallo recurrente. |
+| Kaspersky Mobile Threats (2023) | Global (énfasis LATAM/APAC) | 29% del malware bancario móvil usa keylogging o screen capture. |
+| CASB/MDM enterprise reports (2022) | Flotas Android corporativas | ~10-15% de dispositivos con teclados de terceros activos; riesgo de exfiltración de entradas. |
+
+**Resumen global**
+- Keylogging/screen capture es uno de los vectores principales de malware bancario (≈30% de muestras).
+- Alto porcentaje de apps falla en controles de entrada segura (MASVS), dejando expuesto el PIN.
+- Teclados de terceros son frecuentes en flotas (~10-15%), elevando riesgo de exfiltración.
+
 ### Riesgos
 
 | Tipo | Impacto |
@@ -71,21 +84,39 @@
 | Observabilidad | Evento `pin.entry` con métricas (reintentos, overlay_detected) sin capturar PIN | Móvil/SRE, CI |
 
 ### 3.2 UX, accesibilidad y privacidad
-- Mensajes claros si se detecta overlay o screen capture; CTA para cerrar apps superpuestas.
-- Limitar reintentos y mostrar contador de intentos; feedback háptico opcional para usabilidad.
-- No persistir PIN; hash en memoria temporal y limpieza tras uso.
+| Tema | Política | Nota |
+|:-----|:---------|:-----|
+| Mensajes/overlays | Mensaje claro si se detecta overlay/screen capture; CTA para cerrar apps superpuestas | Reduce riesgo de tapjacking y mejora comprensión |
+| Reintentos | Limitar reintentos y mostrar contador; feedback háptico opcional | Control de uso indebido y mejor UX |
+| Manejo de PIN | No persistir PIN; hash en memoria temporal y limpiar tras uso | Minimiza superficie de fuga |
 
 ### 3.3 Operación y seguridad
-- FLAG_SECURE obligatorio en todas las vistas que muestran o capturan PIN.
-- Keypad se re-aleatoriza en cada apertura y tras cada intento fallido.
-- Monitoreo de `overlay_detected` y `accessibility_detected` con alerta si se disparan en producción (>1% sesiones).
+| Tema | Política | Umbral/Alerta |
+|:-----|:--------|:--------------|
+| FLAG_SECURE | Obligatorio en todas las vistas de PIN | Alerta si vista sin FLAG_SECURE |
+| Aleatorización | Re-aleatorizar keypad en cada apertura y tras cada intento fallido | Evita patrones y replay visual |
+| Monitoreo | `overlay_detected` y `accessibility_detected` alertan si > 1% sesiones | SOC investiga anomalías |
+
+### 3.4 Mini-ADR (Decisión de Arquitectura)
+| Aspecto | Detalle |
+|:--------|:--------|
+| Problema | Teclados/overlays/recordings pueden exfiltrar PIN; input estándar no ofrece protección. |
+| Opciones evaluadas | Teclado sistema con obscure; custom keypad fijo; SecurePinPad con scramble, FLAG_SECURE, overlay detection. |
+| Decisión | SecurePinPad con scramble aleatorio, FLAG_SECURE, detección de overlay, timeout y hash local. |
+| Consecuencias | Mayor esfuerzo UI y pruebas en múltiples OEMs; dependencia de policies de accesibilidad. |
+| Riesgos aceptados | ROMs que deshabilitan FLAG_SECURE; accesibilidad maliciosa con permisos elevados. |
 
 ---
 
 ## 4. Impacto esperado
-- Reducción de capturas de PIN por malware/keylogging ≥ 80%.
-- Tasa de reintentos promedio ≤ 1.2; tiempo de ingreso p95 < 8 s.
-- Incidentes de soporte por bloqueo de teclado ↓ 20%; eventos de overlay detectados alertados al SOC.
+
+| KPI | Objetivo | Umbral/Alerta | Impacto esperado |
+|:----|:---------|:--------------|:-----------------|
+| Captura de PIN por malware/keylogging | Reducción ≥ 80% | Alertar si no mejora tras rollout | Fraude contenido |
+| Reintentos promedio | ≤ 1.2 | Alerta si > 1.2 | Mejor UX y menos soporte |
+| Tiempo de ingreso p95 | < 8 s | Warning si se aproxima | Conversión y experiencia |
+| Eventos overlay/accessibility | < 1% de sesiones | Alerta si ≥ 1% | Detección temprana de tapjacking/abuso |
+| Tickets de soporte (teclado) | ↓ 20% | Alertar si no baja | Costos de soporte controlados |
 
 ---
 
@@ -112,6 +143,8 @@
 - [Android FLAG_SECURE Documentation](https://developer.android.com/reference/android/view/WindowManager.LayoutParams#FLAG_SECURE)
 - [iOS Screen Recording Detection](https://developer.apple.com/documentation/uikit/uiscreen/2921651-iscaptured)
 - [PCI-DSS Requirements for PIN Security](https://www.pcisecuritystandards.org/)
+- [NowSecure - State of Mobile App Security 2024](https://www.nowsecure.com/blog/2024/04/state-of-mobile-app-security-2024/)
+- [Kaspersky - Mobile Threats 2023](https://securelist.com/mobile-malware-evolution-2023/111742/)
 
 ---
 
